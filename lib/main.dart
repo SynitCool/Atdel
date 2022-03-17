@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:atdel_application/pages/permission_pages.dart';
+import 'package:atdel/pages/permission_pages.dart';
 
 void main() {
   runApp(const App());
