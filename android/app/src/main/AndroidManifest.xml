@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.atdel_application">
+
+    <!-- Permission of internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Permission of camera group -->
+    <uses-permission android:name="android.permission.CAMERA"/>
    <application
         android:label="atdel_application"
         android:icon="@mipmap/ic_launcher">
@@ -40,5 +46,6 @@
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ica, face" />
+        
     </application>
 </manifest>
