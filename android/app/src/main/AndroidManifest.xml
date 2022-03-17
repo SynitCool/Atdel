@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.atdel_application">
+    package="com.synit.atdel">
 
     <!-- Permission of internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -7,7 +7,7 @@
     <!-- Permission of camera group -->
     <uses-permission android:name="android.permission.CAMERA"/>
    <application
-        android:label="atdel_application"
+        android:label="Atdel"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
