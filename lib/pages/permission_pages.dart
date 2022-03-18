@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:atdel_application/pages/home_pages.dart';
+import 'package:atdel/pages/signin_pages.dart';
 
 class PermissionPages extends StatefulWidget {
   const PermissionPages({Key? key}) : super(key: key);
@@ -134,7 +134,7 @@ class _PermissionPagesState extends State<PermissionPages> {
 
       debugPrint(singleStatus);
 
-      if (singleStatus == "granted") return const HomePage();
+      if (singleStatus == "granted") return const SignInPage();
 
       return buildWidget();
     } catch (e) {

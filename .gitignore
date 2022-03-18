@@ -47,4 +47,4 @@ app.*.map.json
 
 # Other
 .vscode
-
+google-services.json

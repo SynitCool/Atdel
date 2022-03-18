@@ -1,4 +1,4 @@
-package com.example.atdel_application
+package com.synit.atdel
 
 import io.flutter.embedding.android.FlutterActivity
 

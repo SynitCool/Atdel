@@ -8,7 +8,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   // appbar widget
   PreferredSizeWidget appBarWidget() {
     Widget appBarSettings = IconButton(
@@ -40,16 +39,14 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
 class DrawerWidget extends StatefulWidget {
-  const DrawerWidget({ Key? key }) : super(key: key);
+  const DrawerWidget({Key? key}) : super(key: key);
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-
   Widget materialHeader() {
     return InkWell(
         onTap: () {},
@@ -74,7 +71,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         onTap: onClicked);
   }
 
-
   Widget materialDrawer() {
     const Color color = Color.fromRGBO(50, 75, 205, 1);
     const Widget space12 = SizedBox(height: 12);
@@ -88,18 +84,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     final Widget settingButton = materialHeaderButton(
         text: "Setting", icon: Icons.settings, onClicked: () {});
 
-    List<Widget> materialDrawerButtons = 
-    [
-      space24, 
-      divider70, 
-      space12, 
-      homeButton, 
-      space16, 
+    List<Widget> materialDrawerButtons = [
+      space24,
+      divider70,
+      space12,
+      homeButton,
+      space16,
       settingButton,
       space24,
       divider70,
       space12
-      ];
+    ];
 
     List<Widget> materialDrawerWidget = [
       materialHeader(),
