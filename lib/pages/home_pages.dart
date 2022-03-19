@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:atdel/pages/settings_pages.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -19,9 +21,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   // appbar widget
-  PreferredSizeWidget appBarWidget() {
+  PreferredSizeWidget appBarWidget(BuildContext context) {
     Widget appBarSettings = IconButton(
-      onPressed: () {},
+      onPressed: () {Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsPages())));},
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
     );
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: const DrawerWidget(),
-        appBar: appBarWidget(),
+        appBar: appBarWidget(context),
         body: Center(child: Image.network(user!.photoURL!)),
         floatingActionButton: addRoomButton());
   }

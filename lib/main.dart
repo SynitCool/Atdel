@@ -19,6 +19,6 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => GoogleSignInProvider(),
-        child: const MaterialApp(title: "Atdel", home: PermissionPages()));
+        child: MaterialApp(title: "Atdel", home: PermissionPages("start")));
   }
 }
