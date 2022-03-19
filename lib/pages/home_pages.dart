@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -8,6 +9,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late User? user;
+
+  @override
+  void initState() {
+    super.initState();
+
+    user = FirebaseAuth.instance.currentUser;
+  }
+
   // appbar widget
   PreferredSizeWidget appBarWidget() {
     Widget appBarSettings = IconButton(
@@ -35,6 +45,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         drawer: const DrawerWidget(),
         appBar: appBarWidget(),
+        body: Center(child: Image.network(user!.photoURL!)),
         floatingActionButton: addRoomButton());
   }
 }
