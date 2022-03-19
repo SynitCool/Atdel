@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:atdel/pages/signin_pages.dart';
+import 'package:atdel/pages/home_pages.dart';
 
 class PermissionPages extends StatefulWidget {
   const PermissionPages({Key? key}) : super(key: key);
@@ -134,7 +136,23 @@ class _PermissionPagesState extends State<PermissionPages> {
 
       debugPrint(singleStatus);
 
-      if (singleStatus == "granted") return const SignInPage();
+      if (singleStatus == "granted") {
+        return StreamBuilder(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasData) {
+                return const HomePage();
+              } else if (snapshot.hasError) {
+                return const Center(
+                  child: Text("Something went wrong!"),
+                );
+              } else {
+                return const SignInPage();
+              }
+            });
+      }
 
       return buildWidget();
     } catch (e) {
