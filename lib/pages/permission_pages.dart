@@ -5,8 +5,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:atdel/pages/signin_pages.dart';
 import 'package:atdel/pages/home_pages.dart';
 
+// ignore: must_be_immutable
 class PermissionPages extends StatefulWidget {
-  const PermissionPages({Key? key}) : super(key: key);
+  String type;
+
+  PermissionPages(this.type, {Key? key}) : super(key: key);
 
   @override
   State<PermissionPages> createState() => _PermissionPagesState();
@@ -134,8 +137,6 @@ class _PermissionPagesState extends State<PermissionPages> {
     try {
       String singleStatus = statusPermissions.single;
 
-      debugPrint(singleStatus);
-
       if (singleStatus == "granted") {
         return StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
@@ -162,6 +163,10 @@ class _PermissionPagesState extends State<PermissionPages> {
 
   @override
   Widget build(BuildContext context) {
-    return switchPages();
+    if (widget.type == "run") {
+      return buildWidget();
+    } else {
+      return switchPages();
+    }
   }
 }
