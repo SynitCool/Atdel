@@ -23,7 +23,10 @@ class _HomePageState extends State<HomePage> {
   // appbar widget
   PreferredSizeWidget appBarWidget(BuildContext context) {
     Widget appBarSettings = IconButton(
-      onPressed: () {Navigator.push(context, MaterialPageRoute(builder: ((context) => const SettingsPages())));},
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: ((context) => const SettingsPages())));
+      },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
     );
@@ -45,33 +48,77 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const DrawerWidget(),
+        drawer: DrawerWidget(user!),
         appBar: appBarWidget(context),
         body: Center(child: Image.network(user!.photoURL!)),
         floatingActionButton: addRoomButton());
   }
 }
 
+// ignore: must_be_immutable
 class DrawerWidget extends StatefulWidget {
-  const DrawerWidget({Key? key}) : super(key: key);
+  User user;
+
+  DrawerWidget(this.user, {Key? key}) : super(key: key);
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-  Widget materialHeader() {
-    return InkWell(
-        onTap: () {},
-        child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            child: const Text("Atdel Demo",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold))));
+  late String name;
+  late String email;
+  late String urlImage;
+
+  @override
+  void initState() {
+    super.initState();
+
+    name = widget.user.displayName!;
+    email = widget.user.email!;
+    urlImage = widget.user.photoURL!;
   }
 
+  // header in drawer type material
+  Widget materialHeader({
+    required String urlImage,
+    required String name,
+    required String email,
+  }) {
+    const padding = EdgeInsets.symmetric(horizontal: 20);
+    final CircleAvatar avatarPicture =
+        CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage));
+    const SizedBox spaceWidth20 = SizedBox(width: 20);
+    const SizedBox spaceHeight4 = SizedBox(height: 4);
+
+    Widget avatarInfoWidget =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+        name,
+        style: const TextStyle(fontSize: 20, color: Colors.white),
+      ),
+      spaceHeight4,
+      Text(
+        email,
+        style: const TextStyle(fontSize: 14, color: Colors.white),
+      ),
+    ]);
+
+    return InkWell(
+      onTap: () {},
+      child: Container(
+          padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
+          child: Row(
+            children: [
+              avatarPicture,
+              spaceWidth20,
+              avatarInfoWidget,
+            ],
+          )),
+    );
+  }
+
+  // button in header type material
   Widget materialHeaderButton(
       {required String text, required IconData icon, VoidCallback? onClicked}) {
     const color = Colors.white;
@@ -84,6 +131,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         onTap: onClicked);
   }
 
+  // drawer widget type material
   Widget materialDrawer() {
     const Color color = Color.fromRGBO(50, 75, 205, 1);
     const Widget space12 = SizedBox(height: 12);
@@ -98,9 +146,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         text: "Setting", icon: Icons.settings, onClicked: () {});
 
     List<Widget> materialDrawerButtons = [
-      space24,
-      divider70,
       space12,
+      divider70,
+      space24,
       homeButton,
       space16,
       settingButton,
@@ -110,7 +158,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ];
 
     List<Widget> materialDrawerWidget = [
-      materialHeader(),
+      materialHeader(urlImage: urlImage, name: name, email: email),
       Container(
         padding: padding,
         child: Column(
