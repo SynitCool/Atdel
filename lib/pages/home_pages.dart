@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:atdel/pages/settings_pages.dart';
+import 'package:atdel/pages/user_pages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -80,7 +81,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   // header in drawer type material
-  Widget materialHeader({
+  Widget materialHeader(
+    BuildContext context, {
     required String urlImage,
     required String name,
     required String email,
@@ -105,7 +107,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ]);
 
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => UserPage(widget.user)));
+      },
       child: Container(
           padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
           child: Row(
@@ -158,7 +163,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ];
 
     List<Widget> materialDrawerWidget = [
-      materialHeader(urlImage: urlImage, name: name, email: email),
+      materialHeader(context, urlImage: urlImage, name: name, email: email),
       Container(
         padding: padding,
         child: Column(
