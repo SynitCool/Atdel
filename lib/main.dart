@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:atdel/pages/permission_pages.dart';
 
-void main() {
+import 'package:atdel/pages/permission_pages.dart';
+import 'package:atdel/authentication/firebase_authentication.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(const App());
 }
 
@@ -10,6 +18,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: "Atdel", home: PermissionPages());
+    return ChangeNotifierProvider(
+      create: (context) => GoogleSignInProvider(), 
+      child: const MaterialApp(title: "Atdel", home: PermissionPages()));
   }
 }
