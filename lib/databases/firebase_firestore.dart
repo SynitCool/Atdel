@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Room {
   String id;
   final Map<String, dynamic> info;
-  final List<Map<dynamic, dynamic>> users;
+  final List<Map<String, dynamic>> users;
 
   Room({this.id = "", required this.info, required this.users});
 
@@ -17,7 +17,7 @@ class Room {
       Map<String, dynamic> sign = {};
 
       users[i].forEach((key, value) {
-        if (key == "name") {
+        if (key == "user_uid") {
           name = value;
         } else {
           sign[key] = value;
