@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:atdel/pages/settings_pages.dart';
 import 'package:atdel/pages/user_pages.dart';
+import 'package:atdel/pages/create_room_pages.dart';
 
-import 'package:atdel/databases/firebase_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -43,13 +43,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // add room button
+  Widget addRoomButton(BuildContext context) {
+    return FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CreateRoomPage(user!)));
+        },
+        tooltip: "add room",
+        child: const Icon(Icons.add));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: DrawerWidget(user!),
         appBar: appBarWidget(context),
         body: Center(child: Image.network(user!.photoURL!)),
-        floatingActionButton: AddRoomButton(user!));
+        floatingActionButton: addRoomButton(context));
   }
 }
 
@@ -179,46 +190,5 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     return Drawer(child: materialDrawer());
-  }
-}
-
-// ignore: must_be_immutable
-class AddRoomButton extends StatefulWidget {
-  User user;
-
-  AddRoomButton(this.user, {Key? key}) : super(key: key);
-
-  @override
-  State<AddRoomButton> createState() => _AddRoomButtonState();
-}
-
-class _AddRoomButtonState extends State<AddRoomButton> {
-  void onPressed() {
-    final Map<String, dynamic> info = {
-      "host_name": "test",
-      "members_number": 1,
-      "name": "test_room"
-    };
-
-    final List<Map<dynamic, dynamic>> users = [
-      {"name": "a", "1": DateTime.now()},
-      {"name": "b", "1": false}
-    ];
-
-    final Room room = Room(info: info, users: users);
-
-    room.createRoom();
-  }
-
-  Widget button() {
-    return FloatingActionButton(
-        onPressed: onPressed,
-        tooltip: "add room",
-        child: const Icon(Icons.add));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return button();
   }
 }
