@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:atdel/databases/firebase_firestore.dart';
+
+import 'package:atdel/databases/firebase_firestore.dart' as model;
 
 // ignore: must_be_immutable
 class CreateRoomPage extends StatefulWidget {
@@ -68,7 +69,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       }
     ];
 
-    final Room room = Room(info: info, users: users);
+    final model.Room room = model.Room(info: info, users: users);
 
     Navigator.pop(context);
 
