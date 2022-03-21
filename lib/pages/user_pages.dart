@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import 'package:atdel/authentication/firebase_authentication.dart';
 
 // ignore: must_be_immutable
 class UserPage extends StatefulWidget {
@@ -67,8 +70,10 @@ class _UserPageState extends State<UserPage> {
 
     final Widget signOutButton = ListTile(
         onTap: () async {
-          await FirebaseAuth.instance.signOut();
+          final provider =
+              Provider.of<GoogleSignInProvider>(context, listen: false);
 
+          provider.googleLogout();
 
           Navigator.pop(context);
         },

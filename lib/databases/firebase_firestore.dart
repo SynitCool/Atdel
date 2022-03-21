@@ -73,3 +73,39 @@ class Room {
     return newRoom;
   }
 }
+
+class User {
+  final String uid;
+  final Map<String, dynamic> info;
+  final List<String> rooms;
+
+  User({required this.uid, required this.info, required this.rooms});
+
+  Map<String, dynamic> toJson() => {"id": uid, "info": info, "rooms": rooms};
+
+  Future createAccount() async {
+    final docRoom = FirebaseFirestore.instance.collection("users").doc(uid);
+
+    final Map<String, dynamic> user = toJson();
+
+    bool docExists = await checkAccountExists(uid);
+
+    if (docExists) return;
+
+
+    await docRoom.set(user);
+  }
+
+  // checking the account exist
+  Future<bool> checkAccountExists(String docId) async {
+    try {
+      final collectionRef = FirebaseFirestore.instance.collection("users");
+
+      final doc = await collectionRef.doc(docId).get();
+
+      return doc.exists;
+    } catch (e) {
+      rethrow;
+    }
+  }
+}

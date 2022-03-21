@@ -1,4 +1,3 @@
-import 'package:atdel/databases/firebase_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:atdel/pages/settings_pages.dart';
 import 'package:atdel/pages/user_pages.dart';
 import 'package:atdel/pages/create_room_pages.dart';
+
+import 'package:atdel/databases/firebase_firestore.dart' as model;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -89,11 +90,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   // rooms widgets
-  Widget roomsWidget(BuildContext context, List<Room> data) {
+  Widget roomsWidget(BuildContext context, List<model.Room> data) {
     Widget contentScene = ListView.builder(
         itemCount: data.length,
         itemBuilder: ((context, index) {
-          final Room currentData = data[index];
+          final model.Room currentData = data[index];
 
           final String roomTitle = currentData.info["room_name"];
           final String hostName = currentData.info["host_name"];
@@ -109,13 +110,13 @@ class _HomePageState extends State<HomePage> {
     const Widget errorScene = Center(child: Text("ERROR"));
     const Widget loadingScene = Center(child: CircularProgressIndicator());
 
-    Stream<List<Room>> readRoom = FirebaseFirestore.instance
+    Stream<List<model.Room>> readRoom = FirebaseFirestore.instance
         .collection("rooms")
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => Room.fromJson(doc.data())).toList());
+            snapshot.docs.map((doc) => model.Room.fromJson(doc.data())).toList());
 
-    return StreamBuilder<List<Room>>(
+    return StreamBuilder<List<model.Room>>(
       stream: readRoom,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
