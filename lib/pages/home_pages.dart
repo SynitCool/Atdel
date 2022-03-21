@@ -1,10 +1,11 @@
+import 'package:atdel/databases/firebase_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:atdel/pages/settings_pages.dart';
 import 'package:atdel/pages/user_pages.dart';
 import 'package:atdel/pages/create_room_pages.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -54,12 +55,89 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add));
   }
 
+  // room button Widget
+  Widget roomButtonWidget({
+    required String roomTitle,
+    required String hostName,
+  }) {
+    const EdgeInsets cardPadding =
+        EdgeInsets.symmetric(vertical: 10, horizontal: 20);
+    const EdgeInsets titlePadding = EdgeInsets.fromLTRB(0, 10, 0, 30);
+    const IconData icon = Icons.meeting_room;
+    final ShapeBorder shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    );
+
+    final Widget textRoomTitle = Text(roomTitle);
+    final Widget textHostName = Text(hostName);
+
+    return Card(
+        margin: cardPadding,
+        shape: shape,
+        child: ListTile(
+          onTap: () {},
+          leading: const Icon(icon),
+          title:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(padding: titlePadding, child: textRoomTitle),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: textHostName,
+            )
+          ]),
+        ));
+  }
+
+  // rooms widgets
+  Widget roomsWidget(BuildContext context, List<Room> data) {
+    Widget contentScene = ListView.builder(
+        itemCount: data.length,
+        itemBuilder: ((context, index) {
+          final Room currentData = data[index];
+
+          final String roomTitle = currentData.info["room_name"];
+          final String hostName = currentData.info["host_name"];
+
+          return roomButtonWidget(roomTitle: roomTitle, hostName: hostName);
+        }));
+
+    return contentScene;
+  }
+
+  // room streaming builder widget
+  Widget roomStreamBuilderWidget() {
+    const Widget errorScene = Center(child: Text("ERROR"));
+    const Widget loadingScene = Center(child: CircularProgressIndicator());
+
+    Stream<List<Room>> readRoom = FirebaseFirestore.instance
+        .collection("rooms")
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Room.fromJson(doc.data())).toList());
+
+    return StreamBuilder<List<Room>>(
+      stream: readRoom,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loadingScene;
+        }
+        if (snapshot.hasError) return errorScene;
+
+        final rooms = snapshot.data!;
+
+        if (rooms.isEmpty) return const Center(child: Text("No rooms"));
+
+        return roomsWidget(context, rooms);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: DrawerWidget(user!),
         appBar: appBarWidget(context),
-        body: Center(child: Image.network(user!.photoURL!)),
+        body: roomStreamBuilderWidget(),
         floatingActionButton: addRoomButton(context));
   }
 }
@@ -75,6 +153,7 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  // user profile
   late String name;
   late String email;
   late String urlImage;
@@ -146,6 +225,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   // drawer widget type material
   Widget materialDrawer() {
+    // widget parameters
     const Color color = Color.fromRGBO(50, 75, 205, 1);
     const Widget space12 = SizedBox(height: 12);
     const Widget space24 = SizedBox(height: 24);
@@ -153,11 +233,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     const Widget divider70 = Divider(color: Colors.white70);
     const EdgeInsets padding = EdgeInsets.symmetric(horizontal: 20);
 
+    // widget
     final Widget homeButton =
         materialHeaderButton(text: "Home", icon: Icons.home, onClicked: () {});
     final Widget settingButton = materialHeaderButton(
         text: "Setting", icon: Icons.settings, onClicked: () {});
 
+    // content button widgets
     List<Widget> materialDrawerButtons = [
       space12,
       divider70,
@@ -167,9 +249,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       settingButton,
       space24,
       divider70,
-      space12
+      space12,
     ];
 
+    // content drawer widgets
     List<Widget> materialDrawerWidget = [
       materialHeader(context, urlImage: urlImage, name: name, email: email),
       Container(
@@ -177,9 +260,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         child: Column(
           children: materialDrawerButtons,
         ),
-      )
+      ),
     ];
 
+    // the background widget
     return Material(
         color: color,
         child: ListView(
