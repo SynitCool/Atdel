@@ -48,4 +48,28 @@ class Room {
 
     await docRoom.set(room);
   }
+
+  static Room fromJson(Map<String, dynamic> json) {
+    List<Map<String, dynamic>> users = [];
+    Map<String, dynamic> info = json["info"];
+    String id = json["id"];
+
+    json.forEach((key, value) {
+      if (key == "info" || key == "id") return;
+
+      Map<String, dynamic> user = {};
+
+      user["user_name"] = json[key]["user_name"];
+      user["user_email"] = json[key]["user_email"];
+      user["user_uid"] = json[key]["user_uid"];
+      user["user_image_url"] = json[key]["user_image_url"];
+      user["type"] = json[key]["type"];
+
+      users.add(user);
+    });
+
+    final Room newRoom = Room(info: info, id: id, users: users);
+
+    return newRoom;
+  }
 }

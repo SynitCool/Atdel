@@ -70,9 +70,9 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
     final Room room = Room(info: info, users: users);
 
-    await room.createRoom();
-
     Navigator.pop(context);
+
+    await room.createRoom();
   }
 
   // app bar widget
