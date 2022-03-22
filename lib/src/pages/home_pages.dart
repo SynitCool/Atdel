@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:atdel/pages/settings_pages.dart';
-import 'package:atdel/pages/user_pages.dart';
-import 'package:atdel/pages/create_room_pages.dart';
+import 'package:atdel/src/pages/settings_pages.dart';
+import 'package:atdel/src/pages/user_pages.dart';
+import 'package:atdel/src/pages/create_room_pages.dart';
 
-import 'package:atdel/databases/firebase_firestore.dart' as model;
+import 'package:atdel/src/databases/firebase_firestore.dart' as model;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

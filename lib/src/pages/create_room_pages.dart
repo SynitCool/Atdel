@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:atdel/databases/firebase_firestore.dart' as model;
+import 'package:atdel/src/databases/firebase_firestore.dart' as model;
 
 // ignore: must_be_immutable
 class CreateRoomPage extends StatefulWidget {
