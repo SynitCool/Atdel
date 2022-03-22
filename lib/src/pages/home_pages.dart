@@ -65,11 +65,24 @@ class ContentPage extends StatefulWidget {
 }
 
 class _ContentPageState extends State<ContentPage> {
+  // room snapshots
+  final Stream<List<model.Room>> readRoom = FirebaseFirestore.instance
+        .collection("rooms")
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => model.Room.fromJson(doc.data()))
+            .toList());
+
+  // widgets scene
+  final Widget errorScene = const Center(child: Text("ERROR"));
+  final Widget loadingScene = const Center(child: CircularProgressIndicator());
+
   // room button Widget
   Widget roomButtonWidget({
     required String roomTitle,
     required String hostName,
   }) {
+
     const EdgeInsets cardPadding =
         EdgeInsets.symmetric(vertical: 10, horizontal: 20);
     const EdgeInsets titlePadding = EdgeInsets.fromLTRB(0, 10, 0, 30);
@@ -94,14 +107,16 @@ class _ContentPageState extends State<ContentPage> {
               alignment: Alignment.bottomRight,
               child: textHostName,
             )
-          ]),
-        ));
+          ]
+        ),
+      )
+    );
   }
 
 
   // rooms widgets
   Widget roomsWidget(BuildContext context, List<model.Room> data) {
-    Widget contentScene = ListView.builder(
+    return ListView.builder(
         itemCount: data.length,
         itemBuilder: ((context, index) {
           final model.Room currentData = data[index];
@@ -110,43 +125,33 @@ class _ContentPageState extends State<ContentPage> {
           final String hostName = currentData.info["host_name"];
 
           return roomButtonWidget(roomTitle: roomTitle, hostName: hostName);
-        }));
-
-    return contentScene;
-  }
-
-  // room streaming builder widget
-  Widget roomStreamBuilderWidget() {
-    const Widget errorScene = Center(child: Text("ERROR"));
-    const Widget loadingScene = Center(child: CircularProgressIndicator());
-
-    Stream<List<model.Room>> readRoom = FirebaseFirestore.instance
-        .collection("rooms")
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => model.Room.fromJson(doc.data()))
-            .toList());
-
-    return StreamBuilder<List<model.Room>>(
-      stream: readRoom,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return loadingScene;
         }
-        if (snapshot.hasError) return errorScene;
-
-        final rooms = snapshot.data!;
-
-        if (rooms.isEmpty) return const Center(child: Text("No rooms"));
-
-        return roomsWidget(context, rooms);
-      },
+      )
     );
   }
 
+  // builder function
+  Widget builderFunction(context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+          return loadingScene;
+        }
+
+    if (snapshot.hasError) return errorScene;
+
+    final rooms = snapshot.data!;
+
+    if (rooms.isEmpty) return const Center(child: Text("No rooms"));
+
+    return roomsWidget(context, rooms);
+  }
+
+  // build content widget
   @override
   Widget build(BuildContext context) {
-    return roomStreamBuilderWidget();
+    return StreamBuilder<List<model.Room>>(
+      stream: readRoom,
+      builder: builderFunction,
+    );
   }
 }
 
