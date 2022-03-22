@@ -77,35 +77,57 @@ class Room {
 class User {
   final String uid;
   final Map<String, dynamic> info;
-  final List<String> rooms;
+  final List<dynamic> rooms;
 
   User({required this.uid, required this.info, required this.rooms});
 
+  // converts to json
   Map<String, dynamic> toJson() => {"id": uid, "info": info, "rooms": rooms};
 
-  Future createAccount() async {
-    final docRoom = FirebaseFirestore.instance.collection("users").doc(uid);
+  // converts from json to user object
+  static User fromJson(Map<String, dynamic>? json) =>
+      User(uid: json!["id"], info: json["info"], rooms: json["rooms"]);
 
-    final Map<String, dynamic> user = toJson();
+  // check account
+  Future<User> checkAccount() async {
+    final CollectionReference<Map<String, dynamic>> userCollection =
+        FirebaseFirestore.instance.collection("users");
 
-    bool docExists = await checkAccountExists(uid);
+    // check the uid is exist
+    final DocumentSnapshot<Map<String, dynamic>> doc =
+        await userCollection.doc(uid).get();
+    final bool docExists = doc.exists;
 
-    if (docExists) return;
+    if (docExists) {
+      final User user = fromJson(doc.data());
 
+      return user;
+    } else {
+      final Map<String, dynamic> userJson = toJson();
 
-    await docRoom.set(user);
+      await userCollection.doc(uid).set(userJson);
+
+      return this;
+    }
   }
 
-  // checking the account exist
-  Future<bool> checkAccountExists(String docId) async {
-    try {
-      final collectionRef = FirebaseFirestore.instance.collection("users");
+  // check account stream
+  static Stream<User?> checkAccountStream(String uid) async* {
+    final CollectionReference<Map<String, dynamic>> userCollection =
+        FirebaseFirestore.instance.collection("users");
 
-      final doc = await collectionRef.doc(docId).get();
+    // check the uid is exist
+    final DocumentSnapshot<Map<String, dynamic>> doc =
+        await userCollection.doc(uid).get();
+    final bool docExists = doc.exists;
 
-      return doc.exists;
-    } catch (e) {
-      rethrow;
+    if (docExists) {
+      final User user = fromJson(doc.data());
+
+      yield user;
+    } else {
+
+      yield null;
     }
   }
 }

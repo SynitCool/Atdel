@@ -5,6 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:atdel/src/pages/signin_pages.dart';
 import 'package:atdel/src/pages/home_pages.dart';
 
+import 'package:atdel/src/databases/firebase_firestore.dart' as model;
+
 // ignore: must_be_immutable
 class PermissionPages extends StatefulWidget {
   String type;
@@ -19,6 +21,12 @@ class _PermissionPagesState extends State<PermissionPages> {
   List<dynamic> permissions = [Permission.camera];
   List<String> namePermissions = ["Camera"];
   List<String> statusPermissions = ["denied"];
+
+  Widget loadingScene =
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
+
+  Widget errorScene =
+      const Scaffold(body: Center(child: Text("Something went wrong!")));
 
   @override
   void initState() {
@@ -132,41 +140,83 @@ class _PermissionPagesState extends State<PermissionPages> {
     return Scaffold(appBar: appBarWidget(), body: contentWidget());
   }
 
-  // check and move to home pages
-  Widget switchPages() {
-    try {
-      String singleStatus = statusPermissions.single;
-
-      if (singleStatus == "granted") {
-        return StreamBuilder(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasData) {
-                return const HomePage();
-              } else if (snapshot.hasError) {
-                return const Center(
-                  child: Text("Something went wrong!"),
-                );
-              } else {
-                return const SignInPage();
-              }
-            });
-      }
-
-      return buildWidget();
-    } catch (e) {
-      return buildWidget();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.type == "run") {
       return buildWidget();
     } else {
-      return switchPages();
+      return SwitchPages(statusPermissions, buildWidget());
     }
+  }
+}
+
+// ignore: must_be_immutable
+class SwitchPages extends StatefulWidget {
+  List<dynamic> statusPermissions;
+  Widget buildWidget;
+
+  SwitchPages(this.statusPermissions, this.buildWidget,{Key? key}) : super(key: key);
+
+  @override
+  State<SwitchPages> createState() => _SwitchPagesState();
+}
+
+class _SwitchPagesState extends State<SwitchPages> {
+  // scenes widget
+  Widget loadingScene =
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
+
+  Widget errorScene =
+      const Scaffold(body: Center(child: Text("Something went wrong!")));
+
+  // check permission
+  Widget checkingPermission() {
+    try {
+      String singleStatus = widget.statusPermissions.single;
+
+      if (singleStatus == "granted") {
+        return streamFirebaseAuth();
+      }
+
+      return widget.buildWidget;
+    } catch (e) {
+      return widget.buildWidget;
+    }
+  }
+
+  // stream builder user databaser
+  Widget streamUserDatabase(String uid) {
+    return StreamBuilder<model.User?>(
+      stream: model.User.checkAccountStream(uid),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) return HomePage(snapshot.data!);
+
+        return loadingScene;
+      },
+    );
+  }
+
+  // stream builder firebase auth
+  Widget streamFirebaseAuth() {
+    return StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          } else if (snapshot.hasData) {
+            final userFirebaseUid = snapshot.data!.uid;
+
+            return streamUserDatabase(userFirebaseUid);
+          } else if (snapshot.hasError) {
+            return errorScene;
+          } else {
+            return const SignInPage();
+          }
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return checkingPermission();
   }
 }
