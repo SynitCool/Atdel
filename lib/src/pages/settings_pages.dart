@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:atdel/src/pages/permission_pages.dart';
-import 'package:atdel/src/pages/signin_pages.dart';
 
 class SettingsPages extends StatelessWidget {
   const SettingsPages({Key? key}) : super(key: key);
@@ -24,15 +23,8 @@ class SettingsPages extends StatelessWidget {
         },
         leading: const Icon(Icons.perm_media_rounded),
         title: const Text("Permission"));
-    final Widget signinButton = ListTile(
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const SignInPage()));
-        },
-        leading: const Icon(Icons.login),
-        title: const Text("Sign in"));
 
-    List<Widget> buttons = [signinButton, permissionButton];
+    List<Widget> buttons = [permissionButton];
 
     return Container(
       padding: padding,
