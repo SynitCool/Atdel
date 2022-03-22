@@ -8,8 +8,12 @@ import 'package:atdel/src/pages/create_room_pages.dart';
 
 import 'package:atdel/src/databases/firebase_firestore.dart' as model;
 
+// home page
+// ignore: must_be_immutable
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  model.User userDatabase;
+
+  HomePage(this.userDatabase, {Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -52,37 +56,54 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         drawer: DrawerWidget(context),
         appBar: appBarWidget(context),
-        body: const ContentPage(),
+        body: ContentPage(context, widget.userDatabase),
         floatingActionButton: addRoomButton(context));
   }
 }
 
+// content page
+// ignore: must_be_immutable
 class ContentPage extends StatefulWidget {
-  const ContentPage({ Key? key }) : super(key: key);
+  BuildContext context;
+  model.User userDatabase;
+
+  ContentPage(this.context, this.userDatabase, {Key? key}) : super(key: key);
 
   @override
   State<ContentPage> createState() => _ContentPageState();
 }
 
 class _ContentPageState extends State<ContentPage> {
-  // room snapshots
-  final Stream<List<model.Room>> readRoom = FirebaseFirestore.instance
-        .collection("rooms")
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => model.Room.fromJson(doc.data()))
-            .toList());
+  // user profile
+  late String userUid;
+
+  // stream
+  late Stream<List<model.Room>> readRoom;
+
+  // user
+  final User? user = FirebaseAuth.instance.currentUser;
 
   // widgets scene
   final Widget errorScene = const Center(child: Text("ERROR"));
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
+
+  @override
+  void initState() {
+    super.initState();
+
+    readRoom = FirebaseFirestore.instance.collection("rooms")
+        .snapshots()
+        .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => model.Room.fromJson(doc.data()))
+            .toList());
+  }
 
   // room button Widget
   Widget roomButtonWidget({
     required String roomTitle,
     required String hostName,
   }) {
-
     const EdgeInsets cardPadding =
         EdgeInsets.symmetric(vertical: 10, horizontal: 20);
     const EdgeInsets titlePadding = EdgeInsets.fromLTRB(0, 10, 0, 30);
@@ -107,12 +128,9 @@ class _ContentPageState extends State<ContentPage> {
               alignment: Alignment.bottomRight,
               child: textHostName,
             )
-          ]
-        ),
-      )
-    );
+          ]),
+        ));
   }
-
 
   // rooms widgets
   Widget roomsWidget(BuildContext context, List<model.Room> data) {
@@ -125,16 +143,14 @@ class _ContentPageState extends State<ContentPage> {
           final String hostName = currentData.info["host_name"];
 
           return roomButtonWidget(roomTitle: roomTitle, hostName: hostName);
-        }
-      )
-    );
+        }));
   }
 
   // builder function
   Widget builderFunction(context, snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
-          return loadingScene;
-        }
+      return loadingScene;
+    }
 
     if (snapshot.hasError) return errorScene;
 
@@ -155,12 +171,12 @@ class _ContentPageState extends State<ContentPage> {
   }
 }
 
-
+// drawer widget
 // ignore: must_be_immutable
 class DrawerWidget extends StatefulWidget {
   BuildContext context;
 
-  DrawerWidget(this.context,{Key? key}) : super(key: key);
+  DrawerWidget(this.context, {Key? key}) : super(key: key);
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
@@ -172,7 +188,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   late String email;
   late String urlImage;
 
-  // user 
+  // user
   final User? user = FirebaseAuth.instance.currentUser;
 
   @override
@@ -212,8 +228,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
     return InkWell(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => UserPage(user!)));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => UserPage(user!)));
       },
       child: Container(
           padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
@@ -252,8 +268,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
     // widget
     final Widget settingButton = materialHeaderButton(
-        text: "Setting", icon: Icons.settings, onClicked: () {
-          Navigator.push(widget.context, MaterialPageRoute(builder: (context) => const SettingsPages()));
+        text: "Setting",
+        icon: Icons.settings,
+        onClicked: () {
+          Navigator.push(widget.context,
+              MaterialPageRoute(builder: (context) => const SettingsPages()));
         });
 
     // content button widgets

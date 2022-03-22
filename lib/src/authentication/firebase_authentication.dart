@@ -8,9 +8,12 @@ class GoogleSignInProvider extends ChangeNotifier {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   GoogleSignInAccount? _user;
+  model.User? _currentUserModel;
 
   GoogleSignInAccount? get user => _user;
+  model.User? get currentUserModel => _currentUserModel;
 
+  // google login
   Future googleLogin() async {
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
@@ -26,20 +29,24 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     await FirebaseAuth.instance.signInWithCredential(credential);
 
-    await addToDatabase();
+    await checkUserDatabase();
 
     notifyListeners();
   }
 
+  // google logout
   Future googleLogout() async {
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
   }
 
-  Future addToDatabase() async {
+  // add user in database
+  Future checkUserDatabase() async {
+    // user
     final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
+    // user profile
     final String firebaseUserUid = firebaseUser!.uid;
     final String? firebaseUserDisplayName = firebaseUser.displayName;
     final String? firebaseUserEmail = firebaseUser.email;
@@ -56,11 +63,14 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     final List<String> rooms = [];
 
+    // user model
     final model.User userModel =
         model.User(uid: firebaseUserUid, info: firebaseUserInfo, rooms: rooms);
 
     userModel.toJson();
 
-    userModel.createAccount();
+    _currentUserModel = await userModel.checkAccount();
+
+    notifyListeners();
   }
 }
