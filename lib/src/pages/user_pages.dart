@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-import 'package:atdel/authentication/firebase_authentication.dart';
+import 'package:atdel/src/authentication/firebase_authentication.dart';
 
 // ignore: must_be_immutable
 class UserPage extends StatefulWidget {

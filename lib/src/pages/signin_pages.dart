@@ -1,4 +1,4 @@
-import 'package:atdel/authentication/firebase_authentication.dart';
+import 'package:atdel/src/authentication/firebase_authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
