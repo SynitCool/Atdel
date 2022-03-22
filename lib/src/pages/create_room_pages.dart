@@ -4,17 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:atdel/src/databases/firebase_firestore.dart' as model;
 
-// ignore: must_be_immutable
-class CreateRoomPage extends StatefulWidget {
-  User user;
 
-  CreateRoomPage(this.user, {Key? key}) : super(key: key);
+class CreateRoomPage extends StatefulWidget {
+  const CreateRoomPage({Key? key}) : super(key: key);
 
   @override
   State<CreateRoomPage> createState() => _CreateRoomPageState();
 }
 
 class _CreateRoomPageState extends State<CreateRoomPage> {
+  // user related
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  // widget related
   final TextEditingController nameTextFieldController = TextEditingController();
   String nameText = '';
 
@@ -44,10 +46,10 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     if (nameText.length < 4) return;
 
     final String roomName = nameText;
-    final String? hostName = widget.user.displayName;
-    final String? hostEmail = widget.user.email;
-    final String? hostUid = widget.user.uid;
-    final String? hostImageUrl = widget.user.photoURL;
+    final String? hostName = user!.displayName;
+    final String? hostEmail = user!.email;
+    final String? hostUid = user!.uid;
+    final String? hostImageUrl = user!.photoURL;
     const int memberCounts = 1;
 
     final Map<String, dynamic> info = {
