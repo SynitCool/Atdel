@@ -7,6 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:atdel/src/pages/settings_pages.dart';
 import 'package:atdel/src/pages/user_pages.dart';
 import 'package:atdel/src/pages/create_room_pages.dart';
+import 'package:atdel/src/pages/join_room_page.dart';
+
+import 'package:fab_circular_menu/fab_circular_menu.dart';
 
 // home page
 // ignore: must_be_immutable
@@ -40,13 +43,34 @@ class _HomePageState extends State<HomePage> {
 
   // add room button
   Widget addRoomButton(BuildContext context) {
-    return FloatingActionButton(
+    // fab parameters
+    const Widget fabOpenIcon = Icon(Icons.menu, color: Colors.white);
+    const Color fabOpenColor = Colors.white;
+
+    // fab widget button
+    Widget iconCreateRoomButton = IconButton(
+        tooltip: "Create Room",
+        icon: const Icon(Icons.create, color: Colors.white),
         onPressed: () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const CreateRoomPage()));
-        },
-        tooltip: "add room",
-        child: const Icon(Icons.add));
+        });
+
+    Widget iconJoinRoomButton = IconButton(
+        tooltip: "Join Room",
+        icon: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const JoinRoomPage()));
+        });
+
+    return FabCircularMenu(
+        fabOpenColor: fabOpenColor,
+        fabSize: 64.0,
+        ringDiameter: 250,
+        ringWidth: 70,
+        fabOpenIcon: fabOpenIcon,
+        children: <Widget>[iconCreateRoomButton, iconJoinRoomButton]);
   }
 
   @override
@@ -157,7 +181,9 @@ class _ContentPageState extends State<ContentPage> {
 
     final rooms = snapshot.data.docs;
 
-    if (rooms.isEmpty || rooms == null) return const Center(child: Text("No rooms"));
+    if (rooms.isEmpty || rooms == null) {
+      return const Center(child: Text("No rooms"));
+    }
 
     return roomsWidget(context, rooms);
   }
