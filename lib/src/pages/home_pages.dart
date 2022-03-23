@@ -8,14 +8,10 @@ import 'package:atdel/src/pages/settings_pages.dart';
 import 'package:atdel/src/pages/user_pages.dart';
 import 'package:atdel/src/pages/create_room_pages.dart';
 
-import 'package:atdel/src/databases/firebase_firestore.dart' as model;
-
 // home page
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
-  model.User userDatabase;
-
-  HomePage(this.userDatabase, {Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -58,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         drawer: DrawerWidget(context),
         appBar: appBarWidget(context),
-        body: ContentPage(context, widget.userDatabase),
+        body: ContentPage(context),
         floatingActionButton: addRoomButton(context));
   }
 }
@@ -67,9 +63,8 @@ class _HomePageState extends State<HomePage> {
 // ignore: must_be_immutable
 class ContentPage extends StatefulWidget {
   BuildContext context;
-  model.User userDatabase;
 
-  ContentPage(this.context, this.userDatabase, {Key? key}) : super(key: key);
+  ContentPage(this.context, {Key? key}) : super(key: key);
 
   @override
   State<ContentPage> createState() => _ContentPageState();
@@ -77,10 +72,11 @@ class ContentPage extends StatefulWidget {
 
 class _ContentPageState extends State<ContentPage> {
   // user profile
+  late String userRoomsCollection;
   late String userUid;
 
   // stream
-  late Stream<List<model.Room>> readRoom;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> readRoom;
 
   // user
   final User? user = FirebaseAuth.instance.currentUser;
@@ -93,31 +89,12 @@ class _ContentPageState extends State<ContentPage> {
   void initState() {
     super.initState();
 
-    debugPrint(widget.userDatabase.toString());
+    userUid = user!.uid;
 
-    readRoom = FirebaseFirestore.instance.collection("rooms").snapshots().map(
-        (snapshot) => snapshot.docs
-            .map((doc) => model.Room.fromJson(doc.data()))
-            .toList());
-  }
+    userRoomsCollection = "users/$userUid/rooms";
 
-  // stream local rooms
-  Stream<model.Room?> streamLocalRoom() async* {
-    final List<dynamic> rooms = widget.userDatabase.rooms;
-
-    if (rooms.isEmpty) yield null;
-
-    for (int i = 0; i < rooms.length; i++) {
-      final DocumentReference<Map<String, dynamic>> room = rooms[i];
-
-      final DocumentSnapshot<Map<String, dynamic>> getRoom = await room.get();
-
-      final Map<String, dynamic>? roomJson = getRoom.data();
-
-      final model.Room modelRoom = model.Room.fromJson(roomJson!);
-
-      yield modelRoom;
-    }
+    readRoom =
+        FirebaseFirestore.instance.collection(userRoomsCollection).snapshots();
   }
 
   // room button Widget
@@ -158,10 +135,13 @@ class _ContentPageState extends State<ContentPage> {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: ((context, index) {
-          final model.Room currentData = data[index];
+          final currentDoc = data[index];
+          final currentData = currentDoc.data();
 
-          final String roomTitle = currentData.info["room_name"];
-          final String hostName = currentData.info["host_name"];
+          final infoRoom = currentData["info_room"];
+
+          final String roomTitle = infoRoom["room_name"];
+          final String hostName = infoRoom["host_name"];
 
           return roomButtonWidget(roomTitle: roomTitle, hostName: hostName);
         }));
@@ -175,25 +155,18 @@ class _ContentPageState extends State<ContentPage> {
 
     if (snapshot.hasError) return errorScene;
 
-    final rooms = snapshot.data;
+    final rooms = snapshot.data.docs;
 
-    if (rooms == null) return const Center(child: Text("No rooms"));
+    if (rooms.isEmpty || rooms == null) return const Center(child: Text("No rooms"));
 
-    // if (rooms.isEmpty) return const Center(child: Text("No rooms"));
-
-    // return roomsWidget(context, rooms);
-
-    return loadingScene;
+    return roomsWidget(context, rooms);
   }
 
   // build content widget
   @override
   Widget build(BuildContext context) {
-    // return Center(
-    //   child: CircularProgressIndicator(),
-    // );
-    return StreamBuilder<model.Room?>(
-      stream: streamLocalRoom(),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: readRoom,
       builder: builderFunction,
     );
   }

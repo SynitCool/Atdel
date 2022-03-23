@@ -61,11 +61,9 @@ class GoogleSignInProvider extends ChangeNotifier {
       "is_anonymous": firebaseUserIsAnonymous
     };
 
-    final List<String> rooms = [];
-
     // user model
     final model.User userModel =
-        model.User(uid: firebaseUserUid, info: firebaseUserInfo, rooms: rooms);
+        model.User(uid: firebaseUserUid, info: firebaseUserInfo);
 
     userModel.toJson();
 

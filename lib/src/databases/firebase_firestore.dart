@@ -1,92 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fire_auth;
 
 class Room {
   String id;
-  final Map<String, dynamic> info;
-  final List<Map<String, dynamic>> users;
+  final Map<String, dynamic> infoRoom;
+  final List<Map<String, dynamic>> infoUsers;
 
-  Room({this.id = "", required this.info, required this.users});
+  Room({this.id = "", required this.infoRoom, required this.infoUsers});
 
-  Map<String, dynamic> toJson() {
-    Map<String, Map<String, dynamic>> usersToMap = {};
-    Map<String, dynamic> output = {};
+  Map<String, dynamic> toJson() =>
+      {"id": id, "info_room": infoRoom, "info_users": infoUsers};
 
-    for (int i = 0; i < users.length; i++) {
-      String name = '';
-      Map<String, dynamic> sign = {};
+  Future createRoom(fire_auth.User currentUser) async {
+    final String userUid = currentUser.uid;
 
-      users[i].forEach((key, value) {
-        if (key == "user_uid") {
-          name = value;
-        } else {
-          sign[key] = value;
-        }
-      });
+    final CollectionReference<Map<String, dynamic>> userRooms =
+        FirebaseFirestore.instance.collection("users/$userUid/rooms");
 
-      usersToMap[name] = sign;
-    }
+    final DocumentReference<Map<String, dynamic>> docUserRooms =
+        userRooms.doc();
 
-    output["info"] = info;
-    output["id"] = id;
-
-    usersToMap.forEach((key, value) {
-      output[key] = value;
-    });
-
-    debugPrint(output.toString());
-
-    return output;
-  }
-
-  Future createRoom() async {
-    final docRoom = FirebaseFirestore.instance.collection("rooms").doc();
-
-    id = docRoom.id;
+    id = docUserRooms.id;
 
     final room = toJson();
 
-    await docRoom.set(room);
+    await docUserRooms.set(room);
   }
 
-  static Room fromJson(Map<String, dynamic> json) {
-    List<Map<String, dynamic>> users = [];
-    Map<String, dynamic> info = json["info"];
-    String id = json["id"];
-
-    json.forEach((key, value) {
-      if (key == "info" || key == "id") return;
-
-      Map<String, dynamic> user = {};
-
-      user["user_name"] = json[key]["user_name"];
-      user["user_email"] = json[key]["user_email"];
-      user["user_uid"] = json[key]["user_uid"];
-      user["user_image_url"] = json[key]["user_image_url"];
-      user["type"] = json[key]["type"];
-
-      users.add(user);
-    });
-
-    final Room newRoom = Room(info: info, id: id, users: users);
-
-    return newRoom;
-  }
+  static Room fromJson(Map<String, dynamic> json) => Room(
+      id: json["id"],
+      infoRoom: json["info_room"],
+      infoUsers: json["info_users"]);
 }
 
 class User {
   final String uid;
   final Map<String, dynamic> info;
-  final List<dynamic> rooms;
 
-  User({required this.uid, required this.info, required this.rooms});
+  User({required this.uid, required this.info});
 
   // converts to json
-  Map<String, dynamic> toJson() => {"id": uid, "info": info, "rooms": rooms};
+  Map<String, dynamic> toJson() => {"id": uid, "info": info};
 
   // converts from json to user object
   static User fromJson(Map<String, dynamic>? json) =>
-      User(uid: json!["id"], info: json["info"], rooms: json["rooms"]);
+      User(uid: json!["id"], info: json["info"]);
 
   // check account
   Future<User> checkAccount() async {

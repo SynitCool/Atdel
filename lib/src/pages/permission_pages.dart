@@ -5,8 +5,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:atdel/src/pages/signin_pages.dart';
 import 'package:atdel/src/pages/home_pages.dart';
 
-import 'package:atdel/src/databases/firebase_firestore.dart' as model;
-
 // ignore: must_be_immutable
 class PermissionPages extends StatefulWidget {
   String type;
@@ -185,18 +183,6 @@ class _SwitchPagesState extends State<SwitchPages> {
     }
   }
 
-  // stream builder user databaser
-  Widget streamUserDatabase(String uid) {
-    return StreamBuilder<model.User>(
-      stream: model.User.checkAccountStream(uid),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) return HomePage(snapshot.data!);
-
-        return loadingScene;
-      },
-    );
-  }
-
   // stream builder firebase auth
   Widget streamFirebaseAuth() {
     return StreamBuilder<User?>(
@@ -205,9 +191,7 @@ class _SwitchPagesState extends State<SwitchPages> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
           } else if (snapshot.hasData) {
-            final userFirebaseUid = snapshot.data?.uid;
-
-            return streamUserDatabase(userFirebaseUid!);
+            return const HomePage();
           } else if (snapshot.hasError) {
             return errorScene;
           } else {
