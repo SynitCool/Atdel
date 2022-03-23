@@ -112,22 +112,23 @@ class User {
   }
 
   // check account stream
-  static Stream<User?> checkAccountStream(String uid) async* {
+  static Stream<User> checkAccountStream(String uid) async* {
     final CollectionReference<Map<String, dynamic>> userCollection =
         FirebaseFirestore.instance.collection("users");
 
-    // check the uid is exist
-    final DocumentSnapshot<Map<String, dynamic>> doc =
-        await userCollection.doc(uid).get();
-    final bool docExists = doc.exists;
+    bool docExists = false;
 
-    if (docExists) {
-      final User user = fromJson(doc.data());
+    while (!docExists) {
+      // check the uid is exist
+      final DocumentSnapshot<Map<String, dynamic>> doc =
+          await userCollection.doc(uid).get();
+      docExists = doc.exists;
 
-      yield user;
-    } else {
+      if (docExists) {
+        final User user = fromJson(doc.data());
 
-      yield null;
+        yield user;
+      }
     }
   }
 }

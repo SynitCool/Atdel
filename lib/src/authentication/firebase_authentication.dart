@@ -29,7 +29,7 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     await FirebaseAuth.instance.signInWithCredential(credential);
 
-    await checkUserDatabase();
+    await addUserDatabase();
 
     notifyListeners();
   }
@@ -42,7 +42,7 @@ class GoogleSignInProvider extends ChangeNotifier {
   }
 
   // add user in database
-  Future checkUserDatabase() async {
+  Future addUserDatabase() async {
     // user
     final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
