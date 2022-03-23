@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:atdel/src/databases/firebase_firestore.dart' as model;
 
-
 class CreateRoomPage extends StatefulWidget {
   const CreateRoomPage({Key? key}) : super(key: key);
 
@@ -42,6 +41,8 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
   // create room
   Future createRoom(BuildContext context) async {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
     if (nameText.isEmpty) return;
     if (nameText.length < 4) return;
 
@@ -52,7 +53,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     final String? hostImageUrl = user!.photoURL;
     const int memberCounts = 1;
 
-    final Map<String, dynamic> info = {
+    final Map<String, dynamic> infoRoom = {
       "room_name": roomName,
       "host_name": hostName,
       "host_email": hostEmail,
@@ -61,7 +62,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       "member_counts": memberCounts
     };
 
-    final List<Map<String, dynamic>> users = [
+    final List<Map<String, dynamic>> infoUsers = [
       {
         "user_name": hostName,
         "user_email": hostEmail,
@@ -71,11 +72,11 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       }
     ];
 
-    final model.Room room = model.Room(info: info, users: users);
+    final model.Room room = model.Room(infoRoom: infoRoom, infoUsers: infoUsers);
 
     Navigator.pop(context);
 
-    await room.createRoom();
+    await room.createRoom(currentUser!);
   }
 
   // app bar widget
