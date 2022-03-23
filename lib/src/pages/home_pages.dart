@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -91,12 +93,31 @@ class _ContentPageState extends State<ContentPage> {
   void initState() {
     super.initState();
 
-    readRoom = FirebaseFirestore.instance.collection("rooms")
-        .snapshots()
-        .map(
+    debugPrint(widget.userDatabase.toString());
+
+    readRoom = FirebaseFirestore.instance.collection("rooms").snapshots().map(
         (snapshot) => snapshot.docs
             .map((doc) => model.Room.fromJson(doc.data()))
             .toList());
+  }
+
+  // stream local rooms
+  Stream<model.Room?> streamLocalRoom() async* {
+    final List<dynamic> rooms = widget.userDatabase.rooms;
+
+    if (rooms.isEmpty) yield null;
+
+    for (int i = 0; i < rooms.length; i++) {
+      final DocumentReference<Map<String, dynamic>> room = rooms[i];
+
+      final DocumentSnapshot<Map<String, dynamic>> getRoom = await room.get();
+
+      final Map<String, dynamic>? roomJson = getRoom.data();
+
+      final model.Room modelRoom = model.Room.fromJson(roomJson!);
+
+      yield modelRoom;
+    }
   }
 
   // room button Widget
@@ -133,7 +154,7 @@ class _ContentPageState extends State<ContentPage> {
   }
 
   // rooms widgets
-  Widget roomsWidget(BuildContext context, List<model.Room> data) {
+  Widget roomsWidget(BuildContext context, List<dynamic> data) {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: ((context, index) {
@@ -154,18 +175,25 @@ class _ContentPageState extends State<ContentPage> {
 
     if (snapshot.hasError) return errorScene;
 
-    final rooms = snapshot.data!;
+    final rooms = snapshot.data;
 
-    if (rooms.isEmpty) return const Center(child: Text("No rooms"));
+    if (rooms == null) return const Center(child: Text("No rooms"));
 
-    return roomsWidget(context, rooms);
+    // if (rooms.isEmpty) return const Center(child: Text("No rooms"));
+
+    // return roomsWidget(context, rooms);
+
+    return loadingScene;
   }
 
   // build content widget
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<model.Room>>(
-      stream: readRoom,
+    // return Center(
+    //   child: CircularProgressIndicator(),
+    // );
+    return StreamBuilder<model.Room?>(
+      stream: streamLocalRoom(),
       builder: builderFunction,
     );
   }

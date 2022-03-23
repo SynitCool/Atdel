@@ -155,7 +155,8 @@ class SwitchPages extends StatefulWidget {
   List<dynamic> statusPermissions;
   Widget buildWidget;
 
-  SwitchPages(this.statusPermissions, this.buildWidget,{Key? key}) : super(key: key);
+  SwitchPages(this.statusPermissions, this.buildWidget, {Key? key})
+      : super(key: key);
 
   @override
   State<SwitchPages> createState() => _SwitchPagesState();
@@ -186,7 +187,7 @@ class _SwitchPagesState extends State<SwitchPages> {
 
   // stream builder user databaser
   Widget streamUserDatabase(String uid) {
-    return StreamBuilder<model.User?>(
+    return StreamBuilder<model.User>(
       stream: model.User.checkAccountStream(uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) return HomePage(snapshot.data!);
@@ -204,9 +205,9 @@ class _SwitchPagesState extends State<SwitchPages> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
           } else if (snapshot.hasData) {
-            final userFirebaseUid = snapshot.data!.uid;
+            final userFirebaseUid = snapshot.data?.uid;
 
-            return streamUserDatabase(userFirebaseUid);
+            return streamUserDatabase(userFirebaseUid!);
           } else if (snapshot.hasError) {
             return errorScene;
           } else {
