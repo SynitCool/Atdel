@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:atdel/src/pages/host_room_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -122,7 +123,8 @@ class _ContentPageState extends State<ContentPage> {
   }
 
   // room button Widget
-  Widget roomButtonWidget({
+  Widget roomButtonWidget(
+    BuildContext context, {
     required String roomTitle,
     required String hostName,
   }) {
@@ -141,7 +143,11 @@ class _ContentPageState extends State<ContentPage> {
         margin: cardPadding,
         shape: shape,
         child: ListTile(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const HostRoomPages())
+            );
+          },
           leading: const Icon(icon),
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -167,7 +173,7 @@ class _ContentPageState extends State<ContentPage> {
           final String roomTitle = infoRoom["room_name"];
           final String hostName = infoRoom["host_name"];
 
-          return roomButtonWidget(roomTitle: roomTitle, hostName: hostName);
+          return roomButtonWidget(context, roomTitle: roomTitle, hostName: hostName);
         }));
   }
 
