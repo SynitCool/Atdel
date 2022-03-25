@@ -1,4 +1,3 @@
-import 'package:atdel/src/pages/user_pages.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,6 +32,15 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     borderRadius: BorderRadius.all(Radius.circular(16)),
   );
 
+  // widgets bottom navigation bar
+  final List<Widget> featurePage = [
+    const HomeScreen(),
+    const AttedanceListScreen()
+  ];
+  final List<IconData> iconsPage = [Icons.home, Icons.people];
+
+  int bottomNavIndex = 0;
+
   // controller
   final AdvancedDrawerController _advancedDrawerController =
       AdvancedDrawerController();
@@ -45,6 +53,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     infoRoom = widget.currentData["info_room"];
   }
 
+  // the appbar
   PreferredSizeWidget appBar() {
     Widget leading = IconButton(
       onPressed: () {
@@ -67,8 +76,38 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     return AppBar(title: const Text("Host Room Control"), leading: leading);
   }
 
+  // the screen of feature
   Widget mainContentWidget() {
-    return Scaffold(appBar: appBar());
+    return Scaffold(
+      appBar: appBar(),
+      body: featurePage[bottomNavIndex],
+      bottomNavigationBar: bottomNavigationBar(),
+    );
+  }
+
+  // bottom navigation bar
+  Widget bottomNavigationBar() {
+    return AnimatedBottomNavigationBar.builder(
+      leftCornerRadius: 32,
+      rightCornerRadius: 32,
+      gapLocation: GapLocation.center,
+      notchSmoothness: NotchSmoothness.defaultEdge,
+      splashSpeedInMilliseconds: 300,
+      splashColor: Colors.amberAccent,
+      elevation: 200,
+      itemCount: featurePage.length,
+      activeIndex: bottomNavIndex,
+      onTap: (int index) {
+        setState(() {
+          bottomNavIndex = index;
+        });
+      },
+      tabBuilder: (int index, bool isActive) {
+        final Color color = isActive ? Colors.amberAccent : Colors.black;
+
+        return Icon(iconsPage[index], color: color);
+      },
+    );
   }
 
   @override
@@ -206,7 +245,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       alignment: Alignment.centerLeft,
       child: Text(
         "Members",
-        style: TextStyle(color: Colors.black38, fontWeight: FontWeight.bold, fontSize: 12),
+        style: TextStyle(
+            color: Colors.black38, fontWeight: FontWeight.bold, fontSize: 12),
       ),
     );
 
@@ -281,18 +321,32 @@ class _FloatingActionButtonWidgetState
   }
 }
 
-// bottom navigation bar
-class BottomNavigationBarWidget extends StatefulWidget {
-  const BottomNavigationBarWidget({Key? key}) : super(key: key);
+// home page
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({ Key? key }) : super(key: key);
 
   @override
-  State<BottomNavigationBarWidget> createState() =>
-      _BottomNavigationBarWidgetState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBarWidget();
+    return const Center(child: Text("Home Screen"),);
+  }
+}
+
+// attendance list screen
+class AttedanceListScreen extends StatefulWidget {
+  const AttedanceListScreen({ Key? key }) : super(key: key);
+
+  @override
+  State<AttedanceListScreen> createState() => _AttedanceListScreenState();
+}
+
+class _AttedanceListScreenState extends State<AttedanceListScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text("Attendance List Screen"));
   }
 }
