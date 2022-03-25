@@ -124,10 +124,14 @@ class _ContentPageState extends State<ContentPage> {
 
   // room button Widget
   Widget roomButtonWidget(
-    BuildContext context, {
-    required String roomTitle,
-    required String hostName,
-  }) {
+      BuildContext context, Map<String, dynamic> currentData) {
+    // room info
+    final Map<String, dynamic> infoRoom = currentData["info_room"];
+
+    final String roomTitle = infoRoom["room_name"];
+    final String hostName = infoRoom["host_name"];
+
+    // card parameters
     const EdgeInsets cardPadding =
         EdgeInsets.symmetric(vertical: 10, horizontal: 20);
     const EdgeInsets titlePadding = EdgeInsets.fromLTRB(0, 10, 0, 30);
@@ -145,8 +149,9 @@ class _ContentPageState extends State<ContentPage> {
         child: ListTile(
           onTap: () {
             Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const HostRoomPages())
-            );
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HostRoomPages(currentData)));
           },
           leading: const Icon(icon),
           title:
@@ -166,14 +171,9 @@ class _ContentPageState extends State<ContentPage> {
         itemCount: data.length,
         itemBuilder: ((context, index) {
           final currentDoc = data[index];
-          final currentData = currentDoc.data();
+          final Map<String, dynamic> currentData = currentDoc.data();
 
-          final infoRoom = currentData["info_room"];
-
-          final String roomTitle = infoRoom["room_name"];
-          final String hostName = infoRoom["host_name"];
-
-          return roomButtonWidget(context, roomTitle: roomTitle, hostName: hostName);
+          return roomButtonWidget(context, currentData);
         }));
   }
 
