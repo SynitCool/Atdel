@@ -1,12 +1,16 @@
+import 'package:floating_action_bubble/floating_action_bubble.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 // custom widget
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 // page
 // ignore: must_be_immutable
@@ -34,10 +38,11 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    const HomeScreen(),
+    const HtmlEditorExample(),
     const AttedanceListScreen()
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
+  final List<FloatingActionButton> floatingActionButton = [];
 
   int bottomNavIndex = 0;
 
@@ -323,7 +328,7 @@ class _FloatingActionButtonWidgetState
 
 // home page
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({ Key? key }) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -332,13 +337,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Home Screen"),);
+    return const Center(
+      child: Text("Home Screen"),
+    );
   }
 }
 
 // attendance list screen
 class AttedanceListScreen extends StatefulWidget {
-  const AttedanceListScreen({ Key? key }) : super(key: key);
+  const AttedanceListScreen({Key? key}) : super(key: key);
 
   @override
   State<AttedanceListScreen> createState() => _AttedanceListScreenState();
@@ -348,5 +355,96 @@ class _AttedanceListScreenState extends State<AttedanceListScreen> {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text("Attendance List Screen"));
+  }
+}
+
+class HtmlEditorExample extends StatefulWidget {
+  const HtmlEditorExample({Key? key}) : super(key: key);
+
+  @override
+  _HtmlEditorExampleState createState() => _HtmlEditorExampleState();
+}
+
+class _HtmlEditorExampleState extends State<HtmlEditorExample>
+    with SingleTickerProviderStateMixin {
+  final HtmlEditorController controller = HtmlEditorController();
+
+  late Animation<double> _animation;
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 260),
+    );
+
+    final curvedAnimation =
+        CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
+    _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
+  }
+
+  Bubble reloadButton() {
+    return Bubble(
+        icon: Icons.refresh,
+        iconColor: Colors.white,
+        title: "Refresh",
+        titleStyle: const TextStyle(color: Colors.white),
+        bubbleColor: Colors.blue,
+        onPress: () {
+          if (kIsWeb) {
+            controller.reloadWeb();
+          } else {
+            controller.editorController!.reload();
+          }
+        });
+  }
+
+  Bubble buildButton() {
+    return Bubble(
+        icon: Icons.build,
+        iconColor: Colors.white,
+        title: "Build",
+        titleStyle: const TextStyle(color: Colors.white),
+        bubbleColor: Colors.blue,
+        onPress: () async {
+          final text = await controller.getText();
+
+          debugPrint("Text: " + text);
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (!kIsWeb) {
+          controller.clearFocus();
+        }
+      },
+      child: Scaffold(
+        floatingActionButton: FloatingActionBubble(
+            items: [
+              buildButton(),
+              reloadButton()
+            ],
+            onPress: () => _animationController.isCompleted
+                ? _animationController.reverse()
+                : _animationController.forward(),
+            iconColor: Colors.white,
+            backGroundColor: Colors.blue,
+            animation: _animation,
+            iconData: Icons.menu),
+        body: SingleChildScrollView(
+          child: HtmlEditor(
+            controller: controller,
+            htmlEditorOptions: const HtmlEditorOptions(
+              hint: 'Your text here...',
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
