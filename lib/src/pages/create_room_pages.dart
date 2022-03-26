@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:atdel/src/databases/firebase_firestore.dart' as model;
+import 'package:databases/firebase_firestore.dart' as model;
 
 class CreateRoomPage extends StatefulWidget {
   const CreateRoomPage({Key? key}) : super(key: key);
