@@ -69,13 +69,6 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
         "user_uid": hostUid,
         "user_image_url": hostImageUrl,
         "type": "Host"
-      }, 
-      {
-        "type": "member",
-        "user_email": "synit.1st@gmail.com",
-        "user_image_url": "https://lh3.googleusercontent.com/a-/AOh14GgN8a0kZxd9iloIi8T1N7oXi-1jbgm3EQsntILa=s96-c",
-        "user_name": "Synit",
-        "user_uid": "aFNAKNKCWiasbS6sTvEZCSs3Rkf1",
       }
     ];
 
