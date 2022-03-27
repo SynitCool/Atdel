@@ -1,17 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:databases/firebase_firestore.dart' as model;
-
-class GoogleSignInProvider extends ChangeNotifier {
+class GoogleSignInProvider {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   GoogleSignInAccount? _user;
-  model.User? _currentUserModel;
 
   GoogleSignInAccount? get user => _user;
-  model.User? get currentUserModel => _currentUserModel;
 
   // google login
   Future googleLogin() async {
@@ -30,13 +26,11 @@ class GoogleSignInProvider extends ChangeNotifier {
     await FirebaseAuth.instance.signInWithCredential(credential);
 
     await addUserDatabase();
-
-    notifyListeners();
   }
 
   // google logout
   Future googleLogout() async {
-    await googleSignIn.disconnect();
+    // await googleSignIn.disconnect();
     await googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
   }
@@ -61,14 +55,18 @@ class GoogleSignInProvider extends ChangeNotifier {
       "is_anonymous": firebaseUserIsAnonymous
     };
 
-    // user model
-    final model.User userModel =
-        model.User(uid: firebaseUserUid, info: firebaseUserInfo);
+    await checkAccount(uid: firebaseUserUid, userJson: firebaseUserInfo);
+  }
 
-    userModel.toJson();
+  Future checkAccount({required String uid, required Map<String, dynamic> userJson}) async {
+    final CollectionReference<Map<String, dynamic>> userCollection =
+        FirebaseFirestore.instance.collection("users");
 
-    _currentUserModel = await userModel.checkAccount();
+    // check the uid is exist
+    final DocumentSnapshot<Map<String, dynamic>> doc =
+        await userCollection.doc(uid).get();
+    final bool docExists = doc.exists;
 
-    notifyListeners();
+    if (!docExists) await userCollection.doc(uid).set(userJson);
   }
 }

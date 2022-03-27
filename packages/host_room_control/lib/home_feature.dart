@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 260),
     );
 
     final curvedAnimation =

@@ -1,8 +1,8 @@
-import 'package:atdel/src/authentication/firebase_authentication.dart';
+// import 'package:atdel/src/authentication/firebase_authentication.dart';
+import 'package:authentication/firebase_authentication.dart';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -27,9 +27,11 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
-                      final provider = Provider.of<GoogleSignInProvider>(
-                          context,
-                          listen: false);
+                      // final provider = Provider.of<GoogleSignInProvider>(
+                      //     context,
+                      //     listen: false);
+
+                      final provider = GoogleSignInProvider();
 
                       provider.googleLogin();
 

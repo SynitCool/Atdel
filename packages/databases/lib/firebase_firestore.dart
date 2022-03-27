@@ -90,3 +90,31 @@ class User {
     }
   }
 }
+
+class AttendanceList {
+  final String roomId;
+  final String userUid;
+
+  AttendanceList({required this.roomId, required this.userUid});
+
+  Future createFeature() async {
+    final String collectionPath = "users/$userUid/rooms";
+    final Map<String, dynamic> feature = {"attendance_list": []};
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(collectionPath);
+
+    final DocumentReference<Map<String, dynamic>> docCollection =
+        collection.doc(roomId);
+
+    final DocumentSnapshot<Map<String, dynamic>> getDocCollection =
+        await docCollection.get();
+
+    final Map<String, dynamic>? docCollectionData = getDocCollection.data();
+
+    final bool checkDocCollectionData =
+        docCollectionData!.containsKey("attendance_list");
+
+    if (!checkDocCollectionData) await docCollection.update(feature);
+  }
+}
