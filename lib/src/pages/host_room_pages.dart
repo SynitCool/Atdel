@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+// firebase
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 // custom widget
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
@@ -7,6 +11,8 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 // personal packages
 import 'package:host_room_control/home_feature.dart';
 import 'package:host_room_control/host_drawer.dart';
+
+import 'package:databases/firebase_firestore.dart' as model;
 
 // page
 // ignore: must_be_immutable
@@ -23,6 +29,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   // data
   late final List<dynamic> infoUsers;
   late final Map<String, dynamic> infoRoom;
+  late final String roomId;
 
   // the advanced drawer params
   final Color backdropColor = Colors.blueGrey;
@@ -35,7 +42,6 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
     const HomeScreen(),
-    const AttedanceListScreen()
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
@@ -51,6 +57,9 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
     infoUsers = widget.currentData["info_users"];
     infoRoom = widget.currentData["info_room"];
+    roomId = widget.currentData["id"];
+
+    featurePage.add(AttedanceListScreen(roomId: roomId));
   }
 
   // the appbar
@@ -125,15 +134,119 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
 // attendance list screen
 class AttedanceListScreen extends StatefulWidget {
-  const AttedanceListScreen({Key? key}) : super(key: key);
+  const AttedanceListScreen({Key? key, required this.roomId}) : super(key: key);
+
+  final String roomId;
 
   @override
   State<AttedanceListScreen> createState() => _AttedanceListScreenState();
 }
 
 class _AttedanceListScreenState extends State<AttedanceListScreen> {
+  // firebase
+  final User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+  // user profile
+  late String userUid;
+
+  // path
+  late String readAttendanceListPath;
+
+  // stream
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> readAttendanceList;
+
+  // scene
+  final Widget loadingScene = const Center(child: CircularProgressIndicator());
+  final Widget errorScene = const Center(child: Text("ERROR"));
+
+  // personal database
+  late model.AttendanceList _attendanceList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // firebase user
+    userUid = firebaseUser!.uid;
+
+    // create feature
+    _attendanceList =
+        model.AttendanceList(roomId: widget.roomId, userUid: userUid);
+
+    // read attendance list
+    readAttendanceListPath = "users/$userUid/rooms";
+
+    readAttendanceList = FirebaseFirestore.instance
+        .collection(readAttendanceListPath)
+        .doc(widget.roomId)
+        .snapshots();
+  }
+
+  // builder for read attendance list
+  Widget builderFunction(BuildContext context,
+      AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return loadingScene;
+    }
+
+    if (snapshot.hasError) return errorScene;
+
+    final Map<String, dynamic>? roomData = snapshot.data!.data();
+    final List<dynamic> attendanceListFeature = roomData!["attendance_list"];
+
+    if (attendanceListFeature.isEmpty) {
+      return const Center(child: Text("No attendance"));
+    }
+
+    return attendanceWidget(context, attendanceListFeature);
+  }
+
+  // attendance widget
+  Widget attendanceWidget(BuildContext context, List<dynamic> data) {
+    return ListView.builder(
+        itemCount: data.length,
+        itemBuilder: ((context, index) {
+          final Map<String, dynamic> currentData = data[index];
+
+          return attendanceListButtonWidget(context, currentData);
+        }));
+  }
+
+  // attendance list button widget
+  Widget attendanceListButtonWidget(
+      BuildContext context, Map<String, dynamic> currentData) {
+    // attendance list info
+    final String dateStartAttendanceList =
+        currentData["date_start"].toDate().toString();
+
+    final String dateEndAttendanceList =
+        currentData["date_end"].toDate().toString();
+
+    // widgets parameters
+    const IconData icon = Icons.date_range;
+
+    return ListTile(
+      onTap: () {},
+      leading: const Icon(icon),
+      title: Column(children: [
+        Text("Start: " + dateStartAttendanceList),
+        Text("End: " + dateEndAttendanceList)
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Attendance List Screen"));
+    return FutureBuilder(
+        future: _attendanceList.createFeature(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          return StreamBuilder(stream: readAttendanceList, builder: builderFunction);
+        });
   }
 }
