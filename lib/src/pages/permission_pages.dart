@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:atdel/src/pages/signin_pages.dart';
-import 'package:atdel/src/pages/home_pages.dart';
+import 'package:atdel/src/auth_pages/signin_pages.dart';
+import 'package:atdel/src/home_pages/home_pages.dart';
 
 // ignore: must_be_immutable
 class PermissionPages extends StatefulWidget {
