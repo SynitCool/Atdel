@@ -191,7 +191,7 @@ packages:
     source: hosted
     version: "2.3.1"
   floating_action_bubble:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: floating_action_bubble
       url: "https://pub.dartlang.org"
@@ -332,7 +332,7 @@ packages:
     source: hosted
     version: "1.1.0"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       url: "https://pub.dartlang.org"

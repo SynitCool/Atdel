@@ -97,6 +97,7 @@ class AttendanceList {
 
   AttendanceList({required this.roomId, required this.userUid});
 
+  // make attendance list feature to rooms document
   Future createFeature() async {
     final String collectionPath = "users/$userUid/rooms";
     final Map<String, dynamic> feature = {"attendance_list": []};
@@ -116,5 +117,59 @@ class AttendanceList {
         docCollectionData!.containsKey("attendance_list");
 
     if (!checkDocCollectionData) await docCollection.update(feature);
+  }
+
+  // adding attendance to document
+  Future addAttendance(DateTime startDate, DateTime endDate) async {
+    final String collectionPath = "users/$userUid/rooms";
+    final Timestamp startDateTimestamp = Timestamp.fromDate(startDate);
+    final Timestamp endDateTimestamp = Timestamp.fromDate(endDate);
+
+    Map<String, dynamic> feature = {
+      "date_end": endDateTimestamp,
+      "date_start": startDateTimestamp
+    };
+
+    List<Map<String, dynamic>> usersFeature = [];
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(collectionPath);
+
+    final DocumentReference<Map<String, dynamic>> docCollection =
+        collection.doc(roomId);
+
+    final DocumentSnapshot<Map<String, dynamic>> getDocCollection =
+        await docCollection.get();
+
+    final Map<String, dynamic>? docCollectionData = getDocCollection.data();
+
+    final List<dynamic> infoUsers = docCollectionData!["info_users"];
+
+    for (int i = 0; i < infoUsers.length; i++) {
+      final Map<String, dynamic> currentUser = infoUsers[i];
+
+      final String typeUser = currentUser["type"];
+
+      final Map<String, dynamic> currentUserFeature = {
+        "user_name": currentUser["user_name"],
+        "user_email": currentUser["user_email"],
+        "user_image_url": currentUser["user_image_url"],
+        "absent": true
+      };
+
+      if (typeUser != "Host") usersFeature.add(currentUserFeature);
+    }
+
+    feature["users"] = usersFeature;
+
+    List<dynamic> currentAttendanceList = docCollectionData["attendance_list"];
+
+    currentAttendanceList.add(feature);
+
+    final Map<String, dynamic> currentFeature = {
+      "attendance_list": currentAttendanceList
+    };
+
+    await docCollection.update(currentFeature);
   }
 }
