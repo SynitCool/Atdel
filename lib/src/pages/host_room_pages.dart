@@ -1,3 +1,4 @@
+import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 
 // firebase
@@ -11,6 +12,9 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 // personal packages
 import 'package:host_room_control/home_feature.dart';
 import 'package:host_room_control/host_drawer.dart';
+
+// attendance list feature
+import 'package:atdel/src/pages/add_attendance_list_pages.dart';
 
 import 'package:databases/firebase_firestore.dart' as model;
 
@@ -41,7 +45,8 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    const HomeScreen(),
+    // const HomeScreen(),
+    const Center(child: Text("Home Screen"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
@@ -142,7 +147,8 @@ class AttedanceListScreen extends StatefulWidget {
   State<AttedanceListScreen> createState() => _AttedanceListScreenState();
 }
 
-class _AttedanceListScreenState extends State<AttedanceListScreen> {
+class _AttedanceListScreenState extends State<AttedanceListScreen>
+    with SingleTickerProviderStateMixin {
   // firebase
   final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
@@ -154,6 +160,10 @@ class _AttedanceListScreenState extends State<AttedanceListScreen> {
 
   // stream
   late Stream<DocumentSnapshot<Map<String, dynamic>>> readAttendanceList;
+
+  // floating action button animation
+  late Animation<double> _animation;
+  late AnimationController _animationController;
 
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
@@ -169,7 +179,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen> {
     // firebase user
     userUid = firebaseUser!.uid;
 
-    // create feature
+    // create attendance object
     _attendanceList =
         model.AttendanceList(roomId: widget.roomId, userUid: userUid);
 
@@ -180,6 +190,16 @@ class _AttedanceListScreenState extends State<AttedanceListScreen> {
         .collection(readAttendanceListPath)
         .doc(widget.roomId)
         .snapshots();
+
+    // floating action button animation
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+
+    final curvedAnimation =
+        CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
+    _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
   // builder for read attendance list
@@ -235,18 +255,51 @@ class _AttedanceListScreenState extends State<AttedanceListScreen> {
     );
   }
 
+  // floating action button of attendance list screen
+  Widget floatingActionButtonWidget() {
+    // add button
+    Bubble addAttendanceButton = Bubble(
+        icon: Icons.add,
+        iconColor: Colors.white,
+        title: "Add",
+        titleStyle: const TextStyle(color: Colors.white),
+        bubbleColor: Colors.blue,
+        onPress: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddAttendanceListPage(
+                        roomId: widget.roomId,
+                        userUid: userUid,
+                      )));
+        });
+
+    return FloatingActionBubble(
+        items: [addAttendanceButton],
+        onPress: () => _animationController.isCompleted
+            ? _animationController.reverse()
+            : _animationController.forward(),
+        iconColor: Colors.white,
+        backGroundColor: Colors.blue,
+        animation: _animation,
+        iconData: Icons.menu);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _attendanceList.createFeature(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
+    return Scaffold(
+        floatingActionButton: floatingActionButtonWidget(),
+        body: FutureBuilder(
+            future: _attendanceList.createFeature(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return loadingScene;
+              }
 
-          if (snapshot.hasError) return errorScene;
+              if (snapshot.hasError) return errorScene;
 
-          return StreamBuilder(stream: readAttendanceList, builder: builderFunction);
-        });
+              return StreamBuilder(
+                  stream: readAttendanceList, builder: builderFunction);
+            }));
   }
 }
