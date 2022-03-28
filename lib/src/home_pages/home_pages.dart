@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:atdel/src/pages/host_room_pages.dart';
+import 'package:atdel/src/host_room_control_pages/host_room_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:atdel/src/pages/settings_pages.dart';
-import 'package:atdel/src/pages/user_pages.dart';
-import 'package:atdel/src/pages/create_room_pages.dart';
-import 'package:atdel/src/pages/join_room_page.dart';
+import 'package:atdel/src/settings_pages/settings_pages.dart';
+import 'package:atdel/src/user_pages/user_pages.dart';
+import 'package:atdel/src/home_pages/create_room_pages.dart';
+import 'package:atdel/src/home_pages/join_room_page.dart';
 
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
