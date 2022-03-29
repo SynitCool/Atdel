@@ -13,6 +13,7 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 
 // pages
 import 'package:atdel/src/host_room_control_pages/add_attendance_list_pages.dart';
+import 'package:atdel/src/host_room_control_pages/members_attendance_list_pages.dart';
 
 class AttedanceListScreen extends StatefulWidget {
   const AttedanceListScreen({Key? key, required this.roomId}) : super(key: key);
@@ -122,7 +123,12 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     const IconData icon = Icons.date_range;
 
     return ListTile(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MembersAttendanceListPage(attendanceInfo: currentData)));
+      },
       leading: const Icon(icon),
       title: Column(children: [
         Text("Start: " + dateStartAttendanceList),

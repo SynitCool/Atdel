@@ -29,6 +29,9 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
   String startDateError = '';
   String endDateError = '';
 
+  // sign add button
+  String signAddButton = '';
+
   // format
   final String dateFormat = "MM/dd/yyyy HH:mm";
 
@@ -52,6 +55,7 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
   // add attendance
   Future addAttendanceToDatabase() async {
     if (startDate == null || endDate == null) return;
+    if (signAddButton == "error") return;
 
     _attendance.addAttendance(startDate!, endDate!);
 
@@ -67,6 +71,8 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     final Widget addAttendance = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                primary: signAddButton == "error" ? Colors.red : Colors.blue),
             onPressed: () async {
               addAttendanceToDatabase();
             },
@@ -146,11 +152,13 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
 
           if (startDate!.compareTo(endDate!) == 1) {
             startDateError = "Start Date must be less than End Date";
+            signAddButton = "error";
             return;
           }
 
           endDateError = '';
           startDateError = '';
+          signAddButton = '';
         });
       },
     );
@@ -178,11 +186,13 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
 
           if (endDate!.compareTo(startDate!) == -1) {
             endDateError = "End Date must be greater than Start Date";
+            signAddButton = "error";
             return;
           }
 
           endDateError = '';
           startDateError = '';
+          signAddButton = '';
         });
       },
     );
