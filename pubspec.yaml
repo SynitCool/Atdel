@@ -57,8 +57,6 @@ dependencies:
   intl: ^0.17.0
 
   # personal packages
-  host_room_control:
-    path: ./packages/host_room_control
   databases:
     path: ./packages/databases
   authentication:

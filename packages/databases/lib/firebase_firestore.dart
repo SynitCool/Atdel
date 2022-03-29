@@ -2,17 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fire_auth;
 
 class Room {
-  String id;
-  final Map<String, dynamic> infoRoom;
-  final List<Map<String, dynamic>> infoUsers;
+  String roomId;
 
-  Room({this.id = "", required this.infoRoom, required this.infoUsers});
+  Room({this.roomId = ""});
 
-  Map<String, dynamic> toJson() =>
+  Map<String, dynamic> toJson(String id, Map<String, dynamic> infoRoom,
+          List<Map<String, dynamic>> infoUsers) =>
       {"id": id, "info_room": infoRoom, "info_users": infoUsers};
 
-  Future createRoom(fire_auth.User currentUser) async {
-    final String userUid = currentUser.uid;
+  Future createRoom(Map<String, dynamic> infoRoom,
+      List<Map<String, dynamic>> infoUsers) async {
+    // firebase user
+    final fire_auth.User? firebaseUser =
+        fire_auth.FirebaseAuth.instance.currentUser;
+    final String userUid = firebaseUser!.uid;
 
     final CollectionReference<Map<String, dynamic>> userRooms =
         FirebaseFirestore.instance.collection("users/$userUid/rooms");
@@ -20,17 +23,31 @@ class Room {
     final DocumentReference<Map<String, dynamic>> docUserRooms =
         userRooms.doc();
 
-    id = docUserRooms.id;
+    final String id = docUserRooms.id;
 
-    final room = toJson();
+    final room = toJson(id, infoRoom, infoUsers);
 
     await docUserRooms.set(room);
   }
 
-  static Room fromJson(Map<String, dynamic> json) => Room(
-      id: json["id"],
-      infoRoom: json["info_room"],
-      infoUsers: json["info_users"]);
+  Future deleteRoom() async {
+    // firebase user
+    final fire_auth.User? firebaseUser =
+        fire_auth.FirebaseAuth.instance.currentUser;
+
+    final String userUid = firebaseUser!.uid;
+
+    // firestore
+    final String roomCollectionPath = "users/$userUid/rooms";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(roomCollectionPath);
+
+    final DocumentReference<Map<String, dynamic>> doc = collection.doc(roomId);
+
+    // delete room
+    await doc.delete();
+  }
 }
 
 class User {

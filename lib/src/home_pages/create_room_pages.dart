@@ -41,8 +41,6 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
   // create room
   Future createRoom(BuildContext context) async {
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-
     if (nameText.isEmpty) return;
     if (nameText.length < 4) return;
 
@@ -72,11 +70,11 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       }
     ];
 
-    final model.Room room = model.Room(infoRoom: infoRoom, infoUsers: infoUsers);
+    final model.Room room = model.Room();
 
     Navigator.pop(context);
 
-    await room.createRoom(currentUser!);
+    await room.createRoom(infoRoom, infoUsers);
   }
 
   // app bar widget

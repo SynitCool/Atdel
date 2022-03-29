@@ -9,6 +9,7 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:atdel/src/host_room_control_pages/home_feature.dart';
 import 'package:atdel/src/host_room_control_pages/host_drawer.dart';
 import 'package:atdel/src/host_room_control_pages/attendance_list_pages.dart';
+import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
 
 // page
 // ignore: must_be_immutable
@@ -79,7 +80,19 @@ class _HostRoomPagesState extends State<HostRoomPages> {
       ),
     );
 
-    return AppBar(title: const Text("Host Room Control"), leading: leading);
+    Widget settingsButton = IconButton(
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: ((context) => HostSettingsPage(roomId: roomId))));
+      },
+      icon: const Icon(Icons.settings),
+      padding: const EdgeInsets.all(15.0),
+    );
+
+    return AppBar(
+      title: const Text("Host Room Control"), 
+      leading: leading, 
+      actions: [settingsButton],);
   }
 
   // the screen of feature
