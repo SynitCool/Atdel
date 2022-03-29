@@ -6,7 +6,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 // host room feature
-import 'package:atdel/src/host_room_control_pages/home_feature.dart';
+import 'package:atdel/src/host_room_control_pages/home_preview_feature.dart';
 import 'package:atdel/src/host_room_control_pages/host_drawer.dart';
 import 'package:atdel/src/host_room_control_pages/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
@@ -38,8 +38,8 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    // const HomeScreen(),
-    const Center(child: Text("Home Screen"))
+    const HomePreviewPage(),
+    // const Center(child: Text("Home Screen"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
