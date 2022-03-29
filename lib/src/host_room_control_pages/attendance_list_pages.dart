@@ -89,7 +89,10 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     if (snapshot.hasError) return errorScene;
 
     final Map<String, dynamic>? roomData = snapshot.data!.data();
-    final List<dynamic> attendanceListFeature = roomData!["attendance_list"];
+
+    if (roomData == null) return errorScene;
+    
+    final List<dynamic> attendanceListFeature = roomData["attendance_list"];
 
     if (attendanceListFeature.isEmpty) {
       return const Center(child: Text("No attendance"));
@@ -127,7 +130,8 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MembersAttendanceListPage(attendanceInfo: currentData)));
+                builder: (context) =>
+                    MembersAttendanceListPage(attendanceInfo: currentData)));
       },
       leading: const Icon(icon),
       title: Column(children: [
