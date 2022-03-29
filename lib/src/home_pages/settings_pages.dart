@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:atdel/src/pages/permission_pages.dart';
+import 'package:atdel/src/home_pages/permission_pages.dart';
 
 class SettingsPages extends StatelessWidget {
   const SettingsPages({Key? key}) : super(key: key);

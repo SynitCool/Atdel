@@ -296,15 +296,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0+5"
-  host_room_control:
-    dependency: "direct main"
-    description:
-      path: "packages/host_room_control"
-      relative: true
-    source: path
-    version: "1.0.0+1"
   html_editor_enhanced:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: html_editor_enhanced
       url: "https://pub.dartlang.org"
