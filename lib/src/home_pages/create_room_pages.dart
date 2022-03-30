@@ -57,7 +57,8 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       "host_email": hostEmail,
       "host_uid": hostUid,
       "host_image_url": hostImageUrl,
-      "member_counts": memberCounts
+      "member_counts": memberCounts,
+      "room_desc": "<h1>$roomName</h1><br/><p>created by $hostName</p>"
     };
 
     final List<Map<String, dynamic>> infoUsers = [
