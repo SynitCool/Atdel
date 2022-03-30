@@ -12,22 +12,16 @@ import 'package:atdel/src/host_room_control_pages/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
 
 // page
-// ignore: must_be_immutable
 class HostRoomPages extends StatefulWidget {
-  Map<String, dynamic> currentData;
+  const HostRoomPages({Key? key, required this.currentData}) : super(key: key);
 
-  HostRoomPages(this.currentData, {Key? key}) : super(key: key);
+  final Map<String, dynamic> currentData;
 
   @override
   State<HostRoomPages> createState() => _HostRoomPagesState();
 }
 
 class _HostRoomPagesState extends State<HostRoomPages> {
-  // data
-  late final List<dynamic> infoUsers;
-  late final Map<String, dynamic> infoRoom;
-  late final String roomId;
-
   // the advanced drawer params
   final Color backdropColor = Colors.blueGrey;
   final Curve animationCurve = Curves.easeInOut;
@@ -52,14 +46,11 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   void initState() {
     super.initState();
 
-    infoUsers = widget.currentData["info_users"];
-    infoRoom = widget.currentData["info_room"];
-    roomId = widget.currentData["id"];
-
     featurePage.add(HomePreviewPage(
-      roomId: roomId,
-    ));
-    featurePage.add(AttedanceListScreen(roomId: roomId));
+          currentData: widget.currentData,
+      ));
+
+    featurePage.add(AttedanceListScreen(roomId: widget.currentData["id"]));
   }
 
   // the appbar
@@ -87,7 +78,8 @@ class _HostRoomPagesState extends State<HostRoomPages> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: ((context) => HostSettingsPage(roomId: roomId))));
+                builder: ((context) =>
+                    HostSettingsPage(roomId: widget.currentData["id"]))));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
@@ -109,6 +101,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     );
   }
 
+
   // bottom navigation bar
   Widget bottomNavigationBar() {
     return AnimatedBottomNavigationBar.builder(
@@ -119,7 +112,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
       splashSpeedInMilliseconds: 300,
       splashColor: Colors.amberAccent,
       elevation: 200,
-      itemCount: featurePage.length,
+      itemCount: iconsPage.length,
       activeIndex: bottomNavIndex,
       onTap: (int index) {
         setState(() {
@@ -134,8 +127,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget contentHostRoom() {
     return AdvancedDrawer(
         controller: _advancedDrawerController,
         backdropColor: backdropColor,
@@ -143,6 +135,11 @@ class _HostRoomPagesState extends State<HostRoomPages> {
         animationDuration: animationDuration,
         childDecoration: childDecoration,
         child: mainContentWidget(),
-        drawer: DrawerWidget(usersData: infoUsers));
+        drawer: DrawerWidget(usersData: widget.currentData["info_users"]));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return contentHostRoom();
   }
 }

@@ -157,7 +157,7 @@ class _ContentPageState extends State<ContentPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => HostRoomPages(currentData)));
+                    builder: (context) => HostRoomPages(currentData: currentData)));
           },
           leading: const Icon(icon),
           title:
