@@ -11,16 +11,16 @@ import 'package:databases/firebase_firestore.dart';
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key, required this.roomId}) : super(key: key);
+class JoinRoomHomeScreen extends StatefulWidget {
+  const JoinRoomHomeScreen({Key? key, required this.roomId}) : super(key: key);
 
   final String roomId;
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _JoinRoomHomeScreenState createState() => _JoinRoomHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _JoinRoomHomeScreenState extends State<JoinRoomHomeScreen>
     with SingleTickerProviderStateMixin {
   final HtmlEditorController controller = HtmlEditorController();
 
