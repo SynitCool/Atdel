@@ -38,7 +38,6 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    const HomePreviewPage(),
     // const Center(child: Text("Home Screen"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
@@ -57,6 +56,9 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     infoRoom = widget.currentData["info_room"];
     roomId = widget.currentData["id"];
 
+    featurePage.add(HomePreviewPage(
+      roomId: roomId,
+    ));
     featurePage.add(AttedanceListScreen(roomId: roomId));
   }
 
@@ -82,17 +84,20 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
     Widget settingsButton = IconButton(
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: ((context) => HostSettingsPage(roomId: roomId))));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => HostSettingsPage(roomId: roomId))));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
     );
 
     return AppBar(
-      title: const Text("Host Room Control"), 
-      leading: leading, 
-      actions: [settingsButton],);
+      title: const Text("Host Room Control"),
+      leading: leading,
+      actions: [settingsButton],
+    );
   }
 
   // the screen of feature

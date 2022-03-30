@@ -31,6 +31,9 @@ class Room {
   }
 
   Future deleteRoom() async {
+    // check if room id is empty
+    if (roomId.isEmpty) return;
+
     // firebase user
     final fire_auth.User? firebaseUser =
         fire_auth.FirebaseAuth.instance.currentUser;
@@ -47,6 +50,44 @@ class Room {
 
     // delete room
     await doc.delete();
+  }
+
+  Future updateRoomDesc(String roomDesc) async {
+    // check if room id empty
+    if (roomId.isEmpty) return;
+
+    // firebase user
+    final fire_auth.User? firebaseUser =
+        fire_auth.FirebaseAuth.instance.currentUser;
+    final String firebaseUserUid = firebaseUser!.uid;
+
+    // collection room
+    final String collectionPath = "users/$firebaseUserUid/rooms";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(collectionPath);
+
+    // doc room
+    final DocumentReference<Map<String, dynamic>> docRoom =
+        collection.doc(roomId);
+
+    final DocumentSnapshot<Map<String, dynamic>> getDocRoom =
+        await docRoom.get();
+
+    final Map<String, dynamic>? docRoomData = getDocRoom.data();
+
+    final Map<String, dynamic> roomInfo = docRoomData!["info_room"];
+
+    // updated data room info
+    Map<String, dynamic> updatedRoomDesc = {};
+
+    roomInfo["room_desc"] = roomDesc;
+
+    updatedRoomDesc["info_room"] = roomInfo;
+
+    // update database
+
+    await docRoom.update(updatedRoomDesc);
   }
 }
 
