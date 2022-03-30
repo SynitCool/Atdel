@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:databases/firebase_firestore.dart';
 
 class JoinRoomSettings extends StatefulWidget {
-  const JoinRoomSettings({Key? key, required this.roomId}) : super(key: key);
-
-  final String roomId;
+  const JoinRoomSettings({Key? key}) : super(key: key);
 
   @override
   State<JoinRoomSettings> createState() => _JoinRoomSettingsState();
@@ -21,7 +19,8 @@ class _JoinRoomSettingsState extends State<JoinRoomSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: scaffoldAppBar(), body: ContentPage(roomId: widget.roomId));
+        appBar: scaffoldAppBar(),
+        body: const Center(child: Text("Settings Page")));
   }
 }
 
@@ -40,8 +39,7 @@ class _ContentPageState extends State<ContentPage> {
 
     return ElevatedButton(
         style: ElevatedButton.styleFrom(primary: Colors.red),
-        onPressed: () {
-        },
+        onPressed: () {},
         child: const Text("Disperse Room"));
   }
 

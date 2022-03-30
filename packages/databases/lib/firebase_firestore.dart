@@ -111,6 +111,16 @@ class Room {
 
     return docRoom.snapshots();
   }
+
+  static Future<Map<String, dynamic>?> getRoomDocByReference(
+      DocumentReference<Map<String, dynamic>> reference) async {
+    // get reference
+    final DocumentSnapshot<Map<String, dynamic>> getDocData =
+        await reference.get();
+    final Map<String, dynamic>? docData = getDocData.data();
+
+    return docData;
+  }
 }
 
 class User {

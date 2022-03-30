@@ -1,4 +1,5 @@
 // flutter
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 // custom widget
@@ -11,12 +12,14 @@ import 'package:atdel/src/join_room_control_pages/join_room_drawer.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_attendance_list_page.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_settings_page.dart';
 
+// database
+import 'package:databases/firebase_firestore.dart';
+
 // page
 class JoinRoomControl extends StatefulWidget {
-  const JoinRoomControl({Key? key, required this.currentData})
-      : super(key: key);
+  const JoinRoomControl({Key? key, required this.reference}) : super(key: key);
 
-  final Map<String, dynamic> currentData;
+  final DocumentReference<Map<String, dynamic>> reference;
 
   @override
   State<JoinRoomControl> createState() => _JoinRoomControlState();
@@ -33,7 +36,8 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    // const Center(child: Text("Home Screen"))
+    const Center(child: Text("Home Screen")),
+    const Center(child: Text("Home Screen"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
@@ -47,11 +51,11 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
   void initState() {
     super.initState();
 
-    featurePage.add(HomePreviewPage(
-      currentData: widget.currentData,
-    ));
+    // featurePage.add(JoinRoomHomeScreen(
+    //   currentData: widget.currentData,
+    // ));
 
-    featurePage.add(AttedanceListScreen(roomId: widget.currentData["id"]));
+    // featurePage.add(JoinRoomAttendanceList(roomId: widget.currentData["id"]));
   }
 
   // the appbar
@@ -80,7 +84,7 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
             context,
             MaterialPageRoute(
                 builder: ((context) =>
-                    JoinRoomSettings(roomId: widget.currentData["id"]))));
+                    const JoinRoomSettings())));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
@@ -127,7 +131,7 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
     );
   }
 
-  Widget contentHostRoom() {
+  Widget contentRoom(List<dynamic> infoUsers) {
     return AdvancedDrawer(
         controller: _advancedDrawerController,
         backdropColor: backdropColor,
@@ -135,11 +139,42 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
         animationDuration: animationDuration,
         childDecoration: childDecoration,
         child: mainContentWidget(),
-        drawer: DrawerWidget(usersData: widget.currentData["info_users"]));
+        drawer: DrawerWidget(usersData: infoUsers));
+  }
+
+  Widget loadingScene() {
+    return Scaffold(
+      appBar: appBar(),
+      body: const Center(child: CircularProgressIndicator()),
+      bottomNavigationBar: bottomNavigationBar(),
+    );
+  }
+
+  Widget errorScene() {
+    return Scaffold(
+      appBar: appBar(),
+      body: const Center(child: Text("Something went wrong!")),
+      bottomNavigationBar: bottomNavigationBar(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return contentHostRoom();
+    // return const Center(child: Text("Join Room"));
+    return FutureBuilder<Map<String, dynamic>?>(
+        future: Room.getRoomDocByReference(widget.reference),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene();
+          }
+
+          if (snapshot.hasError) return errorScene();
+
+          final Map<String, dynamic>? data = snapshot.data;
+
+          final List<dynamic> infoUsers = data!["info_users"];
+
+          return contentRoom(infoUsers);
+        });
   }
 }

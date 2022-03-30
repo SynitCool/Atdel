@@ -13,7 +13,12 @@ import 'package:atdel/src/home_pages/settings_pages.dart';
 import 'package:atdel/src/home_pages/create_room_pages.dart';
 import 'package:atdel/src/home_pages/join_room_page.dart';
 import 'package:atdel/src/home_pages/home_drawer.dart';
+
+// host room control
 import 'package:atdel/src/host_room_control_pages/host_room_pages.dart';
+
+// join room control
+import 'package:atdel/src/join_room_control_pages/join_room_control_page.dart';
 
 // custom widget
 import 'package:fab_circular_menu/fab_circular_menu.dart';
@@ -132,10 +137,20 @@ class _ContentPageState extends State<ContentPage> {
   Widget roomButtonWidget(
       BuildContext context, Map<String, dynamic> currentData) {
     // room info
+    String typeUser;
+
     final Map<String, dynamic> infoRoom = currentData["info_room"];
 
     final String roomTitle = infoRoom["room_name"];
     final String hostName = infoRoom["host_name"];
+    final String hostUid = infoRoom["host_uid"];
+
+    // check user type
+    if (hostUid != userUid) {
+      typeUser = "join";
+    } else {
+      typeUser = "host";
+    }
 
     // card parameters
     const EdgeInsets cardPadding =
@@ -154,10 +169,22 @@ class _ContentPageState extends State<ContentPage> {
         shape: shape,
         child: ListTile(
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HostRoomPages(currentData: currentData)));
+            if (typeUser == "host") {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          HostRoomPages(currentData: currentData)));
+            } else {
+              final DocumentReference<Map<String, dynamic>> reference =
+                  infoRoom["room_reference"];
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          JoinRoomControl(reference: reference)));
+            }
           },
           leading: const Icon(icon),
           title:
