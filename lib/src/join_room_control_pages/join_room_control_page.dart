@@ -36,8 +36,6 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    const Center(child: Text("Home Screen")),
-    const Center(child: Text("Home Screen"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
@@ -51,11 +49,11 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
   void initState() {
     super.initState();
 
-    // featurePage.add(JoinRoomHomeScreen(
-    //   currentData: widget.currentData,
-    // ));
+    featurePage.add(JoinRoomPreviewPage(
+      reference: widget.reference,
+    ));
 
-    // featurePage.add(JoinRoomAttendanceList(roomId: widget.currentData["id"]));
+    featurePage.add(JoinRoomAttendanceList(reference: widget.reference));
   }
 
   // the appbar
