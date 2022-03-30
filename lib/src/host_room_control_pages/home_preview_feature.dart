@@ -1,10 +1,8 @@
 // flutter
 import 'package:atdel/src/host_room_control_pages/home_feature.dart';
-import 'package:flutter/material.dart';
-
-// firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:databases/firebase_firestore.dart';
+import 'package:flutter/material.dart';
 
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
@@ -13,9 +11,11 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 class HomePreviewPage extends StatefulWidget {
-  const HomePreviewPage({Key? key, required this.roomId}) : super(key: key);
+  const HomePreviewPage({Key? key, required this.currentData})
+      : super(key: key);
 
-  final String roomId;
+  // final String roomId;
+  final Map<String, dynamic> currentData;
 
   @override
   State<HomePreviewPage> createState() => _HomePreviewPageState();
@@ -52,7 +52,7 @@ class _HomePreviewPageState extends State<HomePreviewPage>
               context,
               MaterialPageRoute(
                   builder: (context) => HomeScreen(
-                        roomId: widget.roomId,
+                        roomId: widget.currentData["id"],
                       )));
         });
   }
@@ -73,7 +73,7 @@ class _HomePreviewPageState extends State<HomePreviewPage>
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: scaffoldFloatingActionButton(),
-        body: ViewHtml(currentRoomId: widget.roomId));
+        body: ViewHtml(currentRoomId: widget.currentData["id"]));
   }
 }
 
@@ -81,68 +81,48 @@ class ViewHtml extends StatefulWidget {
   const ViewHtml({Key? key, required this.currentRoomId}) : super(key: key);
 
   final String currentRoomId;
+  // final String roomDesc;
 
   @override
   State<ViewHtml> createState() => _ViewHtmlState();
 }
 
 class _ViewHtmlState extends State<ViewHtml> {
-  // firebase auth
-  final User? firebaseUser = FirebaseAuth.instance.currentUser;
-
-  late String firebaseUserUid;
-
-  // firebase firestore
-  late String collectionPath;
-  late CollectionReference<Map<String, dynamic>> collection;
-  late DocumentReference<Map<String, dynamic>> docCollection;
-
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene = const Center(child: Text("Something went wrong!"));
-
-  @override
-  void initState() {
-    super.initState();
-    
-    // firebase auth
-    firebaseUserUid = firebaseUser!.uid;
-
-    // firebase firestore
-    collectionPath = "users/$firebaseUserUid/rooms";
-    collection = FirebaseFirestore.instance.collection(collectionPath);
-    docCollection = collection.doc(widget.currentRoomId);
-  }
-
-  Future<String> getRoomInfo() async {
-    // get data databases
-    final DocumentSnapshot<Map<String, dynamic>> getDocCollection =
-        await docCollection.get();
-    final Map<String, dynamic>? getDocColectionData = getDocCollection.data();
-
-    final Map<String, dynamic> roomInfo = getDocColectionData!["info_room"];
-
-    return roomInfo["room_desc"];
-  }
 
   Widget showHtmlWidget(String htmlData) {
     return SingleChildScrollView(child: Html(data: htmlData));
   }
 
+  // get room doc from database
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? getStreamRoomDoc() {
+    final Room room = Room(roomId: widget.currentRoomId);
+
+    final Stream<DocumentSnapshot<Map<String, dynamic>>>? data =
+        room.streamRoomDoc();
+
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getRoomInfo(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: getStreamRoomDoc(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loadingScene;
+        }
 
-          if (snapshot.hasError) return errorScene;
+        if (snapshot.hasError) return errorScene;
 
-          final roomDesc = snapshot.data;
+        final DocumentSnapshot<Map<String, dynamic>>? doc = snapshot.data;
+        final Map<String, dynamic>? data = doc!.data();
+        final Map<String, dynamic> infoRoom = data!["info_room"];
 
-          return showHtmlWidget(roomDesc!);
-        });
+        return showHtmlWidget(infoRoom["room_desc"]);
+      },
+    );
   }
 }

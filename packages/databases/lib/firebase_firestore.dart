@@ -89,6 +89,28 @@ class Room {
 
     await docRoom.update(updatedRoomDesc);
   }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? streamRoomDoc() {
+    // check if room id empty
+    if (roomId.isEmpty) return null;
+
+    // firebase user
+    final fire_auth.User? firebaseUser =
+        fire_auth.FirebaseAuth.instance.currentUser;
+    final String firebaseUserUid = firebaseUser!.uid;
+
+    // collection room
+    final String collectionPath = "users/$firebaseUserUid/rooms";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(collectionPath);
+
+    // doc room
+    final DocumentReference<Map<String, dynamic>> docRoom =
+        collection.doc(roomId);
+
+    return docRoom.snapshots();
+  }
 }
 
 class User {
