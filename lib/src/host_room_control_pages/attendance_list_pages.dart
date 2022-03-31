@@ -91,7 +91,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     final Map<String, dynamic>? roomData = snapshot.data!.data();
 
     if (roomData == null) return errorScene;
-    
+
     final List<dynamic> attendanceListFeature = roomData["attendance_list"];
 
     if (attendanceListFeature.isEmpty) {
@@ -106,7 +106,8 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: ((context, index) {
-          final Map<String, dynamic> currentData = data[index];
+          final currentDoc = data[index];
+          final Map<String, dynamic> currentData = currentDoc.data();
 
           return attendanceListButtonWidget(context, currentData);
         }));
@@ -175,8 +176,10 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
-        body: FutureBuilder(
-            future: _attendanceList.createFeature(),
+        body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance
+                .collection("users/$userUid/rooms/${widget.roomId}/attendance_list")
+                .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return loadingScene;
@@ -184,8 +187,13 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
 
               if (snapshot.hasError) return errorScene;
 
-              return StreamBuilder(
-                  stream: readAttendanceList, builder: builderFunction);
+              final attendanceList = snapshot.data!.docs;
+
+              if (attendanceList.isEmpty) {
+                return const Center(child: Text("No Attendance"));
+              }
+
+              return attendanceWidget(context, attendanceList);
             }));
   }
 }
