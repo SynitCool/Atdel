@@ -57,7 +57,7 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     if (startDate == null || endDate == null) return;
     if (signAddButton == "error") return;
 
-    _attendance.addAttendance(startDate!, endDate!);
+    _attendance.addAttendance(startDate!, endDate!, roomId: widget.roomId, userUid: widget.userUid);
 
     Navigator.pop(context);
   }

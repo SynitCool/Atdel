@@ -187,31 +187,12 @@ class AttendanceList {
 
   AttendanceList({required this.roomId, required this.userUid});
 
-  // make attendance list feature to rooms document
-  Future createFeature() async {
-    final String collectionPath = "users/$userUid/rooms";
-    final Map<String, dynamic> feature = {"attendance_list": []};
-
-    final CollectionReference<Map<String, dynamic>> collection =
-        FirebaseFirestore.instance.collection(collectionPath);
-
-    final DocumentReference<Map<String, dynamic>> docCollection =
-        collection.doc(roomId);
-
-    final DocumentSnapshot<Map<String, dynamic>> getDocCollection =
-        await docCollection.get();
-
-    final Map<String, dynamic>? docCollectionData = getDocCollection.data();
-
-    final bool checkDocCollectionData =
-        docCollectionData!.containsKey("attendance_list");
-
-    if (!checkDocCollectionData) await docCollection.update(feature);
-  }
-
   // adding attendance to document
-  Future addAttendance(DateTime startDate, DateTime endDate) async {
-    final String collectionPath = "users/$userUid/rooms";
+  Future addAttendance(DateTime startDate, DateTime endDate,
+      {required String roomId, required String userUid}) async {
+    // set attendance list info
+    final String collectionPath =
+        "users/$userUid/rooms/$roomId/attendance_list";
     final Timestamp startDateTimestamp = Timestamp.fromDate(startDate);
     final Timestamp endDateTimestamp = Timestamp.fromDate(endDate);
 
@@ -220,46 +201,38 @@ class AttendanceList {
       "date_start": startDateTimestamp
     };
 
-    List<Map<String, dynamic>> usersFeature = [];
-
     final CollectionReference<Map<String, dynamic>> collection =
         FirebaseFirestore.instance.collection(collectionPath);
 
     final DocumentReference<Map<String, dynamic>> docCollection =
-        collection.doc(roomId);
+        collection.doc();
 
-    final DocumentSnapshot<Map<String, dynamic>> getDocCollection =
-        await docCollection.get();
+    feature["id"] = docCollection.id;
 
-    final Map<String, dynamic>? docCollectionData = getDocCollection.data();
+    // get users in room
+    final String collectionRoomPath = "users/$userUid/rooms";
 
-    final List<dynamic> infoUsers = docCollectionData!["info_users"];
+    final DocumentReference<Map<String, dynamic>> docRoomInfo =
+        FirebaseFirestore.instance.collection(collectionRoomPath).doc(roomId);
 
-    for (int i = 0; i < infoUsers.length; i++) {
-      final Map<String, dynamic> currentUser = infoUsers[i];
+    final DocumentSnapshot<Map<String, dynamic>> getRoomInfo =
+        await docRoomInfo.get();
 
-      final String typeUser = currentUser["type"];
+    final Map<String, dynamic>? roomInfoData = getRoomInfo.data();
 
-      final Map<String, dynamic> currentUserFeature = {
-        "user_name": currentUser["user_name"],
-        "user_email": currentUser["user_email"],
-        "user_image_url": currentUser["user_image_url"],
-        "absent": true
-      };
+    final List<dynamic> infoUsers = roomInfoData!["info_users"];
 
-      if (typeUser != "Host") usersFeature.add(currentUserFeature);
+    List<Map<String, dynamic>> users = [];
+    for (Map<String, dynamic> user in infoUsers) {
+      if (user["type"] == "Host") continue;
+
+      user.addAll({"absent": true});
+
+      users.add(user);
     }
 
-    feature["users"] = usersFeature;
+    feature["users"] = users;
 
-    List<dynamic> currentAttendanceList = docCollectionData["attendance_list"];
-
-    currentAttendanceList.add(feature);
-
-    final Map<String, dynamic> currentFeature = {
-      "attendance_list": currentAttendanceList
-    };
-
-    await docCollection.update(currentFeature);
+    await docCollection.set(feature);
   }
 }
