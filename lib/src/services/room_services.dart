@@ -63,6 +63,15 @@ class RoomService {
     final DocumentReference<Map<String, dynamic>> codesDoc =
         codesCollection.doc(roomCodesDoc);
 
+    // room users collections
+    final String roomUsersPath = "$rootRoomsCollection/${roomDoc.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection(roomUsersPath);
+
+    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
+        roomUsersCollection.doc(authUser.uid);
+
     // settings room object and add to room Doc
     Room room = Room.fromFirebaseAuth(authUser);
 
@@ -74,6 +83,13 @@ class RoomService {
     final Map<String, dynamic> roomMap = room.toMap();
 
     await roomDoc.set(roomMap);
+
+    // settings room users
+    model.User modelUser = model.User.fromFirebaseAuth(authUser);
+
+    Map<String, dynamic> modelUserMap = modelUser.toMapRoomUsers();
+
+    await roomUsersDoc.set(modelUserMap);
 
     // update users rooms
     final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
@@ -95,26 +111,6 @@ class RoomService {
     codesMap!.addAll({room.roomCode: roomDoc});
 
     await codesDoc.update(codesMap);
-  }
-
-  // stream global rooms
-  Stream<List<Room>> streamGlobalRooms() {
-    final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootRoomsCollection);
-
-    final Stream<List<Room>> snapshot = collection.snapshots().map(
-        (snap) => snap.docs.map((data) => Room.fromMap(data.data())).toList());
-
-    return snapshot;
-  }
-
-  // stream user rooms
-  Stream<Room> streamReferenceRoom(
-      DocumentReference<Map<String, dynamic>> reference) {
-    final Stream<Room> snapshot =
-        reference.snapshots().map((data) => Room.fromMap(data.data()!));
-
-    return snapshot;
   }
 
   // join room with code
@@ -156,5 +152,38 @@ class RoomService {
     Map<String, dynamic> userModelInfo = userModel.toMap();
 
     await usersDoc.update(userModelInfo);
+  }
+
+  // stream global rooms
+  Stream<List<Room>> streamGlobalRooms() {
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(rootRoomsCollection);
+
+    final Stream<List<Room>> snapshot = collection.snapshots().map(
+        (snap) => snap.docs.map((data) => Room.fromMap(data.data())).toList());
+
+    return snapshot;
+  }
+
+  // stream local rooms
+  Stream<Room> streamReferenceRoom(
+      DocumentReference<Map<String, dynamic>> reference) {
+    final Stream<Room> snapshot =
+        reference.snapshots().map((data) => Room.fromMap(data.data()!));
+
+    return snapshot;
+  }
+
+  // stream users room
+  Stream<List<model.User>> streamUsersRoom(String roomId) {
+    final String collectionPath = "$rootRoomsCollection/$roomId/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        FirebaseFirestore.instance.collection(collectionPath);
+
+    final Stream<List<model.User>> stream = collection.snapshots().map((data) =>
+        data.docs.map((doc) => model.User.fromMap(doc.data())).toList());
+
+    return stream;
   }
 }

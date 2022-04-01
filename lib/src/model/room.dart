@@ -6,6 +6,7 @@ class Room {
   final String hostEmail;
   final String hostPhotoUrl;
   final String hostName;
+  final String hostUid;
   final int memberCounts;
   String roomDesc;
   String roomName;
@@ -16,6 +17,7 @@ class Room {
       {required this.hostEmail,
       required this.hostPhotoUrl,
       required this.hostName,
+      required this.hostUid,
       required this.memberCounts,
       required this.roomDesc,
       required this.roomName,
@@ -29,6 +31,7 @@ class Room {
         hostEmail: data!["host_email"],
         hostPhotoUrl: data["host_photo_url"],
         hostName: data["host_name"],
+        hostUid: data["host_uid"],
         memberCounts: data["member_counts"],
         roomDesc: data["room_desc"],
         roomName: data["room_name"],
@@ -40,6 +43,7 @@ class Room {
       hostEmail: authUser.email!,
       hostPhotoUrl: authUser.photoURL!,
       hostName: authUser.displayName!,
+      hostUid: authUser.uid,
       memberCounts: 1,
       roomDesc: "",
       roomName: "",
@@ -50,6 +54,7 @@ class Room {
       hostEmail: map["host_email"],
       hostPhotoUrl: map["host_photo_url"],
       hostName: map["host_name"],
+      hostUid: map["host_uid"],
       memberCounts: map["member_counts"],
       roomDesc: map["room_desc"],
       roomName: map["room_name"],
@@ -60,6 +65,7 @@ class Room {
         "host_email": hostEmail,
         "host_photo_url": hostPhotoUrl,
         "host_name": hostName,
+        "host_uid": hostUid,
         "member_counts": memberCounts,
         "room_desc": roomDesc,
         "room_name": roomName,

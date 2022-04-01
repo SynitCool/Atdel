@@ -46,7 +46,7 @@ class User {
       isAnonymous: map["is_anonymous"],
       photoUrl: map["photo_url"],
       uid: map["uid"],
-      roomReferences: map["room_references"]);
+      roomReferences: map["room_references"] ?? []);
 
   Map<String, dynamic> toMap() => {
         "display_name": displayName,
@@ -56,4 +56,11 @@ class User {
         "uid": uid,
         "room_references": roomReferences
       };
+
+  Map<String, dynamic> toMapRoomUsers() =>
+      {"display_name": displayName, 
+      "email": email, 
+      "is_anonymous": isAnonymous,
+      "photo_url": photoUrl,
+      "uid": uid};
 }

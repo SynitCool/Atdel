@@ -149,6 +149,7 @@ class _ContentPageState extends State<ContentPage> {
       borderRadius: BorderRadius.circular(10),
     );
 
+    // text widget
     final Widget textRoomTitle = Text(room.roomName);
     final Widget textHostName = Text(room.hostName);
 
@@ -173,6 +174,12 @@ class _ContentPageState extends State<ContentPage> {
             //           builder: (context) =>
             //               JoinRoomControl(reference: reference)));
             // }
+
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        HostRoomPages(room: room)));
           },
           leading: const Icon(icon),
           title:
