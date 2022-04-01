@@ -12,11 +12,8 @@ import 'package:atdel/src/user_pages/user_pages.dart';
 import 'package:atdel/src/model/user.dart' as src_user;
 
 // drawer widget
-// ignore: must_be_immutable
 class DrawerWidget extends StatefulWidget {
-  BuildContext context;
-
-  DrawerWidget(this.context, {Key? key}) : super(key: key);
+  const DrawerWidget({Key? key}) : super(key: key);
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
@@ -111,7 +108,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         text: "Setting",
         icon: Icons.settings,
         onClicked: () {
-          Navigator.push(widget.context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SettingsPages()));
         });
 

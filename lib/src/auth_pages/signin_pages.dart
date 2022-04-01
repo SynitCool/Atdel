@@ -3,12 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// model
-import 'package:atdel/src/model/user.dart';
-
-// services
-import 'package:atdel/src/services/user_services.dart';
-
 // authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
 

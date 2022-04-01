@@ -1,13 +1,11 @@
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 // model
 import 'package:atdel/src/model/user.dart' as model;
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final String rootUsersPath = "new_users";
 

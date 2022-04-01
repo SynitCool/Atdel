@@ -1,6 +1,3 @@
-// dart
-import 'dart:async';
-
 // flutter
 import 'package:flutter/material.dart';
 
@@ -42,7 +39,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // appbar widget
-  PreferredSizeWidget appBarWidget(BuildContext context) {
+  PreferredSizeWidget appBarWidget() {
     Widget appBarSettings = IconButton(
       onPressed: () {
         Navigator.push(context,
@@ -62,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // add room button
-  Widget addRoomButton(BuildContext context) {
+  Widget addRoomButton() {
     // fab parameters
     const Widget fabOpenIcon = Icon(Icons.menu, color: Colors.white);
     const Color fabOpenColor = Colors.white;
@@ -96,69 +93,52 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: DrawerWidget(context),
-        appBar: appBarWidget(context),
-        body: ContentPage(context),
-        floatingActionButton: addRoomButton(context));
+        drawer: const DrawerWidget(),
+        appBar: appBarWidget(),
+        body: const ContentPage(),
+        floatingActionButton: addRoomButton());
   }
 }
 
-// content page
-// ignore: must_be_immutable
+// content of page
 class ContentPage extends StatefulWidget {
-  BuildContext context;
-
-  ContentPage(this.context, {Key? key}) : super(key: key);
+  const ContentPage({Key? key}) : super(key: key);
 
   @override
   State<ContentPage> createState() => _ContentPageState();
 }
 
 class _ContentPageState extends State<ContentPage> {
-  // user profile
-  late String userRoomsCollection;
-  late String userUid;
+  // services
+  final RoomService _roomService = RoomService();
+  final UserService _userService = UserService();
 
-  // stream
-  late Stream<QuerySnapshot<Map<String, dynamic>>> readRoom;
+  // firebase
+  final User? _firebaseUser = FirebaseAuth.instance.currentUser;
 
   // user
-  final User? user = FirebaseAuth.instance.currentUser;
+  late src_user.User currentUser;
 
   // widgets scene
   final Widget errorScene = const Center(child: Text("ERROR"));
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
+  final Widget noRoomsScene = const Center(child: Text("No Rooms"));
 
   @override
   void initState() {
     super.initState();
 
-    userUid = user!.uid;
-
-    userRoomsCollection = "users/$userUid/rooms";
-
-    readRoom =
-        FirebaseFirestore.instance.collection(userRoomsCollection).snapshots();
+    currentUser = src_user.User.fromFirebaseAuth(_firebaseUser!);
   }
 
   // room button Widget
-  Widget roomButtonWidget(
-      BuildContext context, Map<String, dynamic> currentData) {
-    // room info
-    String typeUser;
-
-    final Map<String, dynamic> infoRoom = currentData["info_room"];
-
-    final String roomTitle = infoRoom["room_name"];
-    final String hostName = infoRoom["host_name"];
-    final String hostUid = infoRoom["host_uid"];
-
+  Widget roomButtonWidget(Room room) {
     // check user type
-    if (hostUid != userUid) {
-      typeUser = "join";
-    } else {
-      typeUser = "host";
-    }
+    // if (hostUid != userUid) {
+    //   typeUser = "join";
+    // } else {
+    //   typeUser = "host";
+    // }
 
     // card parameters
     const EdgeInsets cardPadding =
@@ -169,30 +149,30 @@ class _ContentPageState extends State<ContentPage> {
       borderRadius: BorderRadius.circular(10),
     );
 
-    final Widget textRoomTitle = Text(roomTitle);
-    final Widget textHostName = Text(hostName);
+    final Widget textRoomTitle = Text(room.roomName);
+    final Widget textHostName = Text(room.hostName);
 
     return Card(
         margin: cardPadding,
         shape: shape,
         child: ListTile(
           onTap: () {
-            if (typeUser == "host") {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          HostRoomPages(currentData: currentData)));
-            } else {
-              final DocumentReference<Map<String, dynamic>> reference =
-                  infoRoom["room_reference"];
+            // if (typeUser == "host") {
+            //   Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) =>
+            //               HostRoomPages(currentData: currentData)));
+            // } else {
+            //   final DocumentReference<Map<String, dynamic>> reference =
+            //       infoRoom["room_reference"];
 
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          JoinRoomControl(reference: reference)));
-            }
+            //   Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (context) =>
+            //               JoinRoomControl(reference: reference)));
+            // }
           },
           leading: const Icon(icon),
           title:
@@ -206,56 +186,27 @@ class _ContentPageState extends State<ContentPage> {
         ));
   }
 
-  // rooms widgets
-  Widget roomsWidget(BuildContext context, List<dynamic> data) {
-    return ListView.builder(
-        itemCount: data.length,
-        itemBuilder: ((context, index) {
-          final currentDoc = data[index];
-          final Map<String, dynamic> currentData = currentDoc.data();
+  // room stream builder
+  Widget roomStreamBuilder(DocumentReference<Map<String, dynamic>> reference) {
+    return StreamBuilder<Room>(
+        stream: _roomService.streamReferenceRoom(reference),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
 
-          return roomButtonWidget(context, currentData);
-        }));
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return roomButtonWidget(data!);
+        });
   }
 
-  // builder function
-  Widget builderFunction(context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return loadingScene;
-    }
-
-    if (snapshot.hasError) return errorScene;
-
-    final rooms = snapshot.data.docs;
-
-    if (rooms.isEmpty || rooms == null) {
-      return const Center(child: Text("No rooms"));
-    }
-
-    return roomsWidget(context, rooms);
-  }
-
-  // // build content widget
-  // @override
-  // Widget build(BuildContext context) {
-  //   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-  //     stream: readRoom,
-  //     builder: builderFunction,
-  //   );
-  // }
-  // build content widget
   @override
   Widget build(BuildContext context) {
-    final RoomService roomService = RoomService();
-    final UserService userService = UserService();
-
-    final User? firebaseUser = FirebaseAuth.instance.currentUser;
-
-    final src_user.User currentUser =
-        src_user.User.fromFirebaseAuth(firebaseUser!);
-
     return StreamBuilder<src_user.User>(
-        stream: userService.streamUser(currentUser),
+        stream: _userService.streamUser(currentUser),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
@@ -266,27 +217,14 @@ class _ContentPageState extends State<ContentPage> {
           final data = snapshot.data;
           final references = data!.roomReferences;
 
-          if (references.isEmpty) return const Center(child: Text("No Room"));
+          if (references.isEmpty) return noRoomsScene;
 
           return ListView.builder(
               itemCount: references.length,
               itemBuilder: (context, index) {
                 final currentReference = references[index];
 
-                return StreamBuilder<Room>(
-                    stream: roomService.streamReferenceRoom(currentReference),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return loadingScene;
-                      }
-
-                      if (snapshot.hasError) return errorScene;
-
-                      final data = snapshot.data;
-
-                      return ElevatedButton(
-                          onPressed: () {}, child: Text(data!.roomName));
-                    });
+                return roomStreamBuilder(currentReference);
               });
         });
   }

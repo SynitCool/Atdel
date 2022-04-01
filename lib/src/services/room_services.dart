@@ -6,9 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as model;
 
-// services
-import 'package:atdel/src/services/user_services.dart';
-
 class RoomService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
