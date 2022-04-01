@@ -141,6 +141,13 @@ class RoomService {
     // check valid code
     if (!roomCodesMap.containsKey(code)) return;
 
+    // room users doc and update room users
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection("${roomCodesMap[code].path}/users");
+
+    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
+        roomUsersCollection.doc(authUser.uid);
+
     // update the user references
     final DocumentSnapshot<Map<String, dynamic>> getUsersDoc =
         await usersDoc.get();
@@ -152,6 +159,11 @@ class RoomService {
     Map<String, dynamic> userModelInfo = userModel.toMap();
 
     await usersDoc.update(userModelInfo);
+
+    // update room users
+    Map<String, dynamic> userInfo = userModel.toMapRoomUsers();
+
+    await roomUsersDoc.set(userInfo);
   }
 
   // stream global rooms

@@ -55,13 +55,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       memberTitle,
       space24,
     ]);
-
-    containerButtonsContainer = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: materialDrawerButtons,
-      ),
-    );
   }
 
   // drawer host room
@@ -153,17 +146,31 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   // drawer content
   Widget materialDrawer(List<User> users) {
+    materialDrawerWidget = [];
+    materialDrawerButtons = [
+      space12,
+      divider70,
+      memberTitle,
+      space24,
+    ];
+
     for (final user in users) {
       // check host
       if (user.uid == widget.room.hostUid) {
         materialDrawerWidget.add(materialHeader(user));
-        materialDrawerButtons.add(containerButtonsContainer);
       } else {
-        setState(() {
-          materialDrawerButtons.add(materialContentButton(user));
-        });
+        materialDrawerButtons.add(materialContentButton(user));
       }
     }
+
+    containerButtonsContainer = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: materialDrawerButtons,
+      ),
+    );
+
+    materialDrawerWidget.add(containerButtonsContainer);
 
     // the background widget
     return ListView(
