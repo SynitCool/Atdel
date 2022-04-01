@@ -9,10 +9,12 @@ class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  final String rootUsersPath = "new_users";
+
   // get user info from database
   Future<model.User> getUserInfo(String userUid) async {
     final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection("new_users");
+        _db.collection(rootUsersPath);
 
     final DocumentReference<Map<String, dynamic>> doc = collection.doc(userUid);
 
@@ -28,7 +30,7 @@ class UserService {
 
     // make collection
     final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection("new_users");
+        _db.collection(rootUsersPath);
 
     final DocumentReference<Map<String, dynamic>> doc =
         collection.doc(userInfo["uid"]);
@@ -39,5 +41,19 @@ class UserService {
     if (getDoc.exists) return;
 
     await doc.set(userInfo);
+  }
+
+  // stream user
+  Stream<model.User> streamUser(model.User user) {
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(rootUsersPath);
+
+    final DocumentReference<Map<String, dynamic>> doc =
+        collection.doc(user.uid);
+
+    final Stream<model.User> snapshot =
+        doc.snapshots().map((snap) => model.User.fromMap(snap.data()!));
+
+    return snapshot;
   }
 }

@@ -8,6 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:atdel/src/home_pages/settings_pages.dart';
 import 'package:atdel/src/user_pages/user_pages.dart';
 
+// model
+import 'package:atdel/src/model/user.dart' as src_user;
+
 // drawer widget
 // ignore: must_be_immutable
 class DrawerWidget extends StatefulWidget {
@@ -123,9 +126,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       space12,
     ];
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    final src_user.User srcUser = src_user.User.fromFirebaseAuth(currentUser!);
+
     // content drawer widgets
     List<Widget> materialDrawerWidget = [
-      materialHeader(context, urlImage: urlImage, name: name, email: email),
+      materialHeader(context, urlImage: srcUser.photoUrl, name: srcUser.displayName, email: srcUser.email),
       Container(
         padding: padding,
         child: Column(

@@ -23,6 +23,14 @@ import 'package:atdel/src/join_room_control_pages/join_room_control_page.dart';
 // custom widget
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
+// services
+import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/user_services.dart';
+
+// model
+import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/user.dart' as src_user;
+
 // home page
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
@@ -227,12 +235,59 @@ class _ContentPageState extends State<ContentPage> {
     return roomsWidget(context, rooms);
   }
 
+  // // build content widget
+  // @override
+  // Widget build(BuildContext context) {
+  //   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //     stream: readRoom,
+  //     builder: builderFunction,
+  //   );
+  // }
   // build content widget
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: readRoom,
-      builder: builderFunction,
-    );
+    final RoomService roomService = RoomService();
+    final UserService userService = UserService();
+
+    final User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+    final src_user.User currentUser =
+        src_user.User.fromFirebaseAuth(firebaseUser!);
+
+    return StreamBuilder<src_user.User>(
+        stream: userService.streamUser(currentUser),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+          final references = data!.roomReferences;
+
+          if (references.isEmpty) return const Center(child: Text("No Room"));
+
+          return ListView.builder(
+              itemCount: references.length,
+              itemBuilder: (context, index) {
+                final currentReference = references[index];
+
+                return StreamBuilder<Room>(
+                    stream: roomService.streamReferenceRoom(currentReference),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return loadingScene;
+                      }
+
+                      if (snapshot.hasError) return errorScene;
+
+                      final data = snapshot.data;
+
+                      return ElevatedButton(
+                          onPressed: () {}, child: Text(data!.roomName));
+                    });
+              });
+        });
   }
 }

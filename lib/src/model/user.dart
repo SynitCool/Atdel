@@ -10,14 +10,13 @@ class User {
   final String uid;
   List<dynamic> roomReferences;
 
-  User({
-    required this.displayName,
-    required this.email,
-    required this.isAnonymous,
-    required this.photoUrl,
-    required this.uid,
-    required this.roomReferences
-  });
+  User(
+      {required this.displayName,
+      required this.email,
+      required this.isAnonymous,
+      required this.photoUrl,
+      required this.uid,
+      required this.roomReferences});
 
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic>? data = doc.data();
@@ -33,14 +32,21 @@ class User {
 
   factory User.fromFirebaseAuth(auth.User authUser) {
     return User(
-      displayName: authUser.displayName!,
-      email: authUser.email!,
-      isAnonymous: authUser.isAnonymous,
-      photoUrl: authUser.photoURL!,
-      uid: authUser.uid,
-      roomReferences: []
-    );
+        displayName: authUser.displayName!,
+        email: authUser.email!,
+        isAnonymous: authUser.isAnonymous,
+        photoUrl: authUser.photoURL!,
+        uid: authUser.uid,
+        roomReferences: []);
   }
+
+  factory User.fromMap(Map<String, dynamic> map) => User(
+      displayName: map["display_name"],
+      email: map["email"],
+      isAnonymous: map["is_anonymous"],
+      photoUrl: map["photo_url"],
+      uid: map["uid"],
+      roomReferences: map["room_references"]);
 
   Map<String, dynamic> toMap() => {
         "display_name": displayName,

@@ -42,6 +42,16 @@ class Room {
       roomName: "",
       id: "");
 
+  factory Room.fromMap(Map<String, dynamic> map) => Room(
+        hostEmail: map["host_email"],
+        hostPhotoUrl: map["host_photo_url"],
+        hostName: map["host_name"],
+        memberCounts: map["member_counts"],
+        roomDesc: map["room_desc"],
+        roomName: map["room_name"],
+        id: map["id"]
+      );
+
   Map<String, dynamic> toMap() => {
         "host_email": hostEmail,
         "host_photo_url": hostPhotoUrl,
