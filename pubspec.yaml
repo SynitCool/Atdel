@@ -56,6 +56,9 @@ dependencies:
   flutter_html: ^2.2.1
   file_picker: ^4.5.1
 
+  # other
+  random_string_generator: ^2.0.0
+
   # format date time
   intl: ^0.17.0
 

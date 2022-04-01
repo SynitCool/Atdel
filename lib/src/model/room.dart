@@ -10,6 +10,7 @@ class Room {
   String roomDesc;
   String roomName;
   String id;
+  String roomCode;
 
   Room(
       {required this.hostEmail,
@@ -18,7 +19,8 @@ class Room {
       required this.memberCounts,
       required this.roomDesc,
       required this.roomName,
-      required this.id});
+      required this.id,
+      required this.roomCode});
 
   factory Room.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic>? data = doc.data();
@@ -30,7 +32,8 @@ class Room {
         memberCounts: data["member_counts"],
         roomDesc: data["room_desc"],
         roomName: data["room_name"],
-        id: data["id"]);
+        id: data["id"],
+        roomCode: data["room_code"]);
   }
 
   factory Room.fromFirebaseAuth(auth.User authUser) => Room(
@@ -40,17 +43,18 @@ class Room {
       memberCounts: 1,
       roomDesc: "",
       roomName: "",
-      id: "");
+      id: "",
+      roomCode: "");
 
   factory Room.fromMap(Map<String, dynamic> map) => Room(
-        hostEmail: map["host_email"],
-        hostPhotoUrl: map["host_photo_url"],
-        hostName: map["host_name"],
-        memberCounts: map["member_counts"],
-        roomDesc: map["room_desc"],
-        roomName: map["room_name"],
-        id: map["id"]
-      );
+      hostEmail: map["host_email"],
+      hostPhotoUrl: map["host_photo_url"],
+      hostName: map["host_name"],
+      memberCounts: map["member_counts"],
+      roomDesc: map["room_desc"],
+      roomName: map["room_name"],
+      id: map["id"],
+      roomCode: map["room_code"]);
 
   Map<String, dynamic> toMap() => {
         "host_email": hostEmail,
@@ -59,7 +63,8 @@ class Room {
         "member_counts": memberCounts,
         "room_desc": roomDesc,
         "room_name": roomName,
-        "id": id
+        "id": id,
+        "room_code": roomCode
       };
 
   set setRoomDesc(String newRoomDesc) {
@@ -72,5 +77,9 @@ class Room {
 
   set setId(String newId) {
     id = newId;
+  }
+
+  set setRoomCode(String newCode) {
+    roomCode = newCode;
   }
 }
