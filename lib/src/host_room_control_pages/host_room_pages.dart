@@ -35,7 +35,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    const Center(child: Text("Home Screen")),
+    // const Center(child: Text("Home Screen")),
     const Center(child: Text("Attendance List"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
@@ -50,9 +50,9 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   void initState() {
     super.initState();
 
-    // featurePage.add(HomePreviewPage(
-    //   currentData: widget.currentData,
-    // ));
+    featurePage.add(HomePreviewPage(
+      room: widget.room,
+    ));
 
     // featurePage.add(AttedanceListScreen(roomId: widget.currentData["id"]));
   }

@@ -1,7 +1,7 @@
 // flutter
 import 'package:atdel/src/host_room_control_pages/home_feature.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:databases/firebase_firestore.dart';
+// import 'package:databases/firebase_firestore.dart';
 import 'package:flutter/material.dart';
 
 // custom widget
@@ -10,12 +10,16 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 // html
 import 'package:flutter_html/flutter_html.dart';
 
-class HomePreviewPage extends StatefulWidget {
-  const HomePreviewPage({Key? key, required this.currentData})
-      : super(key: key);
+// model
+import 'package:atdel/src/model/room.dart';
 
-  // final String roomId;
-  final Map<String, dynamic> currentData;
+// services
+import 'package:atdel/src/services/room_services.dart';
+
+class HomePreviewPage extends StatefulWidget {
+  const HomePreviewPage({Key? key, required this.room}) : super(key: key);
+
+  final Room room;
 
   @override
   State<HomePreviewPage> createState() => _HomePreviewPageState();
@@ -52,7 +56,7 @@ class _HomePreviewPageState extends State<HomePreviewPage>
               context,
               MaterialPageRoute(
                   builder: (context) => HomeScreen(
-                        roomId: widget.currentData["id"],
+                        room: widget.room,
                       )));
         });
   }
@@ -73,15 +77,14 @@ class _HomePreviewPageState extends State<HomePreviewPage>
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: scaffoldFloatingActionButton(),
-        body: ViewHtml(currentRoomId: widget.currentData["id"]));
+        body: ViewHtml(room: widget.room));
   }
 }
 
 class ViewHtml extends StatefulWidget {
-  const ViewHtml({Key? key, required this.currentRoomId}) : super(key: key);
+  const ViewHtml({Key? key, required this.room}) : super(key: key);
 
-  final String currentRoomId;
-  // final String roomDesc;
+  final Room room;
 
   @override
   State<ViewHtml> createState() => _ViewHtmlState();
@@ -92,24 +95,17 @@ class _ViewHtmlState extends State<ViewHtml> {
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene = const Center(child: Text("Something went wrong!"));
 
+  // services
+  final RoomService _roomService = RoomService();
+
   Widget showHtmlWidget(String htmlData) {
     return SingleChildScrollView(child: Html(data: htmlData));
   }
 
-  // get room doc from database
-  Stream<DocumentSnapshot<Map<String, dynamic>>>? getStreamRoomDoc() {
-    final Room room = Room(roomId: widget.currentRoomId);
-
-    final Stream<DocumentSnapshot<Map<String, dynamic>>>? data =
-        room.streamRoomDoc();
-
-    return data;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: getStreamRoomDoc(),
+    return StreamBuilder<Room>(
+      stream: _roomService.streamGetRoomInfo(widget.room.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -117,11 +113,9 @@ class _ViewHtmlState extends State<ViewHtml> {
 
         if (snapshot.hasError) return errorScene;
 
-        final DocumentSnapshot<Map<String, dynamic>>? doc = snapshot.data;
-        final Map<String, dynamic>? data = doc!.data();
-        final Map<String, dynamic> infoRoom = data!["info_room"];
+        final data = snapshot.data;
 
-        return showHtmlWidget(infoRoom["room_desc"]);
+        return showHtmlWidget(data!.roomDesc);
       },
     );
   }

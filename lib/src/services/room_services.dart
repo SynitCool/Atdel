@@ -166,6 +166,23 @@ class RoomService {
     await roomUsersDoc.set(userInfo);
   }
 
+  // change room desc
+  Future changeRoomDesc(String roomId, String newRoomDesc) async {
+    final collection = _db.collection(rootRoomsCollection);
+
+    final doc = collection.doc(roomId);
+
+    final getDoc = await doc.get();
+
+    Room room = Room.fromFirestore(getDoc);
+
+    room.roomDesc = newRoomDesc;
+
+    final Map<String, dynamic> map = room.toMap();
+
+    await doc.update(map);
+  }
+
   // stream global rooms
   Stream<List<Room>> streamGlobalRooms() {
     final CollectionReference<Map<String, dynamic>> collection =
@@ -195,6 +212,19 @@ class RoomService {
 
     final Stream<List<model.User>> stream = collection.snapshots().map((data) =>
         data.docs.map((doc) => model.User.fromMap(doc.data())).toList());
+
+    return stream;
+  }
+
+  // stream get room info
+  Stream<Room> streamGetRoomInfo(String roomId) {
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(rootRoomsCollection);
+
+    final DocumentReference<Map<String, dynamic>> doc = collection.doc(roomId);
+
+    final Stream<Room> stream =
+        doc.snapshots().map((data) => Room.fromMap(data.data()!));
 
     return stream;
   }
