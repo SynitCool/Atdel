@@ -1,20 +1,21 @@
 // flutter
+import 'package:atdel/src/services/room_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // editor
 import 'package:html_editor_enhanced/html_editor.dart';
 
-// database
-import 'package:databases/firebase_firestore.dart';
-
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key, required this.roomId}) : super(key: key);
+// model
+import 'package:atdel/src/model/room.dart';
 
-  final String roomId;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key, required this.room}) : super(key: key);
+
+  final Room room;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -26,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   late Animation<double> _animation;
   late AnimationController _animationController;
+
+  final RoomService _roomService = RoomService();
 
   @override
   void initState() {
@@ -66,9 +69,7 @@ class _HomeScreenState extends State<HomeScreen>
         onPress: () async {
           final text = await controller.getText();
 
-          Room room = Room(roomId: widget.roomId);
-
-          room.updateRoomDesc(text);
+          _roomService.changeRoomDesc(widget.room.id, text);
 
           Navigator.pop(context);
         });

@@ -1,13 +1,16 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// database
-import 'package:databases/firebase_firestore.dart';
+// model
+import 'package:atdel/src/model/room.dart';
+
+// services
+import 'package:atdel/src/services/room_services.dart';
 
 class HostSettingsPage extends StatefulWidget {
-  const HostSettingsPage({Key? key, required this.roomId}) : super(key: key);
+  const HostSettingsPage({Key? key, required this.room}) : super(key: key);
 
-  final String roomId;
+  final Room room;
 
   @override
   State<HostSettingsPage> createState() => _HostSettingsPageState();
@@ -21,29 +24,29 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: scaffoldAppBar(), body: ContentPage(roomId: widget.roomId));
+        appBar: scaffoldAppBar(), body: ContentPage(room: widget.room));
   }
 }
 
 class ContentPage extends StatefulWidget {
-  const ContentPage({Key? key, required this.roomId}) : super(key: key);
+  const ContentPage({Key? key, required this.room}) : super(key: key);
 
-  final String roomId;
+  final Room room;
 
   @override
   State<ContentPage> createState() => _ContentPageState();
 }
 
 class _ContentPageState extends State<ContentPage> {
-  Widget disperseRoomButton() {
-    final Room room = Room(roomId: widget.roomId);
+  final RoomService _roomService = RoomService();
 
+  Widget disperseRoomButton() {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(primary: Colors.red),
         onPressed: () {
           Navigator.pop(context);
 
-          room.deleteRoom();
+          _roomService.deleteRoomFromDatabase(widget.room);
 
           Navigator.pop(context);
         },

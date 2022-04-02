@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:atdel/src/authentication/firebase_authentication.dart';
 import 'package:authentication/firebase_authentication.dart';
 
+// model
+import 'package:atdel/src/model/user.dart' as src_user;
+
 // ignore: must_be_immutable
 class UserPage extends StatefulWidget {
   User user;
@@ -16,20 +19,28 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  late String name;
-  late String email;
-  late String imageUrl;
+  // late String name;
+  // late String email;
+  // late String imageUrl;
 
   final double coverHeight = 180;
   final double profileHeight = 144;
+
+  // firebase
+  final User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+  // model
+  late src_user.User currentUser;
 
   @override
   void initState() {
     super.initState();
 
-    name = widget.user.displayName!;
-    email = widget.user.email!;
-    imageUrl = widget.user.photoURL!;
+    // name = widget.user.displayName!;
+    // email = widget.user.email!;
+    // imageUrl = widget.user.photoURL!;
+
+    currentUser = src_user.User.fromFirebaseAuth(firebaseUser!);
   }
 
   // cover image
@@ -42,7 +53,7 @@ class _UserPageState extends State<UserPage> {
     return CircleAvatar(
       radius: profileHeight / 2,
       backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(imageUrl),
+      backgroundImage: NetworkImage(currentUser.photoUrl),
     );
   }
 
@@ -84,11 +95,11 @@ class _UserPageState extends State<UserPage> {
 
     return Column(children: [
       space8,
-      Text(name,
+      Text(currentUser.displayName,
           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
       space8,
       Text(
-        email,
+        currentUser.email,
         style: const TextStyle(fontSize: 20, color: Colors.black45),
       ),
       space16,

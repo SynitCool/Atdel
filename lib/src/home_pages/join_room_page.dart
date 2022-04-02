@@ -1,7 +1,8 @@
+// flutter
 import 'package:flutter/material.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// services
+import 'package:atdel/src/services/room_services.dart';
 
 class JoinRoomPage extends StatefulWidget {
   const JoinRoomPage({Key? key}) : super(key: key);
@@ -12,90 +13,27 @@ class JoinRoomPage extends StatefulWidget {
 
 class _JoinRoomPageState extends State<JoinRoomPage> {
   // widget related
-  final TextEditingController userTextFieldController = TextEditingController();
-  final TextEditingController roomIdTextFieldController =
+  final TextEditingController roomCodeTextFieldController =
       TextEditingController();
-  String userUidText = '';
-  String roomIdText = '';
+  String roomCodeText = '';
 
   @override
   void dispose() {
-    userTextFieldController.dispose();
-    roomIdTextFieldController.dispose();
+    roomCodeTextFieldController.dispose();
     super.dispose();
   }
 
-  // user error text field
-  String? get userErrorText {
-    final String userText = userTextFieldController.value.text;
-
-    if (userText.isEmpty) {
-      return 'Can\'t be empty';
-    }
-
-    if (userText.length < 16) {
-      return 'The user uid must be greater than 16';
-    }
-
-    return null;
-  }
-
   // room id error text field
-  String? get roomIdErrorText {
-    final String idRoomText = roomIdTextFieldController.value.text;
+  String? get roomCodeErrorText {
+    final String codeRoomText = roomCodeTextFieldController.value.text;
 
-    if (idRoomText.isEmpty) {
+    if (codeRoomText.isEmpty) {
       return 'Can\'t be empty';
     }
 
-    if (idRoomText.length < 16) {
-      return 'The room id must be greater than 16';
-    }
+    if (codeRoomText.length == 6) return null;
 
-    return null;
-  }
-
-  // join room
-  Future joinRoom(BuildContext context) async {
-    // firebase user
-    final User? user = FirebaseAuth.instance.currentUser;
-    final String userUid = user!.uid;
-
-    // creator room
-    final String collectionCreatorRoomString = "users/$userUidText/rooms";
-
-    final CollectionReference<Map<String, dynamic>> collectionCreatorRoom =
-        FirebaseFirestore.instance.collection(collectionCreatorRoomString);
-
-    final DocumentReference<Map<String, dynamic>> docCreatorRoom =
-        collectionCreatorRoom.doc(roomIdText);
-
-    final DocumentSnapshot<Map<String, dynamic>> getCreatorRoom =
-        await docCreatorRoom.get();
-    final Map<String, dynamic>? dataCreatorRoom = getCreatorRoom.data();
-    final Map<String, dynamic> infoCreatorRoom = dataCreatorRoom!["info_room"];
-
-    // joiner room
-    final String collectionJoinerRoomString = "users/$userUid/rooms";
-
-    final CollectionReference<Map<String, dynamic>> collectionJoinerRoom =
-        FirebaseFirestore.instance.collection(collectionJoinerRoomString);
-
-    final DocumentReference<Map<String, dynamic>> docJoinerRoom =
-        collectionJoinerRoom.doc(roomIdText);
-
-    final Map<String, dynamic> infoJoinerroom = infoCreatorRoom;
-
-    infoJoinerroom["room_reference"] = docCreatorRoom;
-
-    final Map<String, dynamic> wrapperInfoJoinerroom = {
-      "info_room": infoJoinerroom
-    };
-
-    await docJoinerRoom.set(wrapperInfoJoinerroom);
-
-    // back to home
-    Navigator.pop(context);
+    return 'The room id must be 6 characters';
   }
 
   // app bar widget
@@ -104,7 +42,11 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
             onPressed: () {
-              joinRoom(context);
+              final RoomService roomService = RoomService();
+
+              roomService.joinRoomWithCode(roomCodeText);
+
+              Navigator.pop(context);
             },
             child: const Text("Join")));
 
@@ -116,29 +58,15 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
   }
 
   // name room text field widget
-  Widget userTextFieldWidget() {
-    return TextField(
-      controller: userTextFieldController,
-      decoration: InputDecoration(
-          label: const Text("User UID"),
-          border: const OutlineInputBorder(),
-          errorText: userErrorText),
-      onChanged: (text) => setState(() {
-        userUidText = text;
-      }),
-    );
-  }
-
-  // name room text field widget
   Widget roomIdFieldWidget() {
     return TextField(
-      controller: roomIdTextFieldController,
+      controller: roomCodeTextFieldController,
       decoration: InputDecoration(
-          label: const Text("Room ID"),
+          label: const Text("Room Code"),
           border: const OutlineInputBorder(),
-          errorText: roomIdErrorText),
+          errorText: roomCodeErrorText),
       onChanged: (text) => setState(() {
-        roomIdText = text;
+        roomCodeText = text;
       }),
     );
   }
@@ -148,12 +76,10 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
     const EdgeInsets padding =
         EdgeInsets.symmetric(horizontal: 30, vertical: 30);
 
-    const SizedBox space20 = SizedBox(height: 20);
-
     return Padding(
         padding: padding,
         child: ListView(
-          children: [userTextFieldWidget(), space20, roomIdFieldWidget()],
+          children: [roomIdFieldWidget()],
         ));
   }
 

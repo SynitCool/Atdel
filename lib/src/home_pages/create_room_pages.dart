@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:databases/firebase_firestore.dart' as model;
 
+// services
+import 'package:atdel/src/services/room_services.dart';
+
 class CreateRoomPage extends StatefulWidget {
   const CreateRoomPage({Key? key}) : super(key: key);
 
@@ -84,7 +87,11 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
             onPressed: () {
-              createRoom(context);
+              final RoomService roomService = RoomService();
+
+              roomService.addRoomToDatabase(nameText);
+
+              Navigator.pop(context);
             },
             child: const Text("Create")));
 

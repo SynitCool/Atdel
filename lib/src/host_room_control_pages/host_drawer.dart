@@ -1,26 +1,67 @@
 import 'package:flutter/material.dart';
 
+// model
+import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/user.dart';
+
+// services
+import 'package:atdel/src/services/room_services.dart';
 
 class DrawerWidget extends StatefulWidget {
-  final List<dynamic> usersData;
+  const DrawerWidget({Key? key, required this.room}) : super(key: key);
 
-  const DrawerWidget({Key? key, required this.usersData}) : super(key: key);
+  final Room room;
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-  // drawer host room
-  Widget materialHeader(BuildContext context, Map<String, dynamic> hostInfo) {
-    // host profile
-    final String urlImage = hostInfo["user_image_url"];
-    final String name = hostInfo["user_name"];
-    final String email = hostInfo["user_email"];
+  // scene
+  final Widget loadingScene = const Center(child: CircularProgressIndicator());
+  final Widget errorScene =
+      const Center(child: Text("There something went wrong !"));
 
+  // widget parameters
+  final Widget space12 = const SizedBox(height: 12);
+  final Widget space24 = const SizedBox(height: 24);
+  // final Widget space16 = SizedBox(height: 16);
+  final Widget divider70 = const Divider(color: Colors.white70);
+  final Widget memberTitle = const Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      "Members",
+      style: TextStyle(
+          color: Colors.black38, fontWeight: FontWeight.bold, fontSize: 12),
+    ),
+  );
+
+  // content drawer widgets
+  List<Widget> materialDrawerWidget = [];
+
+  // content button widgets
+  List<Widget> materialDrawerButtons = [];
+
+  // drawer buttons container
+  late Widget containerButtonsContainer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    materialDrawerButtons.addAll([
+      space12,
+      divider70,
+      memberTitle,
+      space24,
+    ]);
+  }
+
+  // drawer host room
+  Widget materialHeader(User user) {
     const padding = EdgeInsets.symmetric(horizontal: 20);
     final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage));
+        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
     const SizedBox spaceWidth20 = SizedBox(width: 20);
     const SizedBox spaceWidth4 = SizedBox(width: 4);
     const SizedBox spaceHeight4 = SizedBox(height: 4);
@@ -35,14 +76,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
           spaceWidth4,
           Text(
-            name,
+            user.displayName,
             style: const TextStyle(fontSize: 20, color: Colors.white),
           )
         ],
       ),
       spaceHeight4,
       Text(
-        email,
+        user.email,
         style: const TextStyle(fontSize: 14, color: Colors.white),
       ),
     ]);
@@ -65,15 +106,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   // drawer member room
-  Widget materialContentButton(
-      BuildContext context, Map<String, dynamic> memberInfo) {
-    // host profile
-    final String urlImage = memberInfo["user_image_url"];
-    final String name = memberInfo["user_name"];
-    final String email = memberInfo["user_email"];
-
+  Widget materialContentButton(User user) {
     final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage));
+        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
     const SizedBox spaceWidth4 = SizedBox(width: 4);
     const SizedBox spaceHeight4 = SizedBox(height: 4);
 
@@ -87,14 +122,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
           spaceWidth4,
           Text(
-            name,
+            user.displayName,
             style: const TextStyle(fontSize: 16, color: Colors.white),
           )
         ],
       ),
       spaceHeight4,
       Text(
-        email,
+        user.email,
         style: const TextStyle(fontSize: 12, color: Colors.white),
       ),
     ]);
@@ -110,63 +145,32 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   // drawer content
-  Widget materialDrawer() {
-    // widget parameters
-    const Widget space12 = SizedBox(height: 12);
-    const Widget space24 = SizedBox(height: 24);
-    // const Widget space16 = SizedBox(height: 16);
-    const Widget divider70 = Divider(color: Colors.white70);
-    const EdgeInsets padding = EdgeInsets.symmetric(horizontal: 20);
-    const Widget memberTitle = Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        "Members",
-        style: TextStyle(
-            color: Colors.black38, fontWeight: FontWeight.bold, fontSize: 12),
-      ),
-    );
-
-    // user type
-    late Map<String, dynamic> hostUser;
-    List<dynamic> membersUser = [];
-
-    // separate member and host
-    for (int i = 0; i < widget.usersData.length; i++) {
-      Map<String, dynamic> currentUser = widget.usersData[i];
-      String userType = currentUser["type"];
-
-      if (userType == "Host") {
-        hostUser = currentUser;
-      } else {
-        membersUser.add(currentUser);
-      }
-    }
-
-    // content button widgets
-    List<Widget> materialDrawerButtons = [
+  Widget materialDrawer(List<User> users) {
+    materialDrawerWidget = [];
+    materialDrawerButtons = [
       space12,
       divider70,
       memberTitle,
       space24,
     ];
 
-    // adding member button
-    for (int i = 0; i < membersUser.length; i++) {
-      Map<String, dynamic> currentMember = membersUser[i];
-
-      materialDrawerButtons.add(materialContentButton(context, currentMember));
+    for (final user in users) {
+      // check host
+      if (user.uid == widget.room.hostUid) {
+        materialDrawerWidget.add(materialHeader(user));
+      } else {
+        materialDrawerButtons.add(materialContentButton(user));
+      }
     }
 
-    // content drawer widgets
-    List<Widget> materialDrawerWidget = [
-      materialHeader(context, hostUser),
-      Container(
-        padding: padding,
-        child: Column(
-          children: materialDrawerButtons,
-        ),
+    containerButtonsContainer = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: materialDrawerButtons,
       ),
-    ];
+    );
+
+    materialDrawerWidget.add(containerButtonsContainer);
 
     // the background widget
     return ListView(
@@ -176,6 +180,30 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return materialDrawer();
+    // return materialDrawer();
+    final RoomService roomService = RoomService();
+
+    return StreamBuilder<List<User>>(
+        stream: roomService.streamUsersRoom(widget.room),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return materialDrawer(data!);
+
+          // return ListView.builder(
+          //     itemCount: data!.length,
+          //     itemBuilder: (context, index) {
+          //       final currentData = data[index];
+
+          //       return ElevatedButton(
+          //           onPressed: () {}, child: Text(currentData.displayName));
+          //     });
+        });
   }
 }

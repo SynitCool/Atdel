@@ -11,11 +11,14 @@ import 'package:atdel/src/host_room_control_pages/host_drawer.dart';
 import 'package:atdel/src/host_room_control_pages/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
 
+// model
+import 'package:atdel/src/model/room.dart';
+
 // page
 class HostRoomPages extends StatefulWidget {
-  const HostRoomPages({Key? key, required this.currentData}) : super(key: key);
+  const HostRoomPages({Key? key, required this.room}) : super(key: key);
 
-  final Map<String, dynamic> currentData;
+  final Room room;
 
   @override
   State<HostRoomPages> createState() => _HostRoomPagesState();
@@ -32,7 +35,8 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
-    // const Center(child: Text("Home Screen"))
+    // const Center(child: Text("Home Screen")),
+    // const Center(child: Text("Attendance List"))
   ];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
@@ -47,10 +51,10 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     super.initState();
 
     featurePage.add(HomePreviewPage(
-          currentData: widget.currentData,
-      ));
+      room: widget.room,
+    ));
 
-    featurePage.add(AttedanceListScreen(roomId: widget.currentData["id"]));
+    featurePage.add(AttedanceListScreen(room: widget.room));
   }
 
   // the appbar
@@ -79,7 +83,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
             context,
             MaterialPageRoute(
                 builder: ((context) =>
-                    HostSettingsPage(roomId: widget.currentData["id"]))));
+                    HostSettingsPage(room: widget.room))));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
@@ -100,7 +104,6 @@ class _HostRoomPagesState extends State<HostRoomPages> {
       bottomNavigationBar: bottomNavigationBar(),
     );
   }
-
 
   // bottom navigation bar
   Widget bottomNavigationBar() {
@@ -135,7 +138,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
         animationDuration: animationDuration,
         childDecoration: childDecoration,
         child: mainContentWidget(),
-        drawer: DrawerWidget(usersData: widget.currentData["info_users"]));
+        drawer: DrawerWidget(room: widget.room));
   }
 
   @override
