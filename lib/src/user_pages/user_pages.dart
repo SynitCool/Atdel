@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-// import 'package:atdel/src/authentication/firebase_authentication.dart';
-import 'package:authentication/firebase_authentication.dart';
+import 'package:atdel/src/authentication/google_authentication.dart';
 
 // model
 import 'package:atdel/src/model/user.dart' as src_user;
@@ -81,9 +80,6 @@ class _UserPageState extends State<UserPage> {
 
     final Widget signOutButton = ListTile(
         onTap: () async {
-          // final provider =
-          //     Provider.of<GoogleSignInProvider>(context, listen: false);
-
           final provider = GoogleSignInProvider();
 
           provider.googleLogout();

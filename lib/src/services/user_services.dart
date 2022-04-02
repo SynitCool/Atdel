@@ -7,7 +7,7 @@ import 'package:atdel/src/model/user.dart' as model;
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  final String rootUsersPath = "new_users";
+  final String rootUsersPath = "users";
 
   // get user info from database
   Future<model.User> getUserInfo(String userUid) async {
