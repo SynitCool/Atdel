@@ -77,22 +77,22 @@ class _HostRoomPagesState extends State<HostRoomPages> {
       ),
     );
 
-    // Widget settingsButton = IconButton(
-    //   onPressed: () {
-    //     Navigator.push(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: ((context) =>
-    //                 HostSettingsPage(roomId: widget.currentData["id"]))));
-    //   },
-    //   icon: const Icon(Icons.settings),
-    //   padding: const EdgeInsets.all(15.0),
-    // );
+    Widget settingsButton = IconButton(
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) =>
+                    HostSettingsPage(room: widget.room))));
+      },
+      icon: const Icon(Icons.settings),
+      padding: const EdgeInsets.all(15.0),
+    );
 
     return AppBar(
       title: const Text("Host Room Control"),
       leading: leading,
-      // actions: [settingsButton],
+      actions: [settingsButton],
     );
   }
 

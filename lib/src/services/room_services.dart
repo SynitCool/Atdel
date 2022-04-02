@@ -220,7 +220,7 @@ class RoomService {
 
     roomUsers.forEach((elements) async {
       for (final element in elements) {
-        if (room.hostUid == element.uid) continue;
+        // if (room.hostUid == element.uid) continue;
 
         final elementDoc = attendanceUsersCollection.doc(element.uid);
 
@@ -232,30 +232,82 @@ class RoomService {
   }
 
   // delete room
-  // Future deleteRoomFromDatabase(Room room) async {
-  //   // room doc
-  //   final CollectionReference<Map<String, dynamic>> roomCollection =
-  //       _db.collection(rootRoomsCollection);
+  Future deleteRoomFromDatabase(Room room) async {
+    // room doc
+    final CollectionReference<Map<String, dynamic>> roomCollection =
+        _db.collection(rootRoomsCollection);
 
-  //   final DocumentReference<Map<String, dynamic>> roomDoc =
-  //       roomCollection.doc(room.id);
+    final DocumentReference<Map<String, dynamic>> roomDoc =
+        roomCollection.doc(room.id);
 
-  //   // users collection
-  //   final CollectionReference<Map<String, dynamic>> usersCollection =
-  //       _db.collection(rootUsersCollection);
+    // room codes code
+    final CollectionReference<Map<String, dynamic>> roomCodesCollection =
+        _db.collection(rootCodesCollection);
 
-  //   // delete users room references
-  //   final Stream<List<model.User>> streamRoomUsers = streamUsersRoom(room);
+    final DocumentReference<Map<String, dynamic>> roomCodesDoc =
+        roomCodesCollection.doc("room_codes");
 
-  //   streamRoomUsers.forEach((elements) {
-  //     for (final element in elements) {
+    // delete room code
+    final DocumentSnapshot<Map<String, dynamic>> getRoomCodes =
+        await roomCodesDoc.get();
 
-  //     }
-  //   });
+    final Map<String, dynamic>? roomCodesMap = getRoomCodes.data();
 
-  //   // delete room from database
-  //   await roomDoc.delete();
-  // }
+    roomCodesMap!.remove(room.roomCode);
+
+    await roomCodesDoc.set(roomCodesMap);
+
+    // delete users room references
+    final Stream<List<model.User>> streamRoomUsers = streamUsersRoom(room);
+
+    streamRoomUsers.forEach((elements) async {
+      for (final element in elements) {
+        final DocumentSnapshot<Map<String, dynamic>> getUserReference =
+            await element.userReference.get();
+
+        final model.User user = model.User.fromMap(getUserReference.data()!);
+
+        user.roomReferences.remove(roomDoc);
+
+        final Map<String, dynamic> map = user.toMapUsers();
+
+        await element.userReference.update(map);
+      }
+    });
+
+    // delete room from database
+    await roomDoc.delete();
+
+    // delete all room users
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/users");
+
+    roomUsersCollection.get().then((snapshot) {
+      for (final snap in snapshot.docs) {
+        snap.reference.delete();
+      }
+    });
+
+    // delete all attendance list
+    final CollectionReference<Map<String, dynamic>> attendanceListCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/attendance_list");
+
+    attendanceListCollection.get().then((snapshot) {
+      for (final snap in snapshot.docs) {
+        final referencePath = snap.reference.path;
+
+        final collectionUsersReference = _db.collection("$referencePath/users");
+
+        collectionUsersReference.get().then((usersSnapshot) {
+          for (final userSnap in usersSnapshot.docs) {
+            userSnap.reference.delete();
+          }
+        });
+
+        snap.reference.delete();
+      }
+    });
+  }
 
   // stream global rooms
   Stream<List<Room>> streamGlobalRooms() {
