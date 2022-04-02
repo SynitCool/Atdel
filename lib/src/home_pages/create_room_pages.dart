@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:databases/firebase_firestore.dart' as model;
-
 // services
 import 'package:atdel/src/services/room_services.dart';
 
@@ -40,45 +38,6 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     }
 
     return null;
-  }
-
-  // create room
-  Future createRoom(BuildContext context) async {
-    if (nameText.isEmpty) return;
-    if (nameText.length < 4) return;
-
-    final String roomName = nameText;
-    final String? hostName = user!.displayName;
-    final String? hostEmail = user!.email;
-    final String? hostUid = user!.uid;
-    final String? hostImageUrl = user!.photoURL;
-    const int memberCounts = 1;
-
-    final Map<String, dynamic> infoRoom = {
-      "room_name": roomName,
-      "host_name": hostName,
-      "host_email": hostEmail,
-      "host_uid": hostUid,
-      "host_image_url": hostImageUrl,
-      "member_counts": memberCounts,
-      "room_desc": "<h1>$roomName</h1><br/><p>created by $hostName</p>"
-    };
-
-    final List<Map<String, dynamic>> infoUsers = [
-      {
-        "user_name": hostName,
-        "user_email": hostEmail,
-        "user_uid": hostUid,
-        "user_image_url": hostImageUrl,
-        "type": "Host"
-      }
-    ];
-
-    final model.Room room = model.Room();
-
-    Navigator.pop(context);
-
-    await room.createRoom(infoRoom, infoUsers);
   }
 
   // app bar widget

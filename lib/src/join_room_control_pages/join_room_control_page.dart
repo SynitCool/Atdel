@@ -81,7 +81,7 @@ class _JoinRoomControlState extends State<JoinRoomControl> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: ((context) => const JoinRoomSettings())));
+                builder: ((context) => JoinRoomSettings(room: widget.room))));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),

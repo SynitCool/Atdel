@@ -13,9 +13,9 @@ import 'package:random_string_generator/random_string_generator.dart';
 class RoomService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  final String rootRoomsCollection = "new_rooms";
-  final String rootUsersCollection = "new_users";
-  final String rootCodesCollection = "new_codes";
+  final String rootRoomsCollection = "rooms";
+  final String rootUsersCollection = "users";
+  final String rootCodesCollection = "codes";
 
   final String roomCodesDoc = "room_codes";
 
@@ -336,6 +336,38 @@ class RoomService {
         await userDoc.update(userMap);
       }
     });
+  }
+
+  // leave room
+  Future leaveRoom(Room room) async {
+    // auth user
+    final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
+
+    // room collection
+    final roomCollection = _db.collection(rootRoomsCollection);
+    final roomDoc = roomCollection.doc(room.id);
+
+    // room users collection
+    final roomUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/users");
+    final roomUserDoc = roomUsersCollection.doc(authUser!.uid);
+
+    // users collection
+    final usersCollection = _db.collection(rootUsersCollection);
+    final userDoc = usersCollection.doc(authUser.uid);
+
+    // remove room reference
+    final getUserDoc = await userDoc.get();
+    final user = model.User.fromMap(getUserDoc.data()!);
+
+    user.roomReferences.remove(roomDoc);
+
+    final userMap = user.toMapUsers();
+
+    await userDoc.update(userMap);
+
+    // delete user in room users
+    await roomUserDoc.delete();
   }
 
   // stream global rooms
