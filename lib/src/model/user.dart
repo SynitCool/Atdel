@@ -8,6 +8,7 @@ class User {
   final bool isAnonymous;
   final String photoUrl;
   final String uid;
+  final bool absent;
   List<dynamic> roomReferences;
 
   User(
@@ -16,7 +17,8 @@ class User {
       required this.isAnonymous,
       required this.photoUrl,
       required this.uid,
-      required this.roomReferences});
+      required this.roomReferences,
+      required this.absent});
 
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic>? data = doc.data();
@@ -27,7 +29,8 @@ class User {
         isAnonymous: data["is_anonymous"],
         photoUrl: data["photo_url"],
         uid: data["uid"],
-        roomReferences: data["room_references"]);
+        roomReferences: data["room_references"],
+        absent: true);
   }
 
   factory User.fromFirebaseAuth(auth.User authUser) {
@@ -37,7 +40,8 @@ class User {
         isAnonymous: authUser.isAnonymous,
         photoUrl: authUser.photoURL!,
         uid: authUser.uid,
-        roomReferences: []);
+        roomReferences: [],
+        absent: true);
   }
 
   factory User.fromMap(Map<String, dynamic> map) => User(
@@ -46,9 +50,10 @@ class User {
       isAnonymous: map["is_anonymous"],
       photoUrl: map["photo_url"],
       uid: map["uid"],
-      roomReferences: map["room_references"] ?? []);
+      roomReferences: map["room_references"] ?? [],
+      absent: map["absent"] ?? true);
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMapUsers() => {
         "display_name": displayName,
         "email": email,
         "is_anonymous": isAnonymous,
@@ -57,10 +62,20 @@ class User {
         "room_references": roomReferences
       };
 
-  Map<String, dynamic> toMapRoomUsers() =>
-      {"display_name": displayName, 
-      "email": email, 
-      "is_anonymous": isAnonymous,
-      "photo_url": photoUrl,
-      "uid": uid};
+  Map<String, dynamic> toMapRoomUsers() => {
+        "display_name": displayName,
+        "email": email,
+        "is_anonymous": isAnonymous,
+        "photo_url": photoUrl,
+        "uid": uid
+      };
+
+  Map<String, dynamic> toMapAttendanceUsers() => {
+        "display_name": displayName,
+        "email": email,
+        "is_anonymous": isAnonymous,
+        "photo_url": photoUrl,
+        "uid": uid,
+        "absent": absent
+      };
 }

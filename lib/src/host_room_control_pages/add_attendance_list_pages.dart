@@ -5,13 +5,16 @@ import 'package:intl/intl.dart';
 // personal packages
 import 'package:databases/firebase_firestore.dart' as model;
 
-class AddAttendanceListPage extends StatefulWidget {
-  const AddAttendanceListPage(
-      {Key? key, required this.roomId, required this.userUid})
-      : super(key: key);
+// services
+import 'package:atdel/src/services/room_services.dart';
 
-  final String roomId;
-  final String userUid;
+// model
+import 'package:atdel/src/model/room.dart';
+
+class AddAttendanceListPage extends StatefulWidget {
+  const AddAttendanceListPage({Key? key, required this.room}) : super(key: key);
+
+  final Room room;
 
   @override
   State<AddAttendanceListPage> createState() => _AddAttendanceListPageState();
@@ -39,8 +42,8 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
   void initState() {
     super.initState();
 
-    _attendance =
-        model.AttendanceList(roomId: widget.roomId, userUid: widget.userUid);
+    // _attendance =
+    //     model.AttendanceList(roomId: widget.roomId, userUid: widget.userUid);
   }
 
   // get text date
@@ -57,7 +60,12 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     if (startDate == null || endDate == null) return;
     if (signAddButton == "error") return;
 
-    _attendance.addAttendance(startDate!, endDate!, roomId: widget.roomId, userUid: widget.userUid);
+    final RoomService roomService = RoomService();
+
+    roomService.addAttendanceToDatabase(widget.room.id, startDate!, endDate!);
+
+    // _attendance.addAttendance(startDate!, endDate!,
+    //     roomId: widget.roomId, userUid: widget.userUid);
 
     Navigator.pop(context);
   }

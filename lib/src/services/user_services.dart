@@ -24,7 +24,7 @@ class UserService {
   // add user to database
   Future addUserToDatabase(model.User user) async {
     // user info
-    final Map<String, dynamic> userInfo = user.toMap();
+    final Map<String, dynamic> userInfo = user.toMapUsers();
 
     // make collection
     final CollectionReference<Map<String, dynamic>> collection =

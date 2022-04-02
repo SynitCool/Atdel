@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 // model
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as model;
+import 'package:atdel/src/model/attendance.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -98,7 +99,7 @@ class RoomService {
 
     user.roomReferences.add(roomDoc);
 
-    Map<String, dynamic> usersInfo = user.toMap();
+    Map<String, dynamic> usersInfo = user.toMapUsers();
 
     await usersDoc.update(usersInfo);
 
@@ -156,7 +157,7 @@ class RoomService {
 
     userModel.roomReferences.add(roomCodesMap[code]);
 
-    Map<String, dynamic> userModelInfo = userModel.toMap();
+    Map<String, dynamic> userModelInfo = userModel.toMapUsers();
 
     await usersDoc.update(userModelInfo);
 
@@ -168,11 +169,12 @@ class RoomService {
 
   // change room desc
   Future changeRoomDesc(String roomId, String newRoomDesc) async {
-    final collection = _db.collection(rootRoomsCollection);
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(rootRoomsCollection);
 
-    final doc = collection.doc(roomId);
+    final DocumentReference<Map<String, dynamic>> doc = collection.doc(roomId);
 
-    final getDoc = await doc.get();
+    final DocumentSnapshot<Map<String, dynamic>> getDoc = await doc.get();
 
     Room room = Room.fromFirestore(getDoc);
 
@@ -181,6 +183,47 @@ class RoomService {
     final Map<String, dynamic> map = room.toMap();
 
     await doc.update(map);
+  }
+
+  // add attendance
+  Future addAttendanceToDatabase(
+      String roomId, DateTime dateStart, DateTime dateEnd) async {
+    // attendace list collection
+    final String attendanceListCollectionPath =
+        "$rootRoomsCollection/$roomId/attendance_list";
+    final CollectionReference<Map<String, dynamic>> attendanceListCollection =
+        _db.collection(attendanceListCollectionPath);
+
+    // attendance doc
+    final DocumentReference<Map<String, dynamic>> attendanceListDoc =
+        attendanceListCollection.doc();
+
+    // set to database
+    Attendance attendance = Attendance(
+        dateStart: dateStart, dateEnd: dateEnd, id: attendanceListDoc.id);
+
+    final Map<String, dynamic> map = attendance.toMap();
+
+    await attendanceListDoc.set(map);
+
+    // attendance users collection
+    final String attendanceUsersCollectionPath =
+        "$rootRoomsCollection/$roomId/attendance_list/${attendanceListDoc.id}/users";
+    final CollectionReference<Map<String, dynamic>> attendanceUsersCollection =
+        _db.collection(attendanceUsersCollectionPath);
+
+    // room users docs
+    final roomUsers = streamUsersRoom(roomId);
+
+    roomUsers.forEach((elements) async {
+      for (final element in elements) {
+        final elementDoc = attendanceUsersCollection.doc(element.uid);
+
+        final map = element.toMapAttendanceUsers();
+
+        await elementDoc.set(map);
+      }
+    });
   }
 
   // stream global rooms
@@ -225,6 +268,31 @@ class RoomService {
 
     final Stream<Room> stream =
         doc.snapshots().map((data) => Room.fromMap(data.data()!));
+
+    return stream;
+  }
+
+  // stream attendance list
+  Stream<List<Attendance>> streamAttendanceList(String roomId) {
+    final String collectionPath =
+        "$rootRoomsCollection/$roomId/attendance_list";
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final Stream<List<Attendance>> stream = collection.snapshots().map((data) =>
+        data.docs.map((data) => Attendance.fromMap(data.data())).toList());
+
+    return stream;
+  }
+
+  // stream users attendance
+  Stream<List<model.User>> streamUsersAttendance(String roomId, String attendanceId) {
+    final String collectionPath =
+        "$rootRoomsCollection/$roomId/attendance_list/$attendanceId/users";
+    final collection = _db.collection(collectionPath);
+
+    final stream = collection.snapshots().map((data) =>
+        data.docs.map((data) => model.User.fromMap(data.data())).toList());
 
     return stream;
   }
