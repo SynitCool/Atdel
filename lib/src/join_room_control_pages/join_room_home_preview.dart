@@ -1,14 +1,8 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// custom widget
-import 'package:floating_action_bubble/floating_action_bubble.dart';
-
 // html
 import 'package:flutter_html/flutter_html.dart';
-
-// pages
-import 'package:atdel/src/host_room_control_pages/home_feature.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
@@ -27,22 +21,7 @@ class JoinRoomPreviewPage extends StatefulWidget {
 
 class _JoinRoomPreviewPageState extends State<JoinRoomPreviewPage>
     with SingleTickerProviderStateMixin {
-  // animation
-  late Animation<double> _animation;
-  late AnimationController _animationController;
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 260),
-    );
-
-    final curvedAnimation =
-        CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
-    _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
-  }
 
   @override
   Widget build(BuildContext context) {

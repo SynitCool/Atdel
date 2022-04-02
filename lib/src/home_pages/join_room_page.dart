@@ -76,8 +76,6 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
     const EdgeInsets padding =
         EdgeInsets.symmetric(horizontal: 30, vertical: 30);
 
-    const SizedBox space20 = SizedBox(height: 20);
-
     return Padding(
         padding: padding,
         child: ListView(

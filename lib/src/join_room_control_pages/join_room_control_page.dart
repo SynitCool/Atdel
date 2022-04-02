@@ -1,5 +1,4 @@
 // flutter
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 // custom widget
@@ -12,14 +11,9 @@ import 'package:atdel/src/join_room_control_pages/join_room_drawer.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_attendance_list_page.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_settings_page.dart';
 
-// database
-// import 'package:databases/firebase_firestore.dart';
-
 // model
 import 'package:atdel/src/model/room.dart';
 
-// services
-import 'package:atdel/src/services/room_services.dart';
 
 // page
 class JoinRoomControl extends StatefulWidget {
