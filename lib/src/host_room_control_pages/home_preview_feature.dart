@@ -1,7 +1,4 @@
 // flutter
-import 'package:atdel/src/host_room_control_pages/home_feature.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:databases/firebase_firestore.dart';
 import 'package:flutter/material.dart';
 
 // custom widget
@@ -9,6 +6,9 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 
 // html
 import 'package:flutter_html/flutter_html.dart';
+
+// pages
+import 'package:atdel/src/host_room_control_pages/home_feature.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';

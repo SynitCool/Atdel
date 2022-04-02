@@ -1,9 +1,8 @@
+// flutter
 import 'package:flutter/material.dart';
 
+// work with date
 import 'package:intl/intl.dart';
-
-// personal packages
-import 'package:databases/firebase_firestore.dart' as model;
 
 // services
 import 'package:atdel/src/services/room_services.dart';
@@ -24,9 +23,6 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
   // datetime
   DateTime? startDate;
   DateTime? endDate;
-
-  // attendance database
-  late model.AttendanceList _attendance;
 
   // error date
   String startDateError = '';
@@ -62,7 +58,7 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
 
     final RoomService roomService = RoomService();
 
-    roomService.addAttendanceToDatabase(widget.room.id, startDate!, endDate!);
+    roomService.addAttendanceToDatabase(widget.room, startDate!, endDate!);
 
     // _attendance.addAttendance(startDate!, endDate!,
     //     roomId: widget.roomId, userUid: widget.userUid);

@@ -187,10 +187,10 @@ class RoomService {
 
   // add attendance
   Future addAttendanceToDatabase(
-      String roomId, DateTime dateStart, DateTime dateEnd) async {
+      Room room, DateTime dateStart, DateTime dateEnd) async {
     // attendace list collection
     final String attendanceListCollectionPath =
-        "$rootRoomsCollection/$roomId/attendance_list";
+        "$rootRoomsCollection/${room.id}/attendance_list";
     final CollectionReference<Map<String, dynamic>> attendanceListCollection =
         _db.collection(attendanceListCollectionPath);
 
@@ -208,15 +208,17 @@ class RoomService {
 
     // attendance users collection
     final String attendanceUsersCollectionPath =
-        "$rootRoomsCollection/$roomId/attendance_list/${attendanceListDoc.id}/users";
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendanceListDoc.id}/users";
     final CollectionReference<Map<String, dynamic>> attendanceUsersCollection =
         _db.collection(attendanceUsersCollectionPath);
 
     // room users docs
-    final roomUsers = streamUsersRoom(roomId);
+    final roomUsers = streamUsersRoom(room.id);
 
     roomUsers.forEach((elements) async {
       for (final element in elements) {
+        if (room.hostUid == element.uid) continue;
+
         final elementDoc = attendanceUsersCollection.doc(element.uid);
 
         final map = element.toMapAttendanceUsers();
@@ -286,7 +288,8 @@ class RoomService {
   }
 
   // stream users attendance
-  Stream<List<model.User>> streamUsersAttendance(String roomId, String attendanceId) {
+  Stream<List<model.User>> streamUsersAttendance(
+      String roomId, String attendanceId) {
     final String collectionPath =
         "$rootRoomsCollection/$roomId/attendance_list/$attendanceId/users";
     final collection = _db.collection(collectionPath);
