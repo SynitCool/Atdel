@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "270906629533",
+    "firebase_url": "https://atdel-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "atdel-project",
+    "storage_bucket": "atdel-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270906629533:android:f882e42c6f71c1f24ce374",
+        "android_client_info": {
+          "package_name": "com.synit.atdel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270906629533-i5f133cs5p9id57aflqve5oq3q1letkj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.synit.atdel",
+            "certificate_hash": "2fafda0cdaeda9e0d784de42d2d787bb2d6649af"
+          }
+        },
+        {
+          "client_id": "270906629533-f5mp847lmtetg4jp2g2qnlmhm4i8lifv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb-rtuyrLJ5ULba8oSquiZ7cJehihdZqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270906629533-f5mp847lmtetg4jp2g2qnlmhm4i8lifv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
