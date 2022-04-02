@@ -88,6 +88,8 @@ class RoomService {
     // settings room users
     model.User modelUser = model.User.fromFirebaseAuth(authUser);
 
+    modelUser.setUserReference = usersDoc;
+
     Map<String, dynamic> modelUserMap = modelUser.toMapRoomUsers();
 
     await roomUsersDoc.set(modelUserMap);
@@ -156,6 +158,7 @@ class RoomService {
     final model.User userModel = model.User.fromFirestore(getUsersDoc);
 
     userModel.roomReferences.add(roomCodesMap[code]);
+    userModel.setUserReference = usersDoc;
 
     Map<String, dynamic> userModelInfo = userModel.toMapUsers();
 
@@ -213,7 +216,7 @@ class RoomService {
         _db.collection(attendanceUsersCollectionPath);
 
     // room users docs
-    final roomUsers = streamUsersRoom(room.id);
+    final roomUsers = streamUsersRoom(room);
 
     roomUsers.forEach((elements) async {
       for (final element in elements) {
@@ -227,6 +230,32 @@ class RoomService {
       }
     });
   }
+
+  // delete room
+  // Future deleteRoomFromDatabase(Room room) async {
+  //   // room doc
+  //   final CollectionReference<Map<String, dynamic>> roomCollection =
+  //       _db.collection(rootRoomsCollection);
+
+  //   final DocumentReference<Map<String, dynamic>> roomDoc =
+  //       roomCollection.doc(room.id);
+
+  //   // users collection
+  //   final CollectionReference<Map<String, dynamic>> usersCollection =
+  //       _db.collection(rootUsersCollection);
+
+  //   // delete users room references
+  //   final Stream<List<model.User>> streamRoomUsers = streamUsersRoom(room);
+
+  //   streamRoomUsers.forEach((elements) {
+  //     for (final element in elements) {
+
+  //     }
+  //   });
+
+  //   // delete room from database
+  //   await roomDoc.delete();
+  // }
 
   // stream global rooms
   Stream<List<Room>> streamGlobalRooms() {
@@ -249,8 +278,8 @@ class RoomService {
   }
 
   // stream users room
-  Stream<List<model.User>> streamUsersRoom(String roomId) {
-    final String collectionPath = "$rootRoomsCollection/$roomId/users";
+  Stream<List<model.User>> streamUsersRoom(Room room) {
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
 
     final CollectionReference<Map<String, dynamic>> collection =
         FirebaseFirestore.instance.collection(collectionPath);

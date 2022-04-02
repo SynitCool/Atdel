@@ -9,6 +9,8 @@ class User {
   final String photoUrl;
   final String uid;
   final bool absent;
+
+  dynamic userReference;
   List<dynamic> roomReferences;
 
   User(
@@ -18,7 +20,8 @@ class User {
       required this.photoUrl,
       required this.uid,
       required this.roomReferences,
-      required this.absent});
+      required this.absent,
+      required this.userReference});
 
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic>? data = doc.data();
@@ -30,7 +33,8 @@ class User {
         photoUrl: data["photo_url"],
         uid: data["uid"],
         roomReferences: data["room_references"],
-        absent: true);
+        absent: true,
+        userReference: data["user_reference"]);
   }
 
   factory User.fromFirebaseAuth(auth.User authUser) {
@@ -41,7 +45,8 @@ class User {
         photoUrl: authUser.photoURL!,
         uid: authUser.uid,
         roomReferences: [],
-        absent: true);
+        absent: true,
+        userReference: "");
   }
 
   factory User.fromMap(Map<String, dynamic> map) => User(
@@ -51,7 +56,8 @@ class User {
       photoUrl: map["photo_url"],
       uid: map["uid"],
       roomReferences: map["room_references"] ?? [],
-      absent: map["absent"] ?? true);
+      absent: map["absent"] ?? true,
+      userReference: map["user_reference"]);
 
   Map<String, dynamic> toMapUsers() => {
         "display_name": displayName,
@@ -59,7 +65,8 @@ class User {
         "is_anonymous": isAnonymous,
         "photo_url": photoUrl,
         "uid": uid,
-        "room_references": roomReferences
+        "room_references": roomReferences,
+        "user_reference": userReference
       };
 
   Map<String, dynamic> toMapRoomUsers() => {
@@ -67,7 +74,8 @@ class User {
         "email": email,
         "is_anonymous": isAnonymous,
         "photo_url": photoUrl,
-        "uid": uid
+        "uid": uid,
+        "user_reference": userReference
       };
 
   Map<String, dynamic> toMapAttendanceUsers() => {
@@ -76,6 +84,11 @@ class User {
         "is_anonymous": isAnonymous,
         "photo_url": photoUrl,
         "uid": uid,
-        "absent": absent
+        "absent": absent,
+        "user_reference": userReference
       };
+
+  set setUserReference(DocumentReference<Map<String, dynamic>> newReference) {
+    userReference = newReference;
+  }
 }

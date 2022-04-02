@@ -184,7 +184,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     final RoomService roomService = RoomService();
 
     return StreamBuilder<List<User>>(
-        stream: roomService.streamUsersRoom(widget.room.id),
+        stream: roomService.streamUsersRoom(widget.room),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
