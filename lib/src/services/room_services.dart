@@ -220,7 +220,7 @@ class RoomService {
 
     roomUsers.forEach((elements) async {
       for (final element in elements) {
-        // if (room.hostUid == element.uid) continue;
+        if (room.hostUid == element.uid) continue;
 
         final elementDoc = attendanceUsersCollection.doc(element.uid);
 
@@ -309,6 +309,35 @@ class RoomService {
     });
   }
 
+  // update absent user
+  Future updateAbsentUser(Room room, Attendance attendance) async {
+    // auth user
+    final auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
+
+    final model.User currentUser = model.User.fromFirebaseAuth(firebaseUser!);
+
+    // stream attendance users
+    final Stream<QuerySnapshot<Map<String, dynamic>>>
+        streamAttendanceUsersReference =
+        streamUsersAttendanceReference(room, attendance);
+
+    streamAttendanceUsersReference.forEach((snapshot) async {
+      for (final doc in snapshot.docs) {
+        final model.User user = model.User.fromMap(doc.data());
+
+        if (user.uid != currentUser.uid) return;
+
+        user.setAbsent = false;
+
+        Map<String, dynamic> userMap = user.toMapAttendanceUsers();
+
+        final DocumentReference<Map<String, dynamic>> userDoc = doc.reference;
+
+        await userDoc.update(userMap);
+      }
+    });
+  }
+
   // stream global rooms
   Stream<List<Room>> streamGlobalRooms() {
     final CollectionReference<Map<String, dynamic>> collection =
@@ -356,9 +385,9 @@ class RoomService {
   }
 
   // stream attendance list
-  Stream<List<Attendance>> streamAttendanceList(String roomId) {
+  Stream<List<Attendance>> streamAttendanceList(Room room) {
     final String collectionPath =
-        "$rootRoomsCollection/$roomId/attendance_list";
+        "$rootRoomsCollection/${room.id}/attendance_list";
     final CollectionReference<Map<String, dynamic>> collection =
         _db.collection(collectionPath);
 
@@ -370,13 +399,25 @@ class RoomService {
 
   // stream users attendance
   Stream<List<model.User>> streamUsersAttendance(
-      String roomId, String attendanceId) {
+      Room room, Attendance attendance) {
     final String collectionPath =
-        "$rootRoomsCollection/$roomId/attendance_list/$attendanceId/users";
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
     final collection = _db.collection(collectionPath);
 
     final stream = collection.snapshots().map((data) =>
         data.docs.map((data) => model.User.fromMap(data.data())).toList());
+
+    return stream;
+  }
+
+  // stream users attendance with reference
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamUsersAttendanceReference(
+      Room room, Attendance attendance) {
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
+    final collection = _db.collection(collectionPath);
+
+    final stream = collection.snapshots();
 
     return stream;
   }

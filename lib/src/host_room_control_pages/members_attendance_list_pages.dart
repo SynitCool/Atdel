@@ -95,7 +95,7 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
       appBar: scaffoldAppBar(),
       body: StreamBuilder<List<User>>(
         stream: _roomService.streamUsersAttendance(
-            widget.room.id, widget.attendance.id),
+            widget.room, widget.attendance),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

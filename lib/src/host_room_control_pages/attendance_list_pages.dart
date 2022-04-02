@@ -108,7 +108,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
         body: StreamBuilder<List<Attendance>>(
-          stream: _roomService.streamAttendanceList(widget.room.id),
+          stream: _roomService.streamAttendanceList(widget.room),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return loadingScene;

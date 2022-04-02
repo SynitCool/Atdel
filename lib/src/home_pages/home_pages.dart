@@ -158,28 +158,18 @@ class _ContentPageState extends State<ContentPage> {
         shape: shape,
         child: ListTile(
           onTap: () {
-            // if (typeUser == "host") {
-            //   Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //           builder: (context) =>
-            //               HostRoomPages(currentData: currentData)));
-            // } else {
-            //   final DocumentReference<Map<String, dynamic>> reference =
-            //       infoRoom["room_reference"];
-
-            //   Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //           builder: (context) =>
-            //               JoinRoomControl(reference: reference)));
-            // }
+            if (room.hostUid == currentUser.uid) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HostRoomPages(room: room)));
+              return;
+            }
 
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        HostRoomPages(room: room)));
+              context,
+               MaterialPageRoute(
+                 builder: (context) => JoinRoomControl(room: room)));
           },
           leading: const Icon(icon),
           title:

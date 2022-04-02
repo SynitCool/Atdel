@@ -8,8 +8,8 @@ class User {
   final bool isAnonymous;
   final String photoUrl;
   final String uid;
-  final bool absent;
 
+  bool absent;
   dynamic userReference;
   List<dynamic> roomReferences;
 
@@ -90,5 +90,9 @@ class User {
 
   set setUserReference(DocumentReference<Map<String, dynamic>> newReference) {
     userReference = newReference;
+  }
+
+  set setAbsent(bool newAbsent) {
+    absent = newAbsent;
   }
 }
