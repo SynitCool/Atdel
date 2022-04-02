@@ -62,12 +62,6 @@ dependencies:
   # format date time
   intl: ^0.17.0
 
-  # personal packages
-  databases:
-    path: ./packages/databases
-  authentication:
-    path: ./packages/authentication
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
