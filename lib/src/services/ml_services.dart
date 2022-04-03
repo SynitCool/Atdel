@@ -2,16 +2,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-// flutter
-import 'package:flutter/services.dart';
-
 // tflite
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 // goole ml kit
 import 'package:google_ml_kit/google_ml_kit.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 // image processing
 import 'package:image/image.dart' as img;
@@ -20,12 +15,11 @@ class MLService {
   late FaceDetectorOptions _options;
   late FaceDetector _detector;
   late Interpreter _interpreter;
-  late List<String> _labelList;
+
 
   MLService() {
     _loadDetector();
     _loadModel();
-    _loadLabel();
   }
 
   // load detector
@@ -33,30 +27,12 @@ class MLService {
     _options = const FaceDetectorOptions(mode: FaceDetectorMode.fast);
 
     _detector = GoogleMlKit.vision.faceDetector(_options);
-
-    print("Detector is loaded");
   }
 
   // load model
   Future _loadModel() async {
     _interpreter = await Interpreter.fromAsset("mobile_face_net.tflite");
-
-    var inputShape = _interpreter.getInputTensor(0);
-    var outputShape = _interpreter.getOutputTensor(0);
-
-    print("Load Model - $inputShape / $outputShape");
   }
-
-  // load label
-  Future _loadLabel() async {
-    final labelData = await rootBundle.loadString("assets/labelmap.txt");
-    final labelList = labelData.split("\n");
-
-    _labelList = labelList;
-
-    print("Load Label");
-  }
-
   // run the detector
   Future runDetector(File imageFile) async {
     InputImage input = InputImage.fromFile(imageFile);

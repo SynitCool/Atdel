@@ -1,6 +1,3 @@
-// dart
-import 'dart:convert';
-
 // firebase
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -9,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:atdel/src/model/room.dart';
 
 // linalg
-import 'package:ml_linalg/distance.dart';
 import 'package:ml_linalg/vector.dart';
 
 class UserPhotoMetricService {
@@ -47,7 +43,7 @@ class UserPhotoMetricService {
   }
 
   // calculate similarity
-  Future calcUserSimilarity(Room room, List<dynamic> metric) async {
+  Future<String> calcSmallestUserSimilarity(Room room, List<dynamic> metric) async {
     // database reference
     final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
 
@@ -58,7 +54,7 @@ class UserPhotoMetricService {
     // get all metrics
     final DataSnapshot getReferenceChild = await referenceChild.get();
     final dynamic data = getReferenceChild.value;
-    
+
     num? smallestSimilarity;
     String smallestUserUid = '';
     data.forEach((key, value) {
@@ -77,6 +73,6 @@ class UserPhotoMetricService {
       smallestUserUid = key;
     });
 
-    print(smallestUserUid);
+    return smallestUserUid;
   }
 }
