@@ -58,33 +58,35 @@ class MLService {
   }
 
   // run the detector
-  Future runDetector(File imageFile, Function callback) async {
+  Future runDetector(File imageFile) async {
     InputImage input = InputImage.fromFile(imageFile);
 
     List<Face> faces = await _detector.processImage(input);
-    // int facesLength = faces.length;
+    int facesLength = faces.length;
 
-    // if (facesLength > 1 || facesLength == 0) return;
+    if (facesLength > 1 || facesLength == 0) return;
 
     img.Image croppedImage = cropFace(imageFile, faces[0]);
-    List<int> encodedPng = img.encodePng(croppedImage);
+    // List<int> encodedPng = img.encodePng(croppedImage);
 
-    Directory tempDir = await getTemporaryDirectory();
-    String tempDirPath = tempDir.path;
-    String pngPath = join(tempDirPath, "temporary_image.png");
+    // Directory tempDir = await getTemporaryDirectory();
+    // String tempDirPath = tempDir.path;
+    // String pngPath = join(tempDirPath, "temporary_image.png");
 
-    try {
-      File(pngPath).delete();
-      File(pngPath).writeAsBytesSync(encodedPng, flush: true);
-    } catch (e) {
-      File(pngPath).writeAsBytesSync(encodedPng, flush: true);
-    }
+    // try {
+    //   File(pngPath).delete();
+    //   File(pngPath).writeAsBytesSync(encodedPng, flush: true);
+    // } catch (e) {
+    //   File(pngPath).writeAsBytesSync(encodedPng, flush: true);
+    // }
 
-    callback(pngPath);
+    // callback(pngPath);
+
+    return croppedImage;
   }
 
   // run the model
-  Future runModel(img.Image loadImage) async {
+  Future<List<num>> runModel(img.Image loadImage) async {
     var modelImage = img.copyResize(loadImage, width: 112, height: 112);
     List input = imageToByteListFloat32(modelImage, 112, 128, 128);
 
@@ -93,7 +95,7 @@ class MLService {
 
     _interpreter.run(input, output);
 
-    print(output.toString());
+    return output.flatten();
   }
 
   // crop face
@@ -138,5 +140,4 @@ class MLService {
     }
     return convertedBytes.buffer.asFloat32List();
   }
-
 }
