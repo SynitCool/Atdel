@@ -15,7 +15,8 @@ class SettingsPages extends StatelessWidget {
 
   // header widget
   Widget headerWidgets(BuildContext context) {
-    const EdgeInsets padding = EdgeInsets.symmetric(horizontal: 20, vertical: 20);
+    const EdgeInsets padding =
+        EdgeInsets.symmetric(horizontal: 20, vertical: 20);
     final Widget permissionButton = ListTile(
         onTap: () {
           Navigator.push(context,
@@ -32,11 +33,23 @@ class SettingsPages extends StatelessWidget {
     );
   }
 
+  // dev button
+  Widget devButton() {
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: ListTile(
+          leading: const Icon(Icons.developer_mode),
+          title: const Text("DEV BUTTON"),
+          onTap: () {
+          },
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(),
-      body: Material(child: ListView(children: [headerWidgets(context)]))
-    );
+        appBar: appBarWidget(),
+        body: Material(
+            child: ListView(children: [headerWidgets(context)])));
   }
 }
