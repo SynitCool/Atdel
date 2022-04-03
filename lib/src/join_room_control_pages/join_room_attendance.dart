@@ -4,6 +4,9 @@ import 'dart:io';
 // flutter
 import 'package:flutter/material.dart';
 
+// firebase
+import 'package:firebase_auth/firebase_auth.dart';
+
 // model
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/attendance.dart';
@@ -34,6 +37,7 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
   final MLService _mlService = MLService();
   final UserPhotoMetricService _userPhotoMetricService =
       UserPhotoMetricService();
+  final User? authUser = FirebaseAuth.instance.currentUser;
 
   // get image by gallery
   Widget pickImageByGallery() {
@@ -53,8 +57,12 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
           await _userPhotoMetricService.updateUserPhotoMetric(
               widget.room, runModelMetric);
 
-          await _userPhotoMetricService.calcUserSimilarity(
-              widget.room, runModelMetric);
+          final detectedUid = await _userPhotoMetricService
+              .calcSmallestUserSimilarity(widget.room, runModelMetric);
+
+          if (detectedUid != authUser!.uid) return;
+          
+          _roomService.updateAbsentUser(widget.room, widget.attendance);
         });
   }
 
@@ -76,8 +84,12 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
           await _userPhotoMetricService.updateUserPhotoMetric(
               widget.room, runModelMetric);
 
-          await _userPhotoMetricService.calcUserSimilarity(
-              widget.room, runModelMetric);
+          final detectedUid = await _userPhotoMetricService
+              .calcSmallestUserSimilarity(widget.room, runModelMetric);
+
+          if (detectedUid != authUser!.uid) return;
+          
+          _roomService.updateAbsentUser(widget.room, widget.attendance);
         });
   }
 
