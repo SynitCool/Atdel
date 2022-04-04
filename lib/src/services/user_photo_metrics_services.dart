@@ -43,7 +43,8 @@ class UserPhotoMetricService {
   }
 
   // calculate similarity
-  Future<String> calcSmallestUserSimilarity(Room room, List<dynamic> metric) async {
+  Future<String?> calcSmallestUserSimilarity(
+      Room room, List<dynamic> metric) async {
     // database reference
     final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
 
@@ -53,6 +54,10 @@ class UserPhotoMetricService {
 
     // get all metrics
     final DataSnapshot getReferenceChild = await referenceChild.get();
+
+    // check metrics is exist
+    if (!getReferenceChild.exists) return null;
+
     final dynamic data = getReferenceChild.value;
 
     num? smallestSimilarity;

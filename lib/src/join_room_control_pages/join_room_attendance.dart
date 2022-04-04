@@ -39,8 +39,24 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
       UserPhotoMetricService();
   final User? authUser = FirebaseAuth.instance.currentUser;
 
+  // show user metric warning
+  Future showUserMetricAlert() {
+    return showDialog(
+      context: context, 
+      builder: (BuildContext context) => AlertDialog(
+          title: const Text("ERROR", style: TextStyle(color: Colors.red),),
+          content: const Text("Image for room must be set before take attendance!"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        ),);
+  }
+
   // get image by gallery
-  Widget pickImageByGallery() {
+  Widget attendImageByGallery() {
     return ListTile(
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
@@ -54,20 +70,19 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
-          await _userPhotoMetricService.updateUserPhotoMetric(
-              widget.room, runModelMetric);
-
           final detectedUid = await _userPhotoMetricService
               .calcSmallestUserSimilarity(widget.room, runModelMetric);
 
-          if (detectedUid != authUser!.uid) return;
-          
+          if (detectedUid == null || detectedUid != authUser!.uid) {
+            showUserMetricAlert();
+          }
+
           _roomService.updateAbsentUser(widget.room, widget.attendance);
         });
   }
 
   // get image by camera
-  Widget pickImageByCamera() {
+  Widget attendImageByCamera() {
     return ListTile(
         leading: const Icon(Icons.camera),
         title: const Text("Attend With Camera"),
@@ -81,14 +96,13 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
-          await _userPhotoMetricService.updateUserPhotoMetric(
-              widget.room, runModelMetric);
-
           final detectedUid = await _userPhotoMetricService
               .calcSmallestUserSimilarity(widget.room, runModelMetric);
 
-          if (detectedUid != authUser!.uid) return;
-          
+          if (detectedUid == null || detectedUid != authUser!.uid) {
+            showUserMetricAlert();
+          }
+
           _roomService.updateAbsentUser(widget.room, widget.attendance);
         });
   }
@@ -100,15 +114,9 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView(
-          children: [pickImageByGallery(), pickImageByCamera()],
+          children: [attendImageByGallery(), attendImageByCamera()],
         ),
       ),
-      // Center(
-      //     child: ElevatedButton(
-      //         onPressed: () {
-      //           _roomService.updateAbsentUser(widget.room, widget.attendance);
-      //         },
-      //         child: const Text("Attend")))
     );
   }
 }
