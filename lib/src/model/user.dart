@@ -65,7 +65,7 @@ class User {
         "is_anonymous": isAnonymous,
         "photo_url": photoUrl,
         "uid": uid,
-        "room_references": roomReferences,
+        "room_references": roomReferences.toSet().toList(),
         "user_reference": userReference
       };
 

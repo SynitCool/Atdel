@@ -150,7 +150,15 @@ class _ContentPageState extends State<ContentPage> {
     );
 
     // text widget
-    final Widget textRoomTitle = Text(room.roomName);
+    final Widget textRoomTitle =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(room.roomName,
+        style: const TextStyle(fontWeight: FontWeight.bold)),
+      Text(
+        room.roomCode,
+        style: const TextStyle(fontSize: 12),
+      )
+    ]);
     final Widget textHostName = Text(room.hostName);
 
     return Card(
@@ -167,18 +175,19 @@ class _ContentPageState extends State<ContentPage> {
             }
 
             Navigator.push(
-              context,
-               MaterialPageRoute(
-                 builder: (context) => JoinRoomControl(room: room)));
+                context,
+                MaterialPageRoute(
+                    builder: (context) => JoinRoomControl(room: room)));
           },
           leading: const Icon(icon),
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(padding: titlePadding, child: textRoomTitle),
+            Padding(
+                padding: titlePadding, child: FittedBox(child: textRoomTitle)),
             Align(
               alignment: Alignment.bottomRight,
               child: textHostName,
-            )
+            ),
           ]),
         ));
   }
