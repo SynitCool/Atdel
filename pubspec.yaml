@@ -47,6 +47,7 @@ dependencies:
 
   # state management
   provider: ^6.0.2
+  flutter_riverpod: ^1.0.3
 
   # custom widgets
   fab_circular_menu: ^1.0.2

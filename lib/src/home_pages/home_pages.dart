@@ -29,7 +29,6 @@ import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as src_user;
 
 // home page
-// ignore: must_be_immutable
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -152,8 +151,7 @@ class _ContentPageState extends State<ContentPage> {
     // text widget
     final Widget textRoomTitle =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(room.roomName,
-        style: const TextStyle(fontWeight: FontWeight.bold)),
+      Text(room.roomName, style: const TextStyle(fontWeight: FontWeight.bold)),
       Text(
         room.roomCode,
         style: const TextStyle(fontSize: 12),
@@ -166,11 +164,14 @@ class _ContentPageState extends State<ContentPage> {
         shape: shape,
         child: ListTile(
           onTap: () {
+
             if (room.hostUid == currentUser.uid) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HostRoomPages(room: room)));
+                      builder: (context) =>
+                          // HostRoomPages(room: room)
+                          const TestRiverpod()));
               return;
             }
 

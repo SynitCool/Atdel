@@ -14,6 +14,28 @@ import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
 // model
 import 'package:atdel/src/model/room.dart';
 
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// providers
+import 'package:atdel/src/providers.dart';
+
+class TestRiverpod extends ConsumerWidget {
+  const TestRiverpod({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(selectedProvider);
+
+    return Scaffold(
+      body: Center(child: Text(provider.room.toString())),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        provider.increament();
+      }),
+    );
+  }
+}
+
 // page
 class HostRoomPages extends StatefulWidget {
   const HostRoomPages({Key? key, required this.room}) : super(key: key);
@@ -82,8 +104,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: ((context) =>
-                    HostSettingsPage(room: widget.room))));
+                builder: ((context) => HostSettingsPage(room: widget.room))));
       },
       icon: const Icon(Icons.settings),
       padding: const EdgeInsets.all(15.0),
