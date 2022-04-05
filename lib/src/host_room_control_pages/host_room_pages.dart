@@ -18,19 +18,20 @@ import 'package:atdel/src/model/room.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // providers
-import 'package:atdel/src/providers.dart';
+import 'package:atdel/src/providers/selected_room_providers.dart';
 
 class TestRiverpod extends ConsumerWidget {
   const TestRiverpod({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(selectedProvider);
-
     return Scaffold(
-      body: Center(child: Text(provider.room.toString())),
+      body: Consumer(builder: (context, ref, _) {
+        final provider = ref.watch(selectedProvider);
+        return Center(child: Text(provider.room.toString()));
+      }),
       floatingActionButton: FloatingActionButton(onPressed: () {
-        provider.increament();
+        ref.read(selectedProvider).increament();
       }),
     );
   }
