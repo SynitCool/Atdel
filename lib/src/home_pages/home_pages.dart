@@ -1,5 +1,4 @@
 // flutter
-import 'package:atdel/src/states/current_user.dart';
 import 'package:flutter/material.dart';
 
 // firebase
@@ -35,9 +34,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:atdel/src/providers/current_user_providers.dart';
 
 // home page
-class HomePage extends StatelessWidget {
-  const HomePage({ Key? key }) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   // appbar widget
   PreferredSizeWidget appBarWidget(BuildContext context) {
     Widget appBarSettings = IconButton(
@@ -58,45 +62,51 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // add room button
-  Widget addRoomButton(BuildContext context) {
-    // fab parameters
-    const Widget fabOpenIcon = Icon(Icons.menu, color: Colors.white);
-    const Color fabOpenColor = Colors.white;
-
-    // fab widget button
-    Widget iconCreateRoomButton = IconButton(
-        tooltip: "Create Room",
-        icon: const Icon(Icons.create, color: Colors.white),
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const CreateRoomPage()));
-        });
-
-    Widget iconJoinRoomButton = IconButton(
-        tooltip: "Join Room",
-        icon: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const JoinRoomPage()));
-        });
-
-    return FabCircularMenu(
-        fabOpenColor: fabOpenColor,
-        fabSize: 64.0,
-        ringDiameter: 250,
-        ringWidth: 70,
-        fabOpenIcon: fabOpenIcon,
-        children: <Widget>[iconCreateRoomButton, iconJoinRoomButton]);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: const DrawerWidget(),
         appBar: appBarWidget(context),
         body: const ContentPage(),
-        floatingActionButton: addRoomButton(context));
+        floatingActionButton: const AddRoomButton());
+  }
+}
+
+// add room button widget
+class AddRoomButton extends StatelessWidget {
+  const AddRoomButton({Key? key}) : super(key: key);
+
+  final Widget fabOpenIcon = const Icon(Icons.menu, color: Colors.white);
+  final Color fabOpenColor = Colors.white;
+
+  @override
+  Widget build(BuildContext context) {
+    return FabCircularMenu(
+        fabOpenColor: fabOpenColor,
+        fabSize: 64.0,
+        ringDiameter: 250,
+        ringWidth: 70,
+        fabOpenIcon: fabOpenIcon,
+        children: <Widget>[
+          IconButton(
+              tooltip: "Create Room",
+              icon: const Icon(Icons.create, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CreateRoomPage()));
+              }),
+          IconButton(
+              tooltip: "Join Room",
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const JoinRoomPage()));
+              })
+        ]);
   }
 }
 
@@ -108,77 +118,6 @@ class ContentPage extends ConsumerWidget {
   final Widget errorScene = const Center(child: Text("ERROR"));
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget noRoomsScene = const Center(child: Text("No Rooms"));
-
-  // room stream builder
-  Widget roomStreamBuilder(DocumentReference<Map<String, dynamic>> reference, CurrentUser currentUser) {
-    final _roomService = RoomService();
-    return StreamBuilder<Room>(
-        stream: _roomService.streamReferenceRoom(reference),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
-
-          if (snapshot.hasError) return errorScene;
-
-          final data = snapshot.data;
-
-          return roomButtonWidget(context, data!, currentUser);
-        });
-  }
-
-  // room button Widget
-  Widget roomButtonWidget(BuildContext context, Room room, CurrentUser currentUser) {
-    // card parameters
-    const EdgeInsets cardPadding =
-        EdgeInsets.symmetric(vertical: 10, horizontal: 20);
-    const EdgeInsets titlePadding = EdgeInsets.fromLTRB(0, 10, 0, 30);
-    const IconData icon = Icons.meeting_room;
-    final ShapeBorder shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    );
-
-    // text widget
-    final Widget textRoomTitle =
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(room.roomName, style: const TextStyle(fontWeight: FontWeight.bold)),
-      Text(
-        room.roomCode,
-        style: const TextStyle(fontSize: 12),
-      )
-    ]);
-    final Widget textHostName = Text(room.hostName);
-
-    return Card(
-        margin: cardPadding,
-        shape: shape,
-        child: ListTile(
-          onTap: () {
-            if (room.hostUid == currentUser.user!.uid) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HostRoomPages(room: room)));
-              return;
-            }
-
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => JoinRoomControl(room: room)));
-          },
-          leading: const Icon(icon),
-          title:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(
-                padding: titlePadding, child: FittedBox(child: textRoomTitle)),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: textHostName,
-            ),
-          ]),
-        ));
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -203,8 +142,104 @@ class ContentPage extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final currentReference = references[index];
 
-                return roomStreamBuilder(currentReference, provider);
+                return RoomStreamBuilder(reference: currentReference);
               });
         });
+  }
+}
+
+// room stream builder
+class RoomStreamBuilder extends StatelessWidget {
+  const RoomStreamBuilder({Key? key, required this.reference})
+      : super(key: key);
+
+  final DocumentReference<Map<String, dynamic>> reference;
+
+  // scenes
+  final Widget errorScene = const Center(child: Text("ERROR"));
+  final Widget loadingScene = const Center(child: CircularProgressIndicator());
+
+  @override
+  Widget build(BuildContext context) {
+    final _roomService = RoomService();
+    return StreamBuilder<Room>(
+        stream: _roomService.streamReferenceRoom(reference),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return RoomButtonWidget(room: data!);
+        });
+  }
+}
+
+// room button widget
+class RoomButtonWidget extends ConsumerWidget {
+  const RoomButtonWidget({Key? key, required this.room}) : super(key: key);
+
+  final Room room;
+
+  final EdgeInsets cardPadding =
+      const EdgeInsets.symmetric(vertical: 10, horizontal: 20);
+  final EdgeInsets titlePadding = const EdgeInsets.fromLTRB(0, 10, 0, 30);
+  final IconData icon = Icons.meeting_room;
+
+  // text room title
+  Widget textRoomTitle() =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(room.roomName,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          room.roomCode,
+          style: const TextStyle(fontSize: 12),
+        )
+      ]);
+
+  // text host name
+  Widget textHostName() => Text(room.hostName);
+
+  // shape of card
+  RoundedRectangleBorder shape() => RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      );
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _currentUserProvider = ref.watch(currentUser);
+    return Card(
+        margin: cardPadding,
+        shape: shape(),
+        child: ListTile(
+          onTap: () {
+            if (room.hostUid == _currentUserProvider.user!.uid) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HostRoomPages(room: room)));
+              return;
+            }
+
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => JoinRoomControl(room: room)));
+          },
+          leading: Icon(icon),
+          title:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(
+                padding: titlePadding,
+                child: FittedBox(child: textRoomTitle())),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: textHostName(),
+            ),
+          ]),
+        ));
   }
 }
