@@ -1,5 +1,7 @@
+// flutter
 import 'package:flutter/material.dart';
 
+// pages
 import 'package:atdel/src/home_pages/permission_pages.dart';
 
 class SettingsPages extends StatelessWidget {

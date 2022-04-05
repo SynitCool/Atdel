@@ -14,29 +14,6 @@ import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
 // model
 import 'package:atdel/src/model/room.dart';
 
-// state management
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// providers
-// import 'package:atdel/src/providers/selected_room_providers.dart';
-
-// class TestRiverpod extends ConsumerWidget {
-//   const TestRiverpod({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return Scaffold(
-//       body: Consumer(builder: (context, ref, _) {
-//         final provider = ref.watch(selectedProvider);
-//         return Center(child: Text(provider.room.toString()));
-//       }),
-//       floatingActionButton: FloatingActionButton(onPressed: () {
-//         ref.read(selectedProvider).increament();
-//       }),
-//     );
-//   }
-// }
-
 // page
 class HostRoomPages extends StatefulWidget {
   const HostRoomPages({Key? key, required this.room}) : super(key: key);
