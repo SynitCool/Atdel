@@ -1,79 +1,29 @@
+// flutter
 import 'package:flutter/material.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-
+// authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
 
-// model
-import 'package:atdel/src/model/user.dart' as src_user;
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// ignore: must_be_immutable
-class UserPage extends StatefulWidget {
-  User user;
+// states
+import 'package:atdel/src/states/current_user.dart';
 
-  UserPage(this.user, {Key? key}) : super(key: key);
+// providers
+import 'package:atdel/src/providers/current_user_providers.dart';
 
-  @override
-  State<UserPage> createState() => _UserPageState();
-}
-
-class _UserPageState extends State<UserPage> {
-  // late String name;
-  // late String email;
-  // late String imageUrl;
+class StatelessUserPage extends ConsumerWidget {
+  const StatelessUserPage({Key? key}) : super(key: key);
 
   final double coverHeight = 180;
   final double profileHeight = 144;
 
-  // firebase
-  final User? firebaseUser = FirebaseAuth.instance.currentUser;
-
-  // model
-  late src_user.User currentUser;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // name = widget.user.displayName!;
-    // email = widget.user.email!;
-    // imageUrl = widget.user.photoURL!;
-
-    currentUser = src_user.User.fromFirebaseAuth(firebaseUser!);
-  }
-
-  // cover image
-  Widget buildCoverImage() {
-    return Container(color: Colors.grey, height: coverHeight);
-  }
-
-  // profile image
-  Widget buildProfileImage() {
-    return CircleAvatar(
-      radius: profileHeight / 2,
-      backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(currentUser.photoUrl),
-    );
-  }
-
-  // header or top widget
-  Widget buildTop() {
-    final double top = coverHeight - profileHeight / 2;
-    final double bottom = profileHeight / 2;
-
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.only(bottom: bottom), child: buildCoverImage()),
-        Positioned(child: buildProfileImage(), top: top)
-      ],
-    );
-  }
+  // app bar
+  PreferredSizeWidget appBarWidget() => AppBar();
 
   // content the pages
-  Widget buildContent() {
+  Widget buildContent(BuildContext context, CurrentUser currentUser) {
     const space8 = SizedBox(height: 8);
     const space16 = SizedBox(height: 16);
     const padding = EdgeInsets.symmetric(horizontal: 20);
@@ -91,11 +41,11 @@ class _UserPageState extends State<UserPage> {
 
     return Column(children: [
       space8,
-      Text(currentUser.displayName,
+      Text(currentUser.user!.displayName,
           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
       space8,
       Text(
-        currentUser.email,
+        currentUser.user!.email,
         style: const TextStyle(fontSize: 20, color: Colors.black45),
       ),
       space16,
@@ -108,14 +58,45 @@ class _UserPageState extends State<UserPage> {
     ]);
   }
 
-  PreferredSizeWidget appBarWidget() => AppBar();
+  // cover image
+  Widget buildCoverImage() {
+    return Container(color: Colors.grey, height: coverHeight);
+  }
+
+  // profile image
+  Widget buildProfileImage(CurrentUser currentUser) {
+    return CircleAvatar(
+      radius: profileHeight / 2,
+      backgroundColor: Colors.grey.shade800,
+      backgroundImage: NetworkImage(currentUser.user!.photoUrl),
+    );
+  }
+
+  // header or top widget
+  Widget buildTop(BuildContext context, CurrentUser currentUser) {
+    final double top = coverHeight - profileHeight / 2;
+    final double bottom = profileHeight / 2;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Container(
+            margin: EdgeInsets.only(bottom: bottom), child: buildCoverImage()),
+        Positioned(child: buildProfileImage(currentUser), top: top)
+      ],
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userRef = ref.watch(currentUser);
     return Scaffold(
       appBar: appBarWidget(),
-      body: ListView(
-          padding: EdgeInsets.zero, children: [buildTop(), buildContent()]),
+      body: ListView(padding: EdgeInsets.zero, children: [
+        buildTop(context, userRef),
+        buildContent(context, userRef)
+      ]),
     );
   }
 }

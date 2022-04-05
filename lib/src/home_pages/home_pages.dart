@@ -1,8 +1,8 @@
 // flutter
+import 'package:atdel/src/states/current_user.dart';
 import 'package:flutter/material.dart';
 
 // firebase
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // home pages feature
@@ -28,17 +28,18 @@ import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as src_user;
 
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// providers
+import 'package:atdel/src/providers/current_user_providers.dart';
+
 // home page
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class HomePage extends StatelessWidget {
+  const HomePage({ Key? key }) : super(key: key);
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   // appbar widget
-  PreferredSizeWidget appBarWidget() {
+  PreferredSizeWidget appBarWidget(BuildContext context) {
     Widget appBarSettings = IconButton(
       onPressed: () {
         Navigator.push(context,
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // add room button
-  Widget addRoomButton() {
+  Widget addRoomButton(BuildContext context) {
     // fab parameters
     const Widget fabOpenIcon = Icon(Icons.menu, color: Colors.white);
     const Color fabOpenColor = Colors.white;
@@ -93,52 +94,41 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: const DrawerWidget(),
-        appBar: appBarWidget(),
+        appBar: appBarWidget(context),
         body: const ContentPage(),
-        floatingActionButton: addRoomButton());
+        floatingActionButton: addRoomButton(context));
   }
 }
 
-// content of page
-class ContentPage extends StatefulWidget {
+// content page
+class ContentPage extends ConsumerWidget {
   const ContentPage({Key? key}) : super(key: key);
 
-  @override
-  State<ContentPage> createState() => _ContentPageState();
-}
-
-class _ContentPageState extends State<ContentPage> {
-  // services
-  final RoomService _roomService = RoomService();
-  final UserService _userService = UserService();
-
-  // firebase
-  final User? _firebaseUser = FirebaseAuth.instance.currentUser;
-
-  // user
-  late src_user.User currentUser;
-
-  // widgets scene
+  // scenes
   final Widget errorScene = const Center(child: Text("ERROR"));
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget noRoomsScene = const Center(child: Text("No Rooms"));
 
-  @override
-  void initState() {
-    super.initState();
+  // room stream builder
+  Widget roomStreamBuilder(DocumentReference<Map<String, dynamic>> reference, CurrentUser currentUser) {
+    final _roomService = RoomService();
+    return StreamBuilder<Room>(
+        stream: _roomService.streamReferenceRoom(reference),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
 
-    currentUser = src_user.User.fromFirebaseAuth(_firebaseUser!);
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return roomButtonWidget(context, data!, currentUser);
+        });
   }
 
   // room button Widget
-  Widget roomButtonWidget(Room room) {
-    // check user type
-    // if (hostUid != userUid) {
-    //   typeUser = "join";
-    // } else {
-    //   typeUser = "host";
-    // }
-
+  Widget roomButtonWidget(BuildContext context, Room room, CurrentUser currentUser) {
     // card parameters
     const EdgeInsets cardPadding =
         EdgeInsets.symmetric(vertical: 10, horizontal: 20);
@@ -164,14 +154,11 @@ class _ContentPageState extends State<ContentPage> {
         shape: shape,
         child: ListTile(
           onTap: () {
-
-            if (room.hostUid == currentUser.uid) {
+            if (room.hostUid == currentUser.user!.uid) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          // HostRoomPages(room: room)
-                          const TestRiverpod()));
+                      builder: (context) => HostRoomPages(room: room)));
               return;
             }
 
@@ -193,27 +180,12 @@ class _ContentPageState extends State<ContentPage> {
         ));
   }
 
-  // room stream builder
-  Widget roomStreamBuilder(DocumentReference<Map<String, dynamic>> reference) {
-    return StreamBuilder<Room>(
-        stream: _roomService.streamReferenceRoom(reference),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
-
-          if (snapshot.hasError) return errorScene;
-
-          final data = snapshot.data;
-
-          return roomButtonWidget(data!);
-        });
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(currentUser);
+    final _userService = UserService();
     return StreamBuilder<src_user.User>(
-        stream: _userService.streamUser(currentUser),
+        stream: _userService.streamUser(provider.user!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
@@ -231,7 +203,7 @@ class _ContentPageState extends State<ContentPage> {
               itemBuilder: (context, index) {
                 final currentReference = references[index];
 
-                return roomStreamBuilder(currentReference);
+                return roomStreamBuilder(currentReference, provider);
               });
         });
   }

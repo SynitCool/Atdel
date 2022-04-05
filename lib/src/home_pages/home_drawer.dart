@@ -12,30 +12,8 @@ import 'package:atdel/src/user_pages/user_pages.dart';
 import 'package:atdel/src/model/user.dart' as src_user;
 
 // drawer widget
-class DrawerWidget extends StatefulWidget {
+class DrawerWidget extends StatelessWidget {
   const DrawerWidget({Key? key}) : super(key: key);
-
-  @override
-  State<DrawerWidget> createState() => _DrawerWidgetState();
-}
-
-class _DrawerWidgetState extends State<DrawerWidget> {
-  // user profile
-  late String name;
-  late String email;
-  late String urlImage;
-
-  // user
-  final User? user = FirebaseAuth.instance.currentUser;
-
-  @override
-  void initState() {
-    super.initState();
-
-    name = user!.displayName!;
-    email = user!.email!;
-    urlImage = user!.photoURL!;
-  }
 
   // header in drawer type material
   Widget materialHeader(
@@ -65,8 +43,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => UserPage(user!)));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const StatelessUserPage()));
       },
       child: Container(
           padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
@@ -94,7 +72,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   // drawer widget type material
-  Widget materialDrawer() {
+  Widget materialDrawer(BuildContext context) {
     // widget parameters
     const Color color = Color.fromRGBO(50, 75, 205, 1);
     const Widget space12 = SizedBox(height: 12);
@@ -129,7 +107,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
     // content drawer widgets
     List<Widget> materialDrawerWidget = [
-      materialHeader(context, urlImage: srcUser.photoUrl, name: srcUser.displayName, email: srcUser.email),
+      materialHeader(context,
+          urlImage: srcUser.photoUrl,
+          name: srcUser.displayName,
+          email: srcUser.email),
       Container(
         padding: padding,
         child: Column(
@@ -148,6 +129,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(child: materialDrawer());
+    return Drawer(child: materialDrawer(context));
   }
 }
