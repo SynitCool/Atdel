@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // home pages feature
-import 'package:atdel/src/home_pages/settings_pages.dart';
 import 'package:atdel/src/home_pages/create_room_pages.dart';
 import 'package:atdel/src/home_pages/join_room_page.dart';
 import 'package:atdel/src/home_pages/home_drawer.dart';
@@ -32,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // providers
 import 'package:atdel/src/providers/current_user_providers.dart';
+import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // home page
 class HomePage extends StatefulWidget {
@@ -43,30 +43,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // appbar widget
-  PreferredSizeWidget appBarWidget(BuildContext context) {
-    Widget appBarSettings = IconButton(
-      onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: ((context) => const SettingsPages())));
-      },
-      icon: const Icon(Icons.settings),
-      padding: const EdgeInsets.all(15.0),
-    );
-
-    return AppBar(
-      title: const Text("Atdel Demo"),
-      actions: [
-        appBarSettings,
-      ],
-      elevation: 5,
-    );
-  }
+  PreferredSizeWidget appBarWidget() => AppBar(
+        title: const Text("Atdel Demo"),
+        elevation: 5,
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: const DrawerWidget(),
-        appBar: appBarWidget(context),
+        appBar: appBarWidget(),
         body: const ContentPage(),
         floatingActionButton: const AddRoomButton());
   }
@@ -211,12 +197,15 @@ class RoomButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _currentUserProvider = ref.watch(currentUser);
+    final _selectedRoomProvider = ref.watch(selectedRoom);
     return Card(
         margin: cardPadding,
         shape: shape(),
         child: ListTile(
           onTap: () {
             if (room.hostUid == _currentUserProvider.user!.uid) {
+              _selectedRoomProvider.setRoom = room;
+              _selectedRoomProvider.setTypeRoom = "host";
               Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -224,10 +213,14 @@ class RoomButtonWidget extends ConsumerWidget {
               return;
             }
 
+            _selectedRoomProvider.setRoom = room;
+            _selectedRoomProvider.setTypeRoom = "join";
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => JoinRoomControl(room: room)));
+            return;
           },
           leading: Icon(icon),
           title:

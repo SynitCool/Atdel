@@ -42,57 +42,48 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     return null;
   }
 
+  // create room button
+  Widget createRoomButton() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: ElevatedButton(
+          onPressed: () {
+            final RoomService roomService = RoomService();
+
+            roomService.addRoomToDatabase(nameText);
+
+            Navigator.pop(context);
+          },
+          child: const Text("Create")));
+
   // app bar widget
-  PreferredSizeWidget appBarWidget(BuildContext context) {
-    final Widget createRoomButton = Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: ElevatedButton(
-            onPressed: () {
-              final RoomService roomService = RoomService();
-
-              roomService.addRoomToDatabase(nameText);
-
-              Navigator.pop(context);
-            },
-            child: const Text("Create")));
-
-    return AppBar(
+  PreferredSizeWidget appBarWidget() => AppBar(
       backgroundColor: Colors.white38,
       title: const Text("Create room"),
-      actions: [createRoomButton],
+      actions: [createRoomButton()],
     );
-  }
-
   // name room text field widget
-  Widget nameTextFieldWidget() {
-    return TextField(
-      controller: nameTextFieldController,
-      decoration: InputDecoration(
-          label: const Text("Room name"),
-          border: const OutlineInputBorder(),
-          errorText: errorText),
-      onChanged: (text) => setState(() {
-        nameText = text;
-      }),
-    );
-  }
+  Widget nameTextFieldWidget() => TextField(
+        controller: nameTextFieldController,
+        decoration: InputDecoration(
+            label: const Text("Room name"),
+            border: const OutlineInputBorder(),
+            errorText: errorText),
+        onChanged: (text) => setState(() {
+          nameText = text;
+        }),
+      );
 
   // content widget
-  Widget contentWidget() {
-    const EdgeInsets padding =
-        EdgeInsets.symmetric(horizontal: 30, vertical: 30);
-
-    return Padding(
-        padding: padding,
-        child: ListView(
-          children: [nameTextFieldWidget()],
-        ));
-  }
+  Widget contentWidget() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+      child: ListView(
+        children: [nameTextFieldWidget()],
+      ));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(context),
+      appBar: appBarWidget(),
       body: contentWidget(),
     );
   }

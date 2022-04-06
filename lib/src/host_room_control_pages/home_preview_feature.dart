@@ -16,6 +16,13 @@ import 'package:atdel/src/model/room.dart';
 // services
 import 'package:atdel/src/services/room_services.dart';
 
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
+// home preview page
 class HomePreviewPage extends StatefulWidget {
   const HomePreviewPage({Key? key, required this.room}) : super(key: key);
 
@@ -44,68 +51,53 @@ class _HomePreviewPageState extends State<HomePreviewPage>
     _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
-  Bubble editButton() {
-    return Bubble(
-        icon: Icons.edit,
-        iconColor: Colors.white,
-        title: "Edit",
-        titleStyle: const TextStyle(color: Colors.white),
-        bubbleColor: Colors.blue,
-        onPress: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomeScreen(
-                        room: widget.room,
-                      )));
-        });
-  }
+  // edit button
+  Bubble editButton() => Bubble(
+      icon: Icons.edit,
+      iconColor: Colors.white,
+      title: "Edit",
+      titleStyle: const TextStyle(color: Colors.white),
+      bubbleColor: Colors.blue,
+      onPress: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EditHome(room: widget.room)));
+      });
 
-  FloatingActionBubble scaffoldFloatingActionButton() {
-    return FloatingActionBubble(
-        items: [editButton()],
-        onPress: () => _animationController.isCompleted
-            ? _animationController.reverse()
-            : _animationController.forward(),
-        iconColor: Colors.white,
-        backGroundColor: Colors.blue,
-        animation: _animation,
-        iconData: Icons.menu);
-  }
+  // floating action button
+  FloatingActionBubble scaffoldFloatingActionButton() => FloatingActionBubble(
+      items: [editButton()],
+      onPress: () => _animationController.isCompleted
+          ? _animationController.reverse()
+          : _animationController.forward(),
+      iconColor: Colors.white,
+      backGroundColor: Colors.blue,
+      animation: _animation,
+      iconData: Icons.menu);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: scaffoldFloatingActionButton(),
-        body: ViewHtml(room: widget.room));
+        body: const ViewHtml());
   }
 }
 
-class ViewHtml extends StatefulWidget {
-  const ViewHtml({Key? key, required this.room}) : super(key: key);
+// view html
+class ViewHtml extends ConsumerWidget {
+  const ViewHtml({Key? key}) : super(key: key);
 
-  final Room room;
-
-  @override
-  State<ViewHtml> createState() => _ViewHtmlState();
-}
-
-class _ViewHtmlState extends State<ViewHtml> {
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene = const Center(child: Text("Something went wrong!"));
 
-  // services
-  final RoomService _roomService = RoomService();
-
-  Widget showHtmlWidget(String htmlData) {
-    return SingleChildScrollView(child: Html(data: htmlData));
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _roomService = RoomService();
     return StreamBuilder<Room>(
-      stream: _roomService.streamGetRoomInfo(widget.room.id),
+      stream: _roomService.streamGetRoomInfo(_selectedRoomProvider.room!.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -115,7 +107,7 @@ class _ViewHtmlState extends State<ViewHtml> {
 
         final data = snapshot.data;
 
-        return showHtmlWidget(data!.roomDesc);
+        return SingleChildScrollView(child: Html(data: data!.roomDesc));
       },
     );
   }

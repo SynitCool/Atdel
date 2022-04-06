@@ -8,9 +8,15 @@ class SelectedRoom extends ChangeNotifier {
   Room? room;
   String? typeRoom;
 
-  // setting room
+  // set room
   set setRoom(Room newRoom) {
     room = newRoom;
+    notifyListeners();
+  }
+
+  // set type room
+  set setTypeRoom(String newTypeRoom) {
+    typeRoom = newTypeRoom;
     notifyListeners();
   }
 }

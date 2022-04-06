@@ -34,14 +34,6 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
   // format
   final String dateFormat = "MM/dd/yyyy HH:mm";
 
-  @override
-  void initState() {
-    super.initState();
-
-    // _attendance =
-    //     model.AttendanceList(roomId: widget.roomId, userUid: widget.userUid);
-  }
-
   // get text date
   String getText(DateTime? date, String defaultText) {
     if (date == null) {
@@ -60,33 +52,25 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
 
     roomService.addAttendanceToDatabase(widget.room, startDate!, endDate!);
 
-    // _attendance.addAttendance(startDate!, endDate!,
-    //     roomId: widget.roomId, userUid: widget.userUid);
-
     Navigator.pop(context);
   }
 
+  // add attendance button
+  Widget addAttendanceButton() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              primary: signAddButton == "error" ? Colors.red : Colors.blue),
+          onPressed: () async {
+            addAttendanceToDatabase();
+          },
+          child: const Text("Add")));
+
   // scaffold app bar or app bar
-  PreferredSizeWidget scaffoldAppBarWidget() {
-    // appbar parameters
-    const Color backgroundColor = Colors.grey;
-
-    // actions button
-    final Widget addAttendance = Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                primary: signAddButton == "error" ? Colors.red : Colors.blue),
-            onPressed: () async {
-              addAttendanceToDatabase();
-            },
-            child: const Text("Add")));
-
-    return AppBar(
-        title: const Text("Add Attendance"),
-        actions: [addAttendance],
-        backgroundColor: backgroundColor);
-  }
+  PreferredSizeWidget scaffoldAppBarWidget() => AppBar(
+      title: const Text("Add Attendance"),
+      actions: [addAttendanceButton()],
+      backgroundColor: Colors.grey);
 
   // pick date time
   Future pickDateTime(
@@ -130,106 +114,102 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     return newTime;
   }
 
-  // scaffold body or content
-  Widget scaffoldBody() {
-    // date buttons
-    Widget dateStart = ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(40),
-        primary: startDateError.isNotEmpty ? Colors.red : Colors.blue,
-      ),
-      icon: const Icon(Icons.date_range),
-      label: Text(getText(startDate, "Start Date")),
-      onPressed: () async {
-        pickDateTime(context, startDate, (newDate, newTime) {
-          setState(() {
-            startDate = DateTime(
-              newDate.year,
-              newDate.month,
-              newDate.day,
-              newTime.hour,
-              newTime.minute,
-            );
-          });
+  // display text
+  Widget dueAttendanceText(DateTime? start, DateTime? end) {
+    String startDateText = "Date Start";
+    String endDateText = "Date End";
 
-          if (startDate == null || endDate == null) return;
+    if (start != null) startDateText = DateFormat(dateFormat).format(start);
+    if (end != null) endDateText = DateFormat(dateFormat).format(end);
 
-          if (startDate!.compareTo(endDate!) == 1) {
-            startDateError = "Start Date must be less than End Date";
-            signAddButton = "error";
-            return;
-          }
+    if (startDateError.isNotEmpty) startDateText = startDateError;
+    if (endDateError.isNotEmpty) endDateText = endDateError;
 
-          endDateError = '';
-          startDateError = '';
-          signAddButton = '';
-        });
-      },
-    );
+    String text = "Due Attendance\nStart: $startDateText\nEnd: $endDateText";
 
-    Widget dateEnd = ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(40),
-        primary: endDateError.isNotEmpty ? Colors.red : Colors.blue,
-      ),
-      icon: const Icon(Icons.date_range),
-      label: Text(getText(endDate, "End Date")),
-      onPressed: () async {
-        pickDateTime(context, endDate, (newDate, newTime) {
-          setState(() {
-            endDate = DateTime(
-              newDate.year,
-              newDate.month,
-              newDate.day,
-              newTime.hour,
-              newTime.minute,
-            );
-          });
-
-          if (startDate == null || endDate == null) return;
-
-          if (endDate!.compareTo(startDate!) == -1) {
-            endDateError = "End Date must be greater than Start Date";
-            signAddButton = "error";
-            return;
-          }
-
-          endDateError = '';
-          startDateError = '';
-          signAddButton = '';
-        });
-      },
-    );
-
-    // display text
-    Widget dueAttendanceText(DateTime? start, DateTime? end) {
-      String startDateText = "Date Start";
-      String endDateText = "Date End";
-
-      if (start != null) startDateText = DateFormat(dateFormat).format(start);
-      if (end != null) endDateText = DateFormat(dateFormat).format(end);
-
-      if (startDateError.isNotEmpty) startDateText = startDateError;
-      if (endDateError.isNotEmpty) endDateText = endDateError;
-
-      String text = "Due Attendance\nStart: $startDateText\nEnd: $endDateText";
-
-      return Text(text);
-    }
-
-    // additional widget
-    const SizedBox spacerHeight100 = SizedBox(height: 100);
-
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        dateStart,
-        dateEnd,
-        spacerHeight100,
-        dueAttendanceText(startDate, endDate)
-      ]),
-    );
+    return Text(text);
   }
+
+  // Widget date start button
+  Widget dateStartButton() => ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(40),
+          primary: startDateError.isNotEmpty ? Colors.red : Colors.blue,
+        ),
+        icon: const Icon(Icons.date_range),
+        label: Text(getText(startDate, "Start Date")),
+        onPressed: () async {
+          pickDateTime(context, startDate, (newDate, newTime) {
+            setState(() {
+              startDate = DateTime(
+                newDate.year,
+                newDate.month,
+                newDate.day,
+                newTime.hour,
+                newTime.minute,
+              );
+            });
+
+            if (startDate == null || endDate == null) return;
+
+            if (startDate!.compareTo(endDate!) == 1) {
+              startDateError = "Start Date must be less than End Date";
+              signAddButton = "error";
+              return;
+            }
+
+            endDateError = '';
+            startDateError = '';
+            signAddButton = '';
+          });
+        },
+      );
+
+  // widget date end button
+  Widget dateEndButton() => ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(40),
+          primary: endDateError.isNotEmpty ? Colors.red : Colors.blue,
+        ),
+        icon: const Icon(Icons.date_range),
+        label: Text(getText(endDate, "End Date")),
+        onPressed: () async {
+          pickDateTime(context, endDate, (newDate, newTime) {
+            setState(() {
+              endDate = DateTime(
+                newDate.year,
+                newDate.month,
+                newDate.day,
+                newTime.hour,
+                newTime.minute,
+              );
+            });
+
+            if (startDate == null || endDate == null) return;
+
+            if (endDate!.compareTo(startDate!) == -1) {
+              endDateError = "End Date must be greater than Start Date";
+              signAddButton = "error";
+              return;
+            }
+
+            endDateError = '';
+            startDateError = '';
+            signAddButton = '';
+          });
+        },
+      );
+
+  // scaffold body or content
+  Widget scaffoldBody() => Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          dateStartButton(),
+          dateEndButton(),
+          const SizedBox(height: 100),
+          dueAttendanceText(startDate, endDate)
+        ]),
+      );
 
   @override
   Widget build(BuildContext context) {
