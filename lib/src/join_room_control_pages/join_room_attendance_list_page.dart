@@ -95,7 +95,9 @@ class AttendanceListButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // providers
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+
     return ListTile(
       tileColor: attendance.attendanceActive ? Colors.green : Colors.red,
       onTap: () {
