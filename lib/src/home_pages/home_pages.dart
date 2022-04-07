@@ -219,7 +219,7 @@ class RoomButtonWidget extends ConsumerWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => JoinRoomControl(room: room)));
+                    builder: (context) => const JoinRoomControl()));
             return;
           },
           leading: Icon(icon),
