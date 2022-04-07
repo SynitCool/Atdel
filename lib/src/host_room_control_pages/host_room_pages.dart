@@ -25,19 +25,8 @@ class HostRoomPages extends StatefulWidget {
 }
 
 class _HostRoomPagesState extends State<HostRoomPages> {
-  // the advanced drawer params
-  final Color backdropColor = Colors.blueGrey;
-  final Curve animationCurve = Curves.easeInOut;
-  final Duration animationDuration = const Duration(milliseconds: 300);
-  final BoxDecoration childDecoration = const BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(16)),
-  );
-
   // widgets bottom navigation bar
-  final List<Widget> featurePage = [
-    // const Center(child: Text("Home Screen")),
-    // const Center(child: Text("Attendance List"))
-  ];
+  final List<Widget> featurePage = [];
   final List<IconData> iconsPage = [Icons.home, Icons.people];
 
   int bottomNavIndex = 0;
@@ -57,92 +46,85 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     featurePage.add(AttedanceListScreen(room: widget.room));
   }
 
-  // the appbar
-  PreferredSizeWidget appBar() {
-    Widget leading = IconButton(
-      onPressed: () {
-        _advancedDrawerController.showDrawer();
-      },
-      icon: ValueListenableBuilder<AdvancedDrawerValue>(
-        valueListenable: _advancedDrawerController,
-        builder: (_, value, __) {
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: Icon(
-              value.visible ? Icons.clear : Icons.menu,
-              key: ValueKey<bool>(value.visible),
-            ),
-          );
+  // settings button
+  Widget settingsButton() => IconButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: ((context) => const HostSettingsPage())));
         },
-      ),
-    );
+        icon: const Icon(Icons.settings),
+        padding: const EdgeInsets.all(15.0),
+      );
 
-    Widget settingsButton = IconButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: ((context) =>
-                    HostSettingsPage(room: widget.room))));
-      },
-      icon: const Icon(Icons.settings),
-      padding: const EdgeInsets.all(15.0),
-    );
+  // leading animation
+  Widget leadingAppBar() => IconButton(
+        onPressed: () {
+          _advancedDrawerController.showDrawer();
+        },
+        icon: ValueListenableBuilder<AdvancedDrawerValue>(
+          valueListenable: _advancedDrawerController,
+          builder: (_, value, __) {
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: Icon(
+                value.visible ? Icons.clear : Icons.menu,
+                key: ValueKey<bool>(value.visible),
+              ),
+            );
+          },
+        ),
+      );
 
-    return AppBar(
-      title: const Text("Host Room Control"),
-      leading: leading,
-      actions: [settingsButton],
-    );
-  }
+  // the appbar
+  PreferredSizeWidget appBar() => AppBar(
+        title: const Text("Host Room Control"),
+        leading: leadingAppBar(),
+        actions: [settingsButton()],
+      );
 
   // the screen of feature
-  Widget mainContentWidget() {
-    return Scaffold(
-      appBar: appBar(),
-      body: featurePage[bottomNavIndex],
-      bottomNavigationBar: bottomNavigationBar(),
-    );
-  }
+  Widget mainContentWidget() => Scaffold(
+        appBar: appBar(),
+        body: featurePage[bottomNavIndex],
+        bottomNavigationBar: bottomNavigationBar(),
+      );
 
   // bottom navigation bar
-  Widget bottomNavigationBar() {
-    return AnimatedBottomNavigationBar.builder(
-      leftCornerRadius: 32,
-      rightCornerRadius: 32,
-      gapLocation: GapLocation.center,
-      notchSmoothness: NotchSmoothness.defaultEdge,
-      splashSpeedInMilliseconds: 300,
-      splashColor: Colors.amberAccent,
-      elevation: 200,
-      itemCount: iconsPage.length,
-      activeIndex: bottomNavIndex,
-      onTap: (int index) {
-        setState(() {
-          bottomNavIndex = index;
-        });
-      },
-      tabBuilder: (int index, bool isActive) {
-        final Color color = isActive ? Colors.amberAccent : Colors.black;
+  Widget bottomNavigationBar() => AnimatedBottomNavigationBar.builder(
+        leftCornerRadius: 32,
+        rightCornerRadius: 32,
+        gapLocation: GapLocation.center,
+        notchSmoothness: NotchSmoothness.defaultEdge,
+        splashSpeedInMilliseconds: 300,
+        splashColor: Colors.amberAccent,
+        elevation: 200,
+        itemCount: iconsPage.length,
+        activeIndex: bottomNavIndex,
+        onTap: (int index) {
+          setState(() {
+            bottomNavIndex = index;
+          });
+        },
+        tabBuilder: (int index, bool isActive) {
+          final Color color = isActive ? Colors.amberAccent : Colors.black;
 
-        return Icon(iconsPage[index], color: color);
-      },
-    );
-  }
-
-  Widget contentHostRoom() {
-    return AdvancedDrawer(
-        controller: _advancedDrawerController,
-        backdropColor: backdropColor,
-        animationCurve: animationCurve,
-        animationDuration: animationDuration,
-        childDecoration: childDecoration,
-        child: mainContentWidget(),
-        drawer: DrawerWidget(room: widget.room));
-  }
+          return Icon(iconsPage[index], color: color);
+        },
+      );
 
   @override
   Widget build(BuildContext context) {
-    return contentHostRoom();
+    return AdvancedDrawer(
+        controller: _advancedDrawerController,
+        backdropColor: Colors.blueGrey,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        childDecoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        child: mainContentWidget(),
+        drawer: DrawerWidget(room: widget.room));
   }
 }

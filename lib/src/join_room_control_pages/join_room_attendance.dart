@@ -4,12 +4,8 @@ import 'dart:io';
 // flutter
 import 'package:flutter/material.dart';
 
-// firebase
-import 'package:firebase_auth/firebase_auth.dart';
-
-// model
-import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/attendance.dart';
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // image picker
 import 'package:image_picker/image_picker.dart';
@@ -19,44 +15,74 @@ import 'package:atdel/src/services/room_services.dart';
 import 'package:atdel/src/services/ml_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
 
+// providers
+import 'package:atdel/src/providers/current_user_providers.dart';
+import 'package:atdel/src/providers/selected_attendance_providers.dart';
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
 class JoinRoomAttendance extends StatefulWidget {
   const JoinRoomAttendance(
-      {Key? key, required this.room, required this.attendance})
+      {Key? key})
       : super(key: key);
-
-  final Room room;
-  final Attendance attendance;
 
   @override
   State<JoinRoomAttendance> createState() => _JoinRoomAttendanceState();
 }
 
 class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
-  final RoomService _roomService = RoomService();
-  final ImagePicker _imagePicker = ImagePicker();
-  final MLService _mlService = MLService();
-  final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
-  final User? authUser = FirebaseAuth.instance.currentUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Join Room Attendance")),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ListView(
+          children: const [AttendByGalleryButton(), AttendByCameraButton()],
+        ),
+      ),
+    );
+  }
+}
+
+// attend with image by gallery
+class AttendByGalleryButton extends ConsumerWidget {
+  const AttendByGalleryButton({Key? key}) : super(key: key);
 
   // show user metric warning
-  Future showUserMetricAlert() {
+  Future showUserMetricAlert(BuildContext context) {
     return showDialog(
-      context: context, 
+      context: context,
       builder: (BuildContext context) => AlertDialog(
-          title: const Text("ERROR", style: TextStyle(color: Colors.red),),
-          content: const Text("Image for room must be set before take attendance!"),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'),
-            ),
-          ],
-        ),);
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content:
+            const Text("Image for room must be set before take attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
-  // get image by gallery
-  Widget attendImageByGallery() {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final _mlService = MLService();
+    final _imagePicker = ImagePicker();
+    final _userPhotoMetricService = UserPhotoMetricService();
+    final _roomService = RoomService();
+
+    // states
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+    final _selectedCurrentUserProvider = ref.watch(currentUser);
+
     return ListTile(
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
@@ -70,19 +96,59 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
-          final detectedUid = await _userPhotoMetricService
-              .calcSmallestUserSimilarity(widget.room, runModelMetric);
+          final detectedUid =
+              await _userPhotoMetricService.calcSmallestUserSimilarity(
+                  _selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null || detectedUid != authUser!.uid) {
-            showUserMetricAlert();
+          if (detectedUid == null ||
+              detectedUid != _selectedCurrentUserProvider.user!.uid) {
+            showUserMetricAlert(context);
           }
 
-          _roomService.updateAbsentUser(widget.room, widget.attendance);
+          _roomService.updateAbsentUser(_selectedRoomProvider.room!,
+              _selectedAttendanceProvider.attendance!);
         });
   }
+}
 
-  // get image by camera
-  Widget attendImageByCamera() {
+// attend with image by camera
+class AttendByCameraButton extends ConsumerWidget {
+  const AttendByCameraButton({ Key? key }) : super(key: key);
+
+  // show user metric warning
+  Future showUserMetricAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content:
+            const Text("Image for room must be set before take attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final _mlService = MLService();
+    final _imagePicker = ImagePicker();
+    final _userPhotoMetricService = UserPhotoMetricService();
+    final _roomService = RoomService();
+
+    // states
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+    final _selectedCurrentUserProvider = ref.watch(currentUser);
+
     return ListTile(
         leading: const Icon(Icons.camera),
         title: const Text("Attend With Camera"),
@@ -97,26 +163,13 @@ class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
           final runModelMetric = await _mlService.runModel(detectFace);
 
           final detectedUid = await _userPhotoMetricService
-              .calcSmallestUserSimilarity(widget.room, runModelMetric);
+              .calcSmallestUserSimilarity(_selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null || detectedUid != authUser!.uid) {
-            showUserMetricAlert();
+          if (detectedUid == null || detectedUid != _selectedCurrentUserProvider.user!.uid) {
+            showUserMetricAlert(context);
           }
 
-          _roomService.updateAbsentUser(widget.room, widget.attendance);
+          _roomService.updateAbsentUser(_selectedRoomProvider.room!, _selectedAttendanceProvider.attendance!);
         });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Join Room Attendance")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          children: [attendImageByGallery(), attendImageByCamera()],
-        ),
-      ),
-    );
   }
 }

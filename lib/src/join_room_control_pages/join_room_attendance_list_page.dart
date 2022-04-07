@@ -5,25 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_attendance.dart';
 
 // model
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/attendance.dart';
 
 // services
 import 'package:atdel/src/services/room_services.dart';
 
-class JoinRoomAttendanceList extends StatefulWidget {
-  const JoinRoomAttendanceList({Key? key, required this.room})
-      : super(key: key);
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-  // final String roomId;
-  final Room room;
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+import 'package:atdel/src/providers/selected_attendance_providers.dart';
+
+// join attendance page
+class JoinRoomAttendanceList extends ConsumerStatefulWidget {
+  const JoinRoomAttendanceList({Key? key}) : super(key: key);
 
   @override
-  State<JoinRoomAttendanceList> createState() => _JoinRoomAttendanceListState();
+  ConsumerState<JoinRoomAttendanceList> createState() =>
+      _JoinRoomAttendanceListState();
 }
 
-class _JoinRoomAttendanceListState extends State<JoinRoomAttendanceList>
-    with SingleTickerProviderStateMixin {
+class _JoinRoomAttendanceListState
+    extends ConsumerState<JoinRoomAttendanceList> {
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene = const Center(child: Text("ERROR"));
@@ -31,32 +35,12 @@ class _JoinRoomAttendanceListState extends State<JoinRoomAttendanceList>
   // services
   final RoomService _roomService = RoomService();
 
-  // attendance list button widget
-  Widget attendanceListButtonWidget(Attendance attendance) {
-    // widgets parameters
-    const IconData icon = Icons.date_range;
-
-    return ListTile(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => JoinRoomAttendance(
-                    room: widget.room, attendance: attendance)));
-      },
-      leading: const Icon(icon),
-      title: Column(children: [
-        Text("Start: " + attendance.dateStart.toString()),
-        Text("End: " + attendance.dateEnd.toString())
-      ]),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
     return Scaffold(
         body: StreamBuilder<List<Attendance>>(
-      stream: _roomService.streamAttendanceList(widget.room),
+      stream: _roomService.streamAttendanceList(_selectedRoomProvider.room!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -75,9 +59,36 @@ class _JoinRoomAttendanceListState extends State<JoinRoomAttendanceList>
             itemBuilder: (context, index) {
               final currentData = data[index];
 
-              return attendanceListButtonWidget(currentData);
+              return AttendanceListButtonWidget(attendance: currentData);
             });
       },
     ));
+  }
+}
+
+// attendance button
+class AttendanceListButtonWidget extends ConsumerWidget {
+  const AttendanceListButtonWidget({Key? key, required this.attendance})
+      : super(key: key);
+
+  final Attendance attendance;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+    return ListTile(
+      onTap: () {
+        _selectedAttendanceProvider.setAttendance = attendance;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const JoinRoomAttendance()));
+      },
+      leading: const Icon(Icons.date_range),
+      title: Column(children: [
+        Text("Start: " + attendance.dateStart.toString()),
+        Text("End: " + attendance.dateEnd.toString())
+      ]),
+    );
   }
 }

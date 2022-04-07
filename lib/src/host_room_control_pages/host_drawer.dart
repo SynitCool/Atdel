@@ -57,92 +57,69 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ]);
   }
 
+  // avatar info
+  Widget avatarInfoWidget(User user) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.home,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              user.displayName,
+              style: const TextStyle(fontSize: 20, color: Colors.white),
+            )
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          user.email,
+          style: const TextStyle(fontSize: 14, color: Colors.white),
+        ),
+      ]);
+
   // drawer host room
-  Widget materialHeader(User user) {
-    const padding = EdgeInsets.symmetric(horizontal: 20);
-    final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
-    const SizedBox spaceWidth20 = SizedBox(width: 20);
-    const SizedBox spaceWidth4 = SizedBox(width: 4);
-    const SizedBox spaceHeight4 = SizedBox(height: 4);
-
-    Widget avatarInfoWidget =
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.home,
-            color: Colors.white,
-          ),
-          spaceWidth4,
-          Text(
-            user.displayName,
-            style: const TextStyle(fontSize: 20, color: Colors.white),
-          )
-        ],
-      ),
-      spaceHeight4,
-      Text(
-        user.email,
-        style: const TextStyle(fontSize: 14, color: Colors.white),
-      ),
-    ]);
-
-    return InkWell(
-      onTap: () {
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => UserPage(user!)));
-      },
-      child: Container(
-          padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
-          child: Row(
-            children: [
-              avatarPicture,
-              spaceWidth20,
-              avatarInfoWidget,
-            ],
-          )),
-    );
-  }
-
+  Widget materialHeader(User user) => InkWell(
+        child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20)
+                .add(const EdgeInsets.symmetric(vertical: 40)),
+            child: Row(
+              children: [
+                CircleAvatar(
+                    radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+                const SizedBox(width: 20),
+                avatarInfoWidget(user),
+              ],
+            )),
+      );
+      
   // drawer member room
-  Widget materialContentButton(User user) {
-    final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
-    const SizedBox spaceWidth4 = SizedBox(width: 4);
-    const SizedBox spaceHeight4 = SizedBox(height: 4);
-
-    Widget avatarInfoWidget =
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.person,
-            color: Colors.white,
+  Widget materialContentButton(User user) => ListTile(
+        leading: CircleAvatar(
+            radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.person,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                user.displayName,
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              )
+            ],
           ),
-          spaceWidth4,
+          const SizedBox(height: 4),
           Text(
-            user.displayName,
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          )
-        ],
-      ),
-      spaceHeight4,
-      Text(
-        user.email,
-        style: const TextStyle(fontSize: 12, color: Colors.white),
-      ),
-    ]);
-
-    return ListTile(
-      onTap: () {
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => UserPage(user!)));
-      },
-      leading: avatarPicture,
-      title: avatarInfoWidget,
-    );
-  }
+            user.email,
+            style: const TextStyle(fontSize: 12, color: Colors.white),
+          ),
+        ]),
+      );
 
   // drawer content
   Widget materialDrawer(List<User> users) {
@@ -163,7 +140,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       }
     }
 
-    containerButtonsContainer = Container(
+    Widget containerButtonsContainer = Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: materialDrawerButtons,
@@ -195,15 +172,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           final data = snapshot.data;
 
           return materialDrawer(data!);
-
-          // return ListView.builder(
-          //     itemCount: data!.length,
-          //     itemBuilder: (context, index) {
-          //       final currentData = data[index];
-
-          //       return ElevatedButton(
-          //           onPressed: () {}, child: Text(currentData.displayName));
-          //     });
         });
   }
 }

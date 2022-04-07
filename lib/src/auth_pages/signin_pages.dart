@@ -1,26 +1,22 @@
-// import 'package:authentication/firebase_authentication.dart';
-
+// flutter
 import 'package:flutter/material.dart';
+
+// logo
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
 
-  @override
-  State<SignInPage> createState() => _SignInPageState();
-}
-
-class _SignInPageState extends State<SignInPage> {
-  final PreferredSizeWidget appBarWidget =
+  PreferredSizeWidget appBarWidget() =>
       AppBar(title: const Text("Sign in"), centerTitle: true);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget,
+      appBar: appBarWidget(),
       body: Center(
           child: Padding(
               padding: const EdgeInsets.all(32),

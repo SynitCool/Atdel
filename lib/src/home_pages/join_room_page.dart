@@ -36,57 +36,49 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
     return 'The room id must be 6 characters';
   }
 
+  // join room button
+  Widget joinRoomButton() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: ElevatedButton(
+          onPressed: () {
+            final RoomService roomService = RoomService();
+
+            roomService.joinRoomWithCode(roomCodeText);
+
+            Navigator.pop(context);
+          },
+          child: const Text("Join")));
+
   // app bar widget
-  PreferredSizeWidget appBarWidget(BuildContext context) {
-    final Widget joinRoomButton = Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: ElevatedButton(
-            onPressed: () {
-              final RoomService roomService = RoomService();
-
-              roomService.joinRoomWithCode(roomCodeText);
-
-              Navigator.pop(context);
-            },
-            child: const Text("Join")));
-
-    return AppBar(
-      backgroundColor: Colors.white38,
-      title: const Text("Join room"),
-      actions: [joinRoomButton],
-    );
-  }
+  PreferredSizeWidget appBarWidget() => AppBar(
+        backgroundColor: Colors.white38,
+        title: const Text("Join room"),
+        actions: [joinRoomButton()],
+      );
 
   // name room text field widget
-  Widget roomIdFieldWidget() {
-    return TextField(
-      controller: roomCodeTextFieldController,
-      decoration: InputDecoration(
-          label: const Text("Room Code"),
-          border: const OutlineInputBorder(),
-          errorText: roomCodeErrorText),
-      onChanged: (text) => setState(() {
-        roomCodeText = text;
-      }),
-    );
-  }
+  Widget roomIdFieldWidget() => TextField(
+        controller: roomCodeTextFieldController,
+        decoration: InputDecoration(
+            label: const Text("Room Code"),
+            border: const OutlineInputBorder(),
+            errorText: roomCodeErrorText),
+        onChanged: (text) => setState(() {
+          roomCodeText = text;
+        }),
+      );
 
   // content widget
-  Widget contentWidget() {
-    const EdgeInsets padding =
-        EdgeInsets.symmetric(horizontal: 30, vertical: 30);
-
-    return Padding(
-        padding: padding,
-        child: ListView(
-          children: [roomIdFieldWidget()],
-        ));
-  }
+  Widget contentWidget() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+      child: ListView(
+        children: [roomIdFieldWidget()],
+      ));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(context),
+      appBar: appBarWidget(),
       body: contentWidget(),
     );
   }

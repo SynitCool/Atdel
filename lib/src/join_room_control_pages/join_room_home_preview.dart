@@ -10,51 +10,40 @@ import 'package:atdel/src/model/room.dart';
 // services
 import 'package:atdel/src/services/room_services.dart';
 
-class JoinRoomPreviewPage extends StatefulWidget {
-  const JoinRoomPreviewPage({Key? key, required this.room}) : super(key: key);
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-  final Room room;
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
+class JoinRoomPreviewPage extends StatefulWidget {
+  const JoinRoomPreviewPage({Key? key}) : super(key: key);
 
   @override
   State<JoinRoomPreviewPage> createState() => _JoinRoomPreviewPageState();
 }
 
-class _JoinRoomPreviewPageState extends State<JoinRoomPreviewPage>
-    with SingleTickerProviderStateMixin {
-
-
+class _JoinRoomPreviewPageState extends State<JoinRoomPreviewPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: ViewHtml(room: widget.room));
+    return const Scaffold(body: ViewHtml());
   }
 }
 
-class ViewHtml extends StatefulWidget {
-  const ViewHtml({Key? key, required this.room}) : super(key: key);
+// view html widget
+class ViewHtml extends ConsumerWidget {
+  const ViewHtml({Key? key}) : super(key: key);
 
-  final Room room;
-
-  @override
-  State<ViewHtml> createState() => _ViewHtmlState();
-}
-
-class _ViewHtmlState extends State<ViewHtml> {
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene = const Center(child: Text("Something went wrong!"));
 
-  // services
-  final RoomService _roomService = RoomService();
-
-  Widget showHtmlWidget(String htmlData) {
-    return SingleChildScrollView(child: Html(data: htmlData));
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _roomService = RoomService();
+    final _selectedRoomProvider = ref.watch(selectedRoom);
     return StreamBuilder<Room>(
-      stream: _roomService.streamGetRoomInfo(widget.room.id),
+      stream: _roomService.streamGetRoomInfo(_selectedRoomProvider.room!.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -64,7 +53,7 @@ class _ViewHtmlState extends State<ViewHtml> {
 
         final data = snapshot.data;
 
-        return showHtmlWidget(data!.roomDesc);
+        return SingleChildScrollView(child: Html(data: data!.roomDesc));
       },
     );
   }

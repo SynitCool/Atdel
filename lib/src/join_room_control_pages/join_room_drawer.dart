@@ -1,27 +1,62 @@
 import 'package:flutter/material.dart';
 
 // model
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart';
 
 // services
 import 'package:atdel/src/services/room_services.dart';
 
-class DrawerWidget extends StatefulWidget {
-  const DrawerWidget({Key? key, required this.room}) : super(key: key);
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-  final Room room;
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
+class DrawerWidget extends ConsumerStatefulWidget {
+  const DrawerWidget({Key? key}) : super(key: key);
 
   @override
-  State<DrawerWidget> createState() => _DrawerWidgetState();
+  ConsumerState<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
-class _DrawerWidgetState extends State<DrawerWidget> {
+class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene =
       const Center(child: Text("There something went wrong !"));
 
+  @override
+  Widget build(BuildContext context) {
+    // return materialDrawer();
+    final RoomService roomService = RoomService();
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    return StreamBuilder<List<User>>(
+        stream: roomService.streamUsersRoom(_selectedRoomProvider.room!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return ContentDrawer(users: data!);
+        });
+  }
+}
+
+// content drawer
+class ContentDrawer extends ConsumerStatefulWidget {
+  const ContentDrawer({Key? key, required this.users}) : super(key: key);
+
+  final List<User> users;
+
+  @override
+  ConsumerState<ContentDrawer> createState() => _ContentDrawerState();
+}
+
+class _ContentDrawerState extends ConsumerState<ContentDrawer> {
   // widget parameters
   final Widget space12 = const SizedBox(height: 12);
   final Widget space24 = const SizedBox(height: 24);
@@ -57,95 +92,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ]);
   }
 
-  // drawer host room
-  Widget materialHeader(User user) {
-    const padding = EdgeInsets.symmetric(horizontal: 20);
-    final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
-    const SizedBox spaceWidth20 = SizedBox(width: 20);
-    const SizedBox spaceWidth4 = SizedBox(width: 4);
-    const SizedBox spaceHeight4 = SizedBox(height: 4);
+  @override
+  Widget build(BuildContext context) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
 
-    Widget avatarInfoWidget =
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.home,
-            color: Colors.white,
-          ),
-          spaceWidth4,
-          Text(
-            user.displayName,
-            style: const TextStyle(fontSize: 20, color: Colors.white),
-          )
-        ],
-      ),
-      spaceHeight4,
-      Text(
-        user.email,
-        style: const TextStyle(fontSize: 14, color: Colors.white),
-      ),
-    ]);
-
-    return InkWell(
-      onTap: () {
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => UserPage(user!)));
-      },
-      child: Container(
-          padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
-          child: Row(
-            children: [
-              avatarPicture,
-              spaceWidth20,
-              avatarInfoWidget,
-            ],
-          )),
-    );
-  }
-
-  // drawer member room
-  Widget materialContentButton(User user) {
-    final CircleAvatar avatarPicture =
-        CircleAvatar(radius: 30, backgroundImage: NetworkImage(user.photoUrl));
-    const SizedBox spaceWidth4 = SizedBox(width: 4);
-    const SizedBox spaceHeight4 = SizedBox(height: 4);
-
-    Widget avatarInfoWidget =
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.person,
-            color: Colors.white,
-          ),
-          spaceWidth4,
-          Text(
-            user.displayName,
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          )
-        ],
-      ),
-      spaceHeight4,
-      Text(
-        user.email,
-        style: const TextStyle(fontSize: 12, color: Colors.white),
-      ),
-    ]);
-
-    return ListTile(
-      onTap: () {
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => UserPage(user!)));
-      },
-      leading: avatarPicture,
-      title: avatarInfoWidget,
-    );
-  }
-
-  // drawer content
-  Widget materialDrawer(List<User> users) {
     materialDrawerWidget = [];
     materialDrawerButtons = [
       space12,
@@ -154,12 +104,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       space24,
     ];
 
-    for (final user in users) {
+    for (final user in widget.users) {
       // check host
-      if (user.uid == widget.room.hostUid) {
-        materialDrawerWidget.add(materialHeader(user));
+      if (user.uid == _selectedRoomProvider.room!.hostUid) {
+        materialDrawerWidget.add(HostButton(user: user));
       } else {
-        materialDrawerButtons.add(materialContentButton(user));
+        materialDrawerButtons.add(MemberButton(user: user));
       }
     }
 
@@ -177,33 +127,84 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       children: materialDrawerWidget,
     );
   }
+}
+
+// member button
+class MemberButton extends StatelessWidget {
+  const MemberButton({Key? key, required this.user}) : super(key: key);
+
+  final User user;
 
   @override
   Widget build(BuildContext context) {
-    // return materialDrawer();
-    final RoomService roomService = RoomService();
+    return ListTile(
+      onTap: () {},
+      leading: CircleAvatar(
+          radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              user.displayName,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            )
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          user.email,
+          style: const TextStyle(fontSize: 12, color: Colors.white),
+        ),
+      ]),
+    );
+  }
+}
 
-    return StreamBuilder<List<User>>(
-        stream: roomService.streamUsersRoom(widget.room),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
+// host button
+class HostButton extends StatelessWidget {
+  const HostButton({Key? key, required this.user}) : super(key: key);
 
-          if (snapshot.hasError) return errorScene;
+  final User user;
 
-          final data = snapshot.data;
-
-          return materialDrawer(data!);
-
-          // return ListView.builder(
-          //     itemCount: data!.length,
-          //     itemBuilder: (context, index) {
-          //       final currentData = data[index];
-
-          //       return ElevatedButton(
-          //           onPressed: () {}, child: Text(currentData.displayName));
-          //     });
-        });
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20)
+              .add(const EdgeInsets.symmetric(vertical: 40)),
+          child: Row(
+            children: [
+              CircleAvatar(
+                  radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+              const SizedBox(width: 20),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.home,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      user.displayName,
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  user.email,
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ]),
+            ],
+          )),
+    );
   }
 }

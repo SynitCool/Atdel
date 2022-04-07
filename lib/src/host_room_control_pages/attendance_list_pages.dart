@@ -1,4 +1,5 @@
 // flutter
+import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:flutter/material.dart';
 
 // custom widgets
@@ -14,7 +15,9 @@ import 'package:atdel/src/model/attendance.dart';
 
 // services
 import 'package:atdel/src/services/room_services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// attendance list screen
 class AttedanceListScreen extends StatefulWidget {
   const AttedanceListScreen({Key? key, required this.room}) : super(key: key);
 
@@ -42,7 +45,6 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
   void initState() {
     super.initState();
 
-    // floating action button animation
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
@@ -53,31 +55,8 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
     _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
-  // attendance list button widget
-  Widget attendanceListButtonWidget(Attendance attendance) {
-    // widgets parameters
-    const IconData icon = Icons.date_range;
-
-    return ListTile(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MembersAttendanceListPage(
-                    room: widget.room, attendance: attendance)));
-      },
-      leading: const Icon(icon),
-      title: Column(children: [
-        Text("Start: " + attendance.dateStart.toString()),
-        Text("End: " + attendance.dateEnd.toString())
-      ]),
-    );
-  }
-
-  // floating action button of attendance list screen
-  Widget floatingActionButtonWidget() {
-    // add button
-    Bubble addAttendanceButton = Bubble(
+  // add attendance button
+  Bubble addAttendanceButton() => Bubble(
         icon: Icons.add,
         iconColor: Colors.white,
         title: "Add",
@@ -92,8 +71,9 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
                       )));
         });
 
-    return FloatingActionBubble(
-        items: [addAttendanceButton],
+  // floating action button of attendance list screen
+  Widget floatingActionButtonWidget() => FloatingActionBubble(
+        items: [addAttendanceButton()],
         onPress: () => _animationController.isCompleted
             ? _animationController.reverse()
             : _animationController.forward(),
@@ -101,7 +81,6 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
         backGroundColor: Colors.blue,
         animation: _animation,
         iconData: Icons.menu);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +106,36 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
                 itemBuilder: (context, index) {
                   final currentData = data[index];
 
-                  return attendanceListButtonWidget(currentData);
+                  return AttendanceButtonWidget(attendance: currentData);
                 });
           },
         ));
+  }
+}
+
+// attendance button
+class AttendanceButtonWidget extends ConsumerWidget {
+  const AttendanceButtonWidget({Key? key, required this.attendance}) : super(key: key);
+
+  final Attendance attendance;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    return ListTile(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MembersAttendanceListPage(
+                    room: _selectedRoomProvider.room!,
+                    attendance: attendance)));
+      },
+      leading: const Icon(Icons.date_range),
+      title: Column(children: [
+        Text("Start: " + attendance.dateStart.toString()),
+        Text("End: " + attendance.dateEnd.toString())
+      ]),
+    );
   }
 }
