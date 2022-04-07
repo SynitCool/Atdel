@@ -73,21 +73,49 @@ class AttendanceListButtonWidget extends ConsumerWidget {
 
   final Attendance attendance;
 
+  // attendance active error
+  Future attendanceActiveError(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text("The attendance is not active !."),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
     return ListTile(
+      tileColor: attendance.attendanceActive ? Colors.green : Colors.red,
       onTap: () {
+        if (!attendance.attendanceActive) attendanceActiveError(context);
+        if (!attendance.attendanceActive) return;
+
         _selectedAttendanceProvider.setAttendance = attendance;
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => const JoinRoomAttendance()));
       },
-      leading: const Icon(Icons.date_range),
+      leading: const Icon(Icons.date_range, color: Colors.white),
       title: Column(children: [
-        Text("Start: " + attendance.dateStart.toString()),
-        Text("End: " + attendance.dateEnd.toString())
+        Text(
+          "Start: " + attendance.dateStart.toString(),
+          style: const TextStyle(color: Colors.white),
+        ),
+        Text("End: " + attendance.dateEnd.toString(),
+            style: const TextStyle(color: Colors.white))
       ]),
     );
   }
