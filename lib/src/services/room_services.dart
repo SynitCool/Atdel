@@ -203,7 +203,9 @@ class RoomService {
 
     // set to database
     Attendance attendance = Attendance(
-        dateStart: dateStart, dateEnd: dateEnd, id: attendanceListDoc.id);
+        dateStart: dateStart,
+        dateEnd: dateEnd,
+        id: attendanceListDoc.id);
 
     final Map<String, dynamic> map = attendance.toMap();
 
