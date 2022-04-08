@@ -138,7 +138,6 @@ class MemberButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {},
       leading: CircleAvatar(
           radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
       title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -174,7 +173,6 @@ class HostButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
       child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20)
               .add(const EdgeInsets.symmetric(vertical: 40)),
