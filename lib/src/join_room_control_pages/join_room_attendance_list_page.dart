@@ -1,4 +1,5 @@
 // flutter
+import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:flutter/material.dart';
 
 // pages
@@ -6,9 +7,11 @@ import 'package:atdel/src/join_room_control_pages/join_room_attendance.dart';
 
 // model
 import 'package:atdel/src/model/attendance.dart';
+import 'package:atdel/src/model/user_attendance.dart';
 
 // services
 import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/attendance_services.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,6 +76,12 @@ class AttendanceListButtonWidget extends ConsumerWidget {
 
   final Attendance attendance;
 
+  // scenes
+  final Widget loadingScene = const Center(
+    child: CircularProgressIndicator(),
+  );
+  final Widget errorScene = const Center(child: Text("Something went wrong!"));
+
   // attendance active error
   Future attendanceActiveError(BuildContext context) {
     return showDialog(
@@ -93,30 +102,80 @@ class AttendanceListButtonWidget extends ConsumerWidget {
     );
   }
 
+  // attendance user not absent
+  Future attendanceNotAbsentError(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "HURRAY!",
+          style: TextStyle(color: Colors.yellow),
+        ),
+        content: const Text("You are not absent for this attendance!."),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // get list tile color
+  Color listTileColor(UserAttendance userAttendance) {
+    if (!userAttendance.absent) return Colors.yellow;
+    if (attendance.attendanceActive) return Colors.green;
+
+    return Colors.red;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // providers
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
-    return ListTile(
-      tileColor: attendance.attendanceActive ? Colors.green : Colors.red,
-      onTap: () {
-        if (!attendance.attendanceActive) attendanceActiveError(context);
-        if (!attendance.attendanceActive) return;
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _currentUserProvider = ref.watch(currentUser);
 
-        _selectedAttendanceProvider.setAttendance = attendance;
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const JoinRoomAttendance()));
-      },
-      leading: const Icon(Icons.date_range, color: Colors.white),
-      title: Column(children: [
-        Text(
-          "Start: " + attendance.dateStart.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-        Text("End: " + attendance.dateEnd.toString(),
-            style: const TextStyle(color: Colors.white))
-      ]),
-    );
+    // services
+    final _attendanceService = AttendanceService();
+
+    return FutureBuilder<UserAttendance>(
+        future: _attendanceService.getUserAttendance(_currentUserProvider.user!,
+            _selectedRoomProvider.room!, attendance),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return ListTile(
+            tileColor: listTileColor(data!),
+            onTap: () {
+              if (!data.absent) attendanceNotAbsentError(context);
+              if (!data.absent) return;
+              if (!attendance.attendanceActive) attendanceActiveError(context);
+              if (!attendance.attendanceActive) return;
+
+              _selectedAttendanceProvider.setAttendance = attendance;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const JoinRoomAttendance()));
+            },
+            leading: const Icon(Icons.date_range, color: Colors.white),
+            title: Column(children: [
+              Text(
+                "Start: " + attendance.dateStart.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              Text("End: " + attendance.dateEnd.toString(),
+                  style: const TextStyle(color: Colors.white))
+            ]),
+          );
+        });
   }
 }

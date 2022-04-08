@@ -5,6 +5,7 @@ class Attendance {
   final DateTime dateStart;
   final DateTime dateEnd;
   final String id;
+
   bool attendanceActive = false;
 
   Attendance(
@@ -52,7 +53,7 @@ class Attendance {
     };
   }
 
-  // static method
+  // check attendance active
   static bool checkAttendanceActive(DateTime dateStart, DateTime dateEnd) {
     final DateTime currentDateTime = DateTime.now();
     if (currentDateTime.compareTo(dateStart) == -1) return false;
