@@ -1,8 +1,7 @@
 // flutter
+import 'package:atdel/src/home_pages/specify_joiner.dart';
 import 'package:flutter/material.dart';
 
-// services
-import 'package:atdel/src/services/room_services.dart';
 
 class JoinRoomPage extends StatefulWidget {
   const JoinRoomPage({Key? key}) : super(key: key);
@@ -36,24 +35,11 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
     return 'The room id must be 6 characters';
   }
 
-  // join room button
-  Widget joinRoomButton() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: ElevatedButton(
-          onPressed: () {
-            final RoomService roomService = RoomService();
-
-            roomService.joinRoomWithCode(roomCodeText);
-
-            Navigator.pop(context);
-          },
-          child: const Text("Join")));
-
   // app bar widget
   PreferredSizeWidget appBarWidget() => AppBar(
         backgroundColor: Colors.white38,
         title: const Text("Join room"),
-        actions: [joinRoomButton()],
+        actions: [NextRoomButton(roomCode: roomCodeText,)],
       );
 
   // name room text field widget
@@ -81,5 +67,27 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
       appBar: appBarWidget(),
       body: contentWidget(),
     );
+  }
+}
+
+class NextRoomButton extends StatelessWidget {
+  const NextRoomButton({Key? key, required this.roomCode}) : super(key: key);
+
+  final String roomCode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: ElevatedButton(
+            onPressed: () {
+              if (roomCode.isEmpty || roomCode.length != 6) return;
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SpecifyJoiner(roomCodeText: roomCode)));
+            },
+            child: const Text("Next")));
   }
 }

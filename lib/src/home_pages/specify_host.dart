@@ -1,17 +1,19 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// pages
-import 'package:atdel/src/home_pages/specify_host.dart';
+// services
+import 'package:atdel/src/services/room_services.dart';
 
-class CreateRoomPage extends StatefulWidget {
-  const CreateRoomPage({Key? key}) : super(key: key);
+class SpecifyHost extends StatefulWidget {
+  const SpecifyHost({Key? key, required this.nameRoom}) : super(key: key);
+
+  final String nameRoom;
 
   @override
-  State<CreateRoomPage> createState() => _CreateRoomPageState();
+  State<SpecifyHost> createState() => _SpecifyHostState();
 }
 
-class _CreateRoomPageState extends State<CreateRoomPage> {
+class _SpecifyHostState extends State<SpecifyHost> {
   // widget related
   final TextEditingController nameTextFieldController = TextEditingController();
   String nameText = '';
@@ -21,6 +23,15 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     nameTextFieldController.dispose();
     super.dispose();
   }
+
+  // app bar widget
+  PreferredSizeWidget appBarWidget() => AppBar(
+        backgroundColor: Colors.white38,
+        title: const Text("Specify Host"),
+        actions: [
+          CreateRoomButton(nameRoom: widget.nameRoom, hostAlias: nameText)
+        ],
+      );
 
   // error text field
   String? get errorText {
@@ -37,18 +48,11 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
     return null;
   }
 
-  // app bar widget
-  PreferredSizeWidget appBarWidget() => AppBar(
-        backgroundColor: Colors.white38,
-        title: const Text("Setting Room"),
-        actions: [NextRoomButton(nameRoom: nameText)],
-      );
-
   // name room text field widget
   Widget nameTextFieldWidget() => TextField(
         controller: nameTextFieldController,
         decoration: InputDecoration(
-            label: const Text("Room name"),
+            label: const Text("Host alias"),
             border: const OutlineInputBorder(),
             errorText: errorText),
         onChanged: (text) => setState(() {
@@ -72,14 +76,18 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   }
 }
 
-// next room button
-class NextRoomButton extends StatelessWidget {
-  const NextRoomButton({Key? key, required this.nameRoom}) : super(key: key);
+// create room button
+class CreateRoomButton extends StatelessWidget {
+  const CreateRoomButton(
+      {Key? key, required this.nameRoom, required this.hostAlias})
+      : super(key: key);
 
   final String nameRoom;
+  final String hostAlias;
 
   @override
   Widget build(BuildContext context) {
+    final RoomService roomService = RoomService();
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
@@ -87,13 +95,11 @@ class NextRoomButton extends StatelessWidget {
               if (nameRoom.isEmpty || nameRoom.length < 4) return;
               if (nameRoom.length > 12) return;
 
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SpecifyHost(
-                            nameRoom: nameRoom,
-                          )));
+              roomService.addRoomToDatabase(nameRoom, hostAlias);
+
+              Navigator.pop(context);
+              Navigator.pop(context);
             },
-            child: const Text("Next")));
+            child: const Text("Create")));
   }
 }

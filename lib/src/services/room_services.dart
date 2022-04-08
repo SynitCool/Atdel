@@ -6,6 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as model;
 import 'package:atdel/src/model/attendance.dart';
+import 'package:atdel/src/model/user_room.dart';
+
+// services
+import 'package:atdel/src/services/user_room_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -32,14 +36,7 @@ class RoomService {
   }
 
   // add room to database
-  Future addRoomToDatabase(String roomName) async {
-    // generator
-    final RandomStringGenerator generator =
-        RandomStringGenerator(fixedLength: 6);
-
-    generator.hasSymbols = false;
-    generator.hasDigits = false;
-
+  Future addRoomToDatabase(String roomName, String hostAlias) async {
     // current user
     final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
@@ -79,20 +76,32 @@ class RoomService {
     room.setRoomDesc = "<h1>Welcome</h1>";
     room.setRoomName = roomName;
     room.setId = roomDoc.id;
-    room.setRoomCode = generator.generate();
+    room.setRoomCode = makeRandomCode();
 
     final Map<String, dynamic> roomMap = room.toMap();
 
     await roomDoc.set(roomMap);
 
     // settings room users
-    model.User modelUser = model.User.fromFirebaseAuth(authUser);
+    UserRoom hostUser = UserRoom(
+        alias: hostAlias,
+        displayName: authUser.displayName!,
+        email: authUser.email!,
+        photoUrl: authUser.photoURL!,
+        uid: authUser.uid,
+        userReference: usersDoc);
 
-    modelUser.setUserReference = usersDoc;
+    Map<String, dynamic> hostUserMap = hostUser.toMap();
 
-    Map<String, dynamic> modelUserMap = modelUser.toMapRoomUsers();
+    await roomUsersDoc.set(hostUserMap);
 
-    await roomUsersDoc.set(modelUserMap);
+    // model.User modelUser = model.User.fromFirebaseAuth(authUser);
+
+    // modelUser.setUserReference = usersDoc;
+
+    // Map<String, dynamic> modelUserMap = modelUser.toMapRoomUsers();
+
+    // await roomUsersDoc.set(modelUserMap);
 
     // update users rooms
     final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
@@ -117,7 +126,7 @@ class RoomService {
   }
 
   // join room with code
-  Future joinRoomWithCode(String code) async {
+  Future joinRoomWithCode(String code, String userAlias) async {
     // current user
     final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
@@ -165,9 +174,15 @@ class RoomService {
     await usersDoc.update(userModelInfo);
 
     // update room users
-    Map<String, dynamic> userInfo = userModel.toMapRoomUsers();
+    // Map<String, dynamic> userInfo = userModel.toMapRoomUsers();
 
-    await roomUsersDoc.set(userInfo);
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser);
+    userRoom.setUserReference = usersDoc;
+    userRoom.setAlias = userAlias;
+
+    Map<String, dynamic> userRoomMap = userRoom.toMap();
+
+    await roomUsersDoc.set(userRoomMap);
   }
 
   // change room desc
@@ -203,9 +218,7 @@ class RoomService {
 
     // set to database
     Attendance attendance = Attendance(
-        dateStart: dateStart,
-        dateEnd: dateEnd,
-        id: attendanceListDoc.id);
+        dateStart: dateStart, dateEnd: dateEnd, id: attendanceListDoc.id);
 
     final Map<String, dynamic> map = attendance.toMap();
 
@@ -260,7 +273,9 @@ class RoomService {
     await roomCodesDoc.set(roomCodesMap);
 
     // delete users room references
-    final Stream<List<model.User>> streamRoomUsers = streamUsersRoom(room);
+    final userRoomService = UserRoomService();
+    final Stream<List<UserRoom>> streamRoomUsers =
+        userRoomService.streamUsersRoom(room);
 
     streamRoomUsers.forEach((elements) async {
       for (final element in elements) {
@@ -425,8 +440,11 @@ class RoomService {
     final CollectionReference<Map<String, dynamic>> collection =
         _db.collection(collectionPath);
 
-    final Stream<List<Attendance>> stream = collection.orderBy("date_start", descending: true).snapshots().map((data) =>
-        data.docs.map((data) => Attendance.fromMap(data.data())).toList());
+    final Stream<List<Attendance>> stream = collection
+        .orderBy("date_start", descending: true)
+        .snapshots()
+        .map((data) =>
+            data.docs.map((data) => Attendance.fromMap(data.data())).toList());
 
     return stream;
   }
@@ -454,5 +472,17 @@ class RoomService {
     final stream = collection.snapshots();
 
     return stream;
+  }
+
+  // make random code
+  static String makeRandomCode() {
+    // generator
+    final RandomStringGenerator generator =
+        RandomStringGenerator(fixedLength: 6);
+
+    generator.hasSymbols = false;
+    generator.hasDigits = false;
+
+    return generator.generate();
   }
 }
