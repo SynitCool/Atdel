@@ -29,28 +29,73 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
   PreferredSizeWidget scaffoldAppBar() =>
       AppBar(title: const Text("Attendance"));
 
-  // member info button
-  Widget memberInfo(User user) => Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-                backgroundImage: NetworkImage(user.photoUrl), radius: 30),
-            title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Expanded(child: Text(user.displayName)),
-                  const VerticalDivider(),
-                  Expanded(child: Text(user.email)),
-                  const VerticalDivider(),
-                  Expanded(child: Text(user.absent.toString())),
-                ]),
-          ),
-          const Divider(color: Colors.black)
-        ],
-      );
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: scaffoldAppBar(),
+      body: StreamBuilder<List<User>>(
+        stream:
+            _roomService.streamUsersAttendance(widget.room, widget.attendance),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  // scaffold body
-  Widget scaffoldBody(List<User> users) => Column(
+          if (snapshot.hasError) {
+            return const Center(child: Text("Something went wrong!"));
+          }
+
+          final data = snapshot.data;
+
+          if (data!.isEmpty) {
+            return const Center(child: Text("No users in attendance"));
+          }
+
+          return MemberView(users: data);
+        },
+      ),
+    );
+  }
+}
+
+// member info
+class MemberInfoWidget extends StatelessWidget {
+  const MemberInfoWidget({Key? key, required this.user}) : super(key: key);
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListTile(
+          leading: CircleAvatar(
+              backgroundImage: NetworkImage(user.photoUrl), radius: 30),
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(child: Text(user.displayName)),
+                const VerticalDivider(),
+                Expanded(child: Text(user.email)),
+                const VerticalDivider(),
+                Expanded(child: user.absent ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.close, color: Colors.red)),
+              ]),
+        ),
+        const Divider(color: Colors.black)
+      ],
+    );
+  }
+}
+
+// view of members
+class MemberView extends StatelessWidget {
+  const MemberView({Key? key, required this.users}) : super(key: key);
+
+  final List<User> users;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
         children: [
           ListTile(
             leading: const CircleAvatar(
@@ -80,38 +125,11 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
               itemBuilder: (context, index) {
                 final User currentUser = users[index];
 
-                return memberInfo(currentUser);
+                return MemberInfoWidget(user: currentUser);
               },
             ),
           ),
         ],
       );
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: scaffoldAppBar(),
-      body: StreamBuilder<List<User>>(
-        stream:
-            _roomService.streamUsersAttendance(widget.room, widget.attendance),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return const Center(child: Text("Something went wrong!"));
-          }
-
-          final data = snapshot.data;
-
-          if (data!.isEmpty) {
-            return const Center(child: Text("No users in attendance"));
-          }
-
-          return scaffoldBody(data);
-        },
-      ),
-    );
   }
 }
