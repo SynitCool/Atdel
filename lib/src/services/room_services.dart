@@ -425,7 +425,7 @@ class RoomService {
     final CollectionReference<Map<String, dynamic>> collection =
         _db.collection(collectionPath);
 
-    final Stream<List<Attendance>> stream = collection.snapshots().map((data) =>
+    final Stream<List<Attendance>> stream = collection.orderBy("date_start", descending: true).snapshots().map((data) =>
         data.docs.map((data) => Attendance.fromMap(data.data())).toList());
 
     return stream;

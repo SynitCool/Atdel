@@ -30,6 +30,6 @@ class UserAttendance {
         photoUrl: data["photo_url"],
         uid: data["uid"],
         userReference: data["user_reference"],
-        absent: data["absen"]);
+        absent: data["absent"]);
   }
 }
