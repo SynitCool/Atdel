@@ -1,27 +1,63 @@
+// flutter
 import 'package:flutter/material.dart';
 
 // model
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_room.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
 
-class DrawerWidget extends StatefulWidget {
-  const DrawerWidget({Key? key, required this.room}) : super(key: key);
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-  final Room room;
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
+class DrawerWidget extends ConsumerStatefulWidget {
+  const DrawerWidget({Key? key}) : super(key: key);
 
   @override
-  State<DrawerWidget> createState() => _DrawerWidgetState();
+  ConsumerState<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
-class _DrawerWidgetState extends State<DrawerWidget> {
+class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
   // scene
   final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget errorScene =
       const Center(child: Text("There something went wrong !"));
 
+  @override
+  Widget build(BuildContext context) {
+    // return materialDrawer();
+    final UserRoomService _userRoomService = UserRoomService();
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    return StreamBuilder<List<UserRoom>>(
+        stream: _userRoomService.streamUsersRoom(_selectedRoomProvider.room!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loadingScene;
+          }
+
+          if (snapshot.hasError) return errorScene;
+
+          final data = snapshot.data;
+
+          return ContentDrawer(users: data!);
+        });
+  }
+}
+
+// content drawer
+class ContentDrawer extends ConsumerStatefulWidget {
+  const ContentDrawer({Key? key, required this.users}) : super(key: key);
+
+  final List<UserRoom> users;
+
+  @override
+  ConsumerState<ContentDrawer> createState() => _ContentDrawerState();
+}
+
+class _ContentDrawerState extends ConsumerState<ContentDrawer> {
   // widget parameters
   final Widget space12 = const SizedBox(height: 12);
   final Widget space24 = const SizedBox(height: 24);
@@ -57,72 +93,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ]);
   }
 
-  // avatar info
-  Widget avatarInfoWidget(UserRoom user) =>
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.home,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              user.alias,
-              style: const TextStyle(fontSize: 20, color: Colors.white),
-            )
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          user.email,
-          style: const TextStyle(fontSize: 14, color: Colors.white),
-        ),
-      ]);
+  @override
+  Widget build(BuildContext context) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
 
-  // drawer host room
-  Widget materialHeader(UserRoom user) => InkWell(
-        child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20)
-                .add(const EdgeInsets.symmetric(vertical: 40)),
-            child: Row(
-              children: [
-                CircleAvatar(
-                    radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
-                const SizedBox(width: 20),
-                avatarInfoWidget(user),
-              ],
-            )),
-      );
-
-  // drawer member room
-  Widget materialContentButton(UserRoom user) => ListTile(
-        leading: CircleAvatar(
-            radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
-        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                user.alias,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              )
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            user.email,
-            style: const TextStyle(fontSize: 12, color: Colors.white),
-          ),
-        ]),
-      );
-
-  // drawer content
-  Widget materialDrawer(List<UserRoom> users) {
     materialDrawerWidget = [];
     materialDrawerButtons = [
       space12,
@@ -131,16 +105,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       space24,
     ];
 
-    for (final user in users) {
+    for (final user in widget.users) {
       // check host
-      if (user.uid == widget.room.hostUid) {
-        materialDrawerWidget.add(materialHeader(user));
+      if (user.uid == _selectedRoomProvider.room!.hostUid) {
+        materialDrawerWidget.add(HostButton(user: user));
       } else {
-        materialDrawerButtons.add(materialContentButton(user));
+        materialDrawerButtons.add(MemberButton(user: user));
       }
     }
 
-    Widget containerButtonsContainer = Container(
+    containerButtonsContainer = Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: materialDrawerButtons,
@@ -154,23 +128,82 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       children: materialDrawerWidget,
     );
   }
+}
+
+// member button
+class MemberButton extends StatelessWidget {
+  const MemberButton({Key? key, required this.user}) : super(key: key);
+
+  final UserRoom user;
 
   @override
   Widget build(BuildContext context) {
-    // return materialDrawer();
-    final UserRoomService userRoomService = UserRoomService();
-    return StreamBuilder<List<UserRoom>>(
-        stream: userRoomService.streamUsersRoom(widget.room),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
+    return ListTile(
+      leading: CircleAvatar(
+          radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              user.alias,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            )
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          user.email,
+          style: const TextStyle(fontSize: 12, color: Colors.white),
+        ),
+      ]),
+    );
+  }
+}
 
-          if (snapshot.hasError) return errorScene;
+// host button
+class HostButton extends StatelessWidget {
+  const HostButton({Key? key, required this.user}) : super(key: key);
 
-          final data = snapshot.data;
+  final UserRoom user;
 
-          return materialDrawer(data!);
-        });
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20)
+              .add(const EdgeInsets.symmetric(vertical: 40)),
+          child: Row(
+            children: [
+              CircleAvatar(
+                  radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+              const SizedBox(width: 20),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.home,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      user.alias,
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  user.email,
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ]),
+            ],
+          )),
+    );
   }
 }

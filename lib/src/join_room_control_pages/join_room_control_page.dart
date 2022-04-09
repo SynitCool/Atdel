@@ -10,6 +10,7 @@ import 'package:atdel/src/join_room_control_pages/join_room_home_preview.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_drawer.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_attendance_list_page.dart';
 import 'package:atdel/src/join_room_control_pages/join_room_settings_page.dart';
+import 'package:atdel/src/join_room_control_pages/join_room_info.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,9 +27,10 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
     const JoinRoomPreviewPage(),
-    const JoinRoomAttendanceList()
+    const JoinRoomAttendanceList(),
+    const RoomInfo()
   ];
-  final List<IconData> iconsPage = [Icons.home, Icons.people];
+  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.info];
 
   int bottomNavIndex = 0;
 
@@ -57,26 +59,26 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
 
   // bottom navigator bar
   Widget bottomNavigationBar() => AnimatedBottomNavigationBar.builder(
-      leftCornerRadius: 32,
-      rightCornerRadius: 32,
-      gapLocation: GapLocation.center,
-      notchSmoothness: NotchSmoothness.defaultEdge,
-      splashSpeedInMilliseconds: 300,
-      splashColor: Colors.amberAccent,
-      elevation: 200,
-      itemCount: iconsPage.length,
-      activeIndex: bottomNavIndex,
-      onTap: (int index) {
-        setState(() {
-          bottomNavIndex = index;
-        });
-      },
-      tabBuilder: (int index, bool isActive) {
-        final Color color = isActive ? Colors.amberAccent : Colors.black;
+        leftCornerRadius: 32,
+        rightCornerRadius: 0,
+        gapLocation: GapLocation.none,
+        notchSmoothness: NotchSmoothness.defaultEdge,
+        splashSpeedInMilliseconds: 300,
+        splashColor: Colors.amberAccent,
+        elevation: 200,
+        itemCount: iconsPage.length,
+        activeIndex: bottomNavIndex,
+        onTap: (int index) {
+          setState(() {
+            bottomNavIndex = index;
+          });
+        },
+        tabBuilder: (int index, bool isActive) {
+          final Color color = isActive ? Colors.amberAccent : Colors.black;
 
-        return Icon(iconsPage[index], color: color);
-      },
-    );
+          return Icon(iconsPage[index], color: color);
+        },
+      );
 
   // the appbar
   PreferredSizeWidget scaffoldAppBar() => AppBar(

@@ -7,19 +7,21 @@ import 'package:intl/intl.dart';
 // services
 import 'package:atdel/src/services/attendance_services.dart';
 
-// model
-import 'package:atdel/src/model/room.dart';
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
 
-class AddAttendanceListPage extends StatefulWidget {
-  const AddAttendanceListPage({Key? key, required this.room}) : super(key: key);
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-  final Room room;
+class AddAttendanceListPage extends ConsumerStatefulWidget {
+  const AddAttendanceListPage({Key? key}) : super(key: key);
 
   @override
-  State<AddAttendanceListPage> createState() => _AddAttendanceListPageState();
+  ConsumerState<AddAttendanceListPage> createState() =>
+      _AddAttendanceListPageState();
 }
 
-class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
+class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
   // datetime
   DateTime? startDate;
   DateTime? endDate;
@@ -49,8 +51,10 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     if (signAddButton == "error") return;
 
     final AttendanceService attendanceService = AttendanceService();
+    final _selectedRoomProvider = ref.watch(selectedRoom);
 
-    attendanceService.addAttendanceToDatabase(widget.room, startDate!, endDate!);
+    attendanceService.addAttendanceToDatabase(
+        _selectedRoomProvider.room!, startDate!, endDate!);
 
     Navigator.pop(context);
   }

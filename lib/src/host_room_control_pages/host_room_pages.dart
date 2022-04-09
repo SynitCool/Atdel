@@ -10,15 +10,11 @@ import 'package:atdel/src/host_room_control_pages/home_preview_feature.dart';
 import 'package:atdel/src/host_room_control_pages/host_drawer.dart';
 import 'package:atdel/src/host_room_control_pages/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_control_pages/host_settings_pages.dart';
-
-// model
-import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/host_room_control_pages/host_room_info.dart';
 
 // page
 class HostRoomPages extends StatefulWidget {
-  const HostRoomPages({Key? key, required this.room}) : super(key: key);
-
-  final Room room;
+  const HostRoomPages({Key? key}) : super(key: key);
 
   @override
   State<HostRoomPages> createState() => _HostRoomPagesState();
@@ -26,37 +22,18 @@ class HostRoomPages extends StatefulWidget {
 
 class _HostRoomPagesState extends State<HostRoomPages> {
   // widgets bottom navigation bar
-  final List<Widget> featurePage = [];
-  final List<IconData> iconsPage = [Icons.home, Icons.people];
+  final List<Widget> featurePage = [
+    const HomePreviewPage(),
+    const AttedanceListScreen(),
+    const RoomInfo()
+  ];
+  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.info];
 
   int bottomNavIndex = 0;
 
   // controller
   final AdvancedDrawerController _advancedDrawerController =
       AdvancedDrawerController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    featurePage.add(HomePreviewPage(
-      room: widget.room,
-    ));
-
-    featurePage.add(AttedanceListScreen(room: widget.room));
-  }
-
-  // settings button
-  Widget settingsButton() => IconButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: ((context) => const HostSettingsPage())));
-        },
-        icon: const Icon(Icons.settings),
-        padding: const EdgeInsets.all(15.0),
-      );
 
   // leading animation
   Widget leadingAppBar() => IconButton(
@@ -81,7 +58,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   PreferredSizeWidget appBar() => AppBar(
         title: const Text("Host Room Control"),
         leading: leadingAppBar(),
-        actions: [settingsButton()],
+        actions: const [SettingsButton()],
       );
 
   // the screen of feature
@@ -94,8 +71,8 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   // bottom navigation bar
   Widget bottomNavigationBar() => AnimatedBottomNavigationBar.builder(
         leftCornerRadius: 32,
-        rightCornerRadius: 32,
-        gapLocation: GapLocation.center,
+        rightCornerRadius: 0,
+        gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.defaultEdge,
         splashSpeedInMilliseconds: 300,
         splashColor: Colors.amberAccent,
@@ -125,6 +102,25 @@ class _HostRoomPagesState extends State<HostRoomPages> {
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         child: mainContentWidget(),
-        drawer: DrawerWidget(room: widget.room));
+        drawer: const DrawerWidget());
+  }
+}
+
+// settings button
+class SettingsButton extends StatelessWidget {
+  const SettingsButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => const HostSettingsPage())));
+      },
+      icon: const Icon(Icons.settings),
+      padding: const EdgeInsets.all(15.0),
+    );
   }
 }

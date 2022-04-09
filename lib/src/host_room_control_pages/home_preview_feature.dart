@@ -23,16 +23,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // home preview page
-class HomePreviewPage extends StatefulWidget {
-  const HomePreviewPage({Key? key, required this.room}) : super(key: key);
-
-  final Room room;
+class HomePreviewPage extends ConsumerStatefulWidget {
+  const HomePreviewPage({Key? key}) : super(key: key);
 
   @override
-  State<HomePreviewPage> createState() => _HomePreviewPageState();
+  ConsumerState<HomePreviewPage> createState() => _HomePreviewPageState();
 }
 
-class _HomePreviewPageState extends State<HomePreviewPage>
+class _HomePreviewPageState extends ConsumerState<HomePreviewPage>
     with SingleTickerProviderStateMixin {
   // animation
   late Animation<double> _animation;
@@ -62,7 +60,7 @@ class _HomePreviewPageState extends State<HomePreviewPage>
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => EditHome(room: widget.room)));
+                builder: (context) => const EditHome()));
       });
 
   // floating action button
