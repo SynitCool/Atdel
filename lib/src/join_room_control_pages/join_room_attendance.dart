@@ -2,6 +2,7 @@
 import 'dart:io';
 
 // flutter
+import 'package:atdel/src/services/user_attendance_services.dart';
 import 'package:flutter/material.dart';
 
 // state management
@@ -11,7 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
 import 'package:atdel/src/services/ml_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
 
@@ -21,16 +21,13 @@ import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
 class JoinRoomAttendance extends StatefulWidget {
-  const JoinRoomAttendance(
-      {Key? key})
-      : super(key: key);
+  const JoinRoomAttendance({Key? key}) : super(key: key);
 
   @override
   State<JoinRoomAttendance> createState() => _JoinRoomAttendanceState();
 }
 
 class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +73,7 @@ class AttendByGalleryButton extends ConsumerWidget {
     final _mlService = MLService();
     final _imagePicker = ImagePicker();
     final _userPhotoMetricService = UserPhotoMetricService();
-    final _roomService = RoomService();
+    final _userAttendanceService = UserAttendanceService();
 
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
@@ -105,7 +102,9 @@ class AttendByGalleryButton extends ConsumerWidget {
             showUserMetricAlert(context);
           }
 
-          _roomService.updateAbsentUser(_selectedRoomProvider.room!,
+          _userAttendanceService.updateAbsentUser(
+              _selectedCurrentUserProvider.user!,
+              _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
         });
   }
@@ -113,7 +112,7 @@ class AttendByGalleryButton extends ConsumerWidget {
 
 // attend with image by camera
 class AttendByCameraButton extends ConsumerWidget {
-  const AttendByCameraButton({ Key? key }) : super(key: key);
+  const AttendByCameraButton({Key? key}) : super(key: key);
 
   // show user metric warning
   Future showUserMetricAlert(BuildContext context) {
@@ -142,7 +141,7 @@ class AttendByCameraButton extends ConsumerWidget {
     final _mlService = MLService();
     final _imagePicker = ImagePicker();
     final _userPhotoMetricService = UserPhotoMetricService();
-    final _roomService = RoomService();
+    final _userAttendanceService = UserAttendanceService();
 
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
@@ -162,14 +161,19 @@ class AttendByCameraButton extends ConsumerWidget {
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
-          final detectedUid = await _userPhotoMetricService
-              .calcSmallestUserSimilarity(_selectedRoomProvider.room!, runModelMetric);
+          final detectedUid =
+              await _userPhotoMetricService.calcSmallestUserSimilarity(
+                  _selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null || detectedUid != _selectedCurrentUserProvider.user!.uid) {
+          if (detectedUid == null ||
+              detectedUid != _selectedCurrentUserProvider.user!.uid) {
             showUserMetricAlert(context);
           }
 
-          _roomService.updateAbsentUser(_selectedRoomProvider.room!, _selectedAttendanceProvider.attendance!);
+          _userAttendanceService.updateAbsentUser(
+            _selectedCurrentUserProvider.user!,
+            _selectedRoomProvider.room!,
+              _selectedAttendanceProvider.attendance!);
         });
   }
 }

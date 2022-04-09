@@ -33,7 +33,7 @@ class UserService {
     // user info
     user.userReference = doc;
 
-    final Map<String, dynamic> userInfo = user.toMapUsers();
+    final Map<String, dynamic> userInfo = user.toMap();
 
     // check user in database
     final getDoc = await doc.get();

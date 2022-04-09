@@ -1,5 +1,4 @@
 // flutter
-import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:flutter/material.dart';
 
 // pages
@@ -10,8 +9,8 @@ import 'package:atdel/src/model/attendance.dart';
 import 'package:atdel/src/model/user_attendance.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
-import 'package:atdel/src/services/attendance_services.dart';
+import 'package:atdel/src/services/user_attendance_services.dart';
+import 'package:atdel/src/services/attendance_list_services.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
+import 'package:atdel/src/providers/current_user_providers.dart';
 
 // join attendance page
 class JoinRoomAttendanceList extends ConsumerStatefulWidget {
@@ -36,14 +36,14 @@ class _JoinRoomAttendanceListState
   final Widget errorScene = const Center(child: Text("ERROR"));
 
   // services
-  final RoomService _roomService = RoomService();
+  final AttendanceListService _attendanceListService = AttendanceListService();
 
   @override
   Widget build(BuildContext context) {
     final _selectedRoomProvider = ref.watch(selectedRoom);
     return Scaffold(
         body: StreamBuilder<List<Attendance>>(
-      stream: _roomService.streamAttendanceList(_selectedRoomProvider.room!),
+      stream: _attendanceListService.streamAttendanceList(_selectedRoomProvider.room!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -138,11 +138,13 @@ class AttendanceListButtonWidget extends ConsumerWidget {
     final _currentUserProvider = ref.watch(currentUser);
 
     // services
-    final _attendanceService = AttendanceService();
+    final _userAttendanceService = UserAttendanceService();
 
     return StreamBuilder<UserAttendance>(
-        stream: _attendanceService.streamUserAttendance(_currentUserProvider.user!,
-            _selectedRoomProvider.room!, attendance),
+        stream: _userAttendanceService.streamUserAttendance(
+            _currentUserProvider.user!,
+            _selectedRoomProvider.room!,
+            attendance),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;

@@ -9,7 +9,6 @@ class User {
   final String photoUrl;
   final String uid;
 
-  bool absent;
   dynamic userReference;
   List<dynamic> roomReferences;
 
@@ -20,7 +19,6 @@ class User {
       required this.photoUrl,
       required this.uid,
       required this.roomReferences,
-      required this.absent,
       required this.userReference});
 
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -33,7 +31,6 @@ class User {
         photoUrl: data["photo_url"],
         uid: data["uid"],
         roomReferences: data["room_references"],
-        absent: true,
         userReference: data["user_reference"]);
   }
 
@@ -45,7 +42,6 @@ class User {
         photoUrl: authUser.photoURL!,
         uid: authUser.uid,
         roomReferences: [],
-        absent: true,
         userReference: "");
   }
 
@@ -56,10 +52,9 @@ class User {
       photoUrl: map["photo_url"],
       uid: map["uid"],
       roomReferences: map["room_references"] ?? [],
-      absent: map["absent"] ?? true,
       userReference: map["user_reference"]);
 
-  Map<String, dynamic> toMapUsers() => {
+  Map<String, dynamic> toMap() => {
         "display_name": displayName,
         "email": email,
         "is_anonymous": isAnonymous,
@@ -69,30 +64,7 @@ class User {
         "user_reference": userReference
       };
 
-  Map<String, dynamic> toMapRoomUsers() => {
-        "display_name": displayName,
-        "email": email,
-        "is_anonymous": isAnonymous,
-        "photo_url": photoUrl,
-        "uid": uid,
-        "user_reference": userReference
-      };
-
-  Map<String, dynamic> toMapAttendanceUsers() => {
-        "display_name": displayName,
-        "email": email,
-        "is_anonymous": isAnonymous,
-        "photo_url": photoUrl,
-        "uid": uid,
-        "absent": absent,
-        "user_reference": userReference
-      };
-
   set setUserReference(DocumentReference<Map<String, dynamic>> newReference) {
     userReference = newReference;
-  }
-
-  set setAbsent(bool newAbsent) {
-    absent = newAbsent;
   }
 }
