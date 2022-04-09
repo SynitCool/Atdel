@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/user.dart';
 import 'package:atdel/src/model/user_room.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
 import 'package:atdel/src/services/user_room_services.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -70,7 +68,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
             const SizedBox(width: 4),
             Text(
-              user.displayName,
+              user.alias,
               style: const TextStyle(fontSize: 20, color: Colors.white),
             )
           ],
@@ -110,7 +108,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               const SizedBox(width: 4),
               Text(
-                user.displayName,
+                user.alias,
                 style: const TextStyle(fontSize: 16, color: Colors.white),
               )
             ],
@@ -160,7 +158,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     // return materialDrawer();
-    final RoomService roomService = RoomService();
     final UserRoomService userRoomService = UserRoomService();
     return StreamBuilder<List<UserRoom>>(
         stream: userRoomService.streamUsersRoom(widget.room),

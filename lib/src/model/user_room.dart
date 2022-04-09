@@ -10,6 +10,7 @@ class UserRoom {
 
   String alias;
   dynamic userReference;
+  bool absent;
 
   UserRoom(
       {required this.alias,
@@ -17,7 +18,8 @@ class UserRoom {
       required this.email,
       required this.photoUrl,
       required this.uid,
-      required this.userReference});
+      required this.userReference,
+      this.absent = true});
 
   factory UserRoom.fromFirestore(DocumentSnapshot<Map<String, dynamic>?> doc) {
     final data = doc.data();
@@ -28,7 +30,8 @@ class UserRoom {
         email: data["email"],
         photoUrl: data["photo_url"],
         uid: data["uid"],
-        userReference: data["user_reference"]);
+        userReference: data["user_reference"],
+        absent: data["absent"] ?? true);
   }
 
   factory UserRoom.fromMap(Map<String, dynamic> map) => UserRoom(
@@ -37,7 +40,8 @@ class UserRoom {
       email: map["email"],
       photoUrl: map["photo_url"],
       uid: map["uid"],
-      userReference: map["user_reference"]);
+      userReference: map["user_reference"],
+      absent: map["absent"] ?? true);
 
   factory UserRoom.fromFirebaseAuth(auth.User user) => UserRoom(
       alias: "",
@@ -45,7 +49,8 @@ class UserRoom {
       email: user.email!,
       photoUrl: user.photoURL!,
       uid: user.uid,
-      userReference: "");
+      userReference: "",
+      absent: true);
 
   Map<String, dynamic> toMap() => {
         "alias": alias,
@@ -54,6 +59,16 @@ class UserRoom {
         "photo_url": photoUrl,
         "uid": uid,
         "user_reference": userReference
+      };
+
+  Map<String, dynamic> toMapAttendanceUser() => {
+        "alias": alias,
+        "absent": true,
+        "display_name": displayName,
+        "email": email,
+        "photo_url": photoUrl,
+        "uid": uid,
+        "user_reference": userReference,
       };
 
   // set alias

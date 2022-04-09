@@ -94,6 +94,7 @@ class JoinRoomButton extends StatelessWidget {
         child: ElevatedButton(
             onPressed: () {
               if (roomCode.isEmpty || roomCode.length != 6) return;
+              if (userAlias.isEmpty || userAlias.length > 12) return;
 
               roomService.joinRoomWithCode(roomCode, userAlias);
 

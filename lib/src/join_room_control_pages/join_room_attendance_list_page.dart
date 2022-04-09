@@ -140,8 +140,8 @@ class AttendanceListButtonWidget extends ConsumerWidget {
     // services
     final _attendanceService = AttendanceService();
 
-    return FutureBuilder<UserAttendance>(
-        future: _attendanceService.getUserAttendance(_currentUserProvider.user!,
+    return StreamBuilder<UserAttendance>(
+        stream: _attendanceService.streamUserAttendance(_currentUserProvider.user!,
             _selectedRoomProvider.room!, attendance),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

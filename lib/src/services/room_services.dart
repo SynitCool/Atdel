@@ -1,4 +1,5 @@
 // firebase
+import 'package:atdel/src/services/user_attendance_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
@@ -7,6 +8,7 @@ import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart' as model;
 import 'package:atdel/src/model/attendance.dart';
 import 'package:atdel/src/model/user_room.dart';
+import 'package:atdel/src/model/user_attendance.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
@@ -231,7 +233,8 @@ class RoomService {
         _db.collection(attendanceUsersCollectionPath);
 
     // room users docs
-    final roomUsers = streamUsersRoom(room);
+    final _userRoomService = UserRoomService();
+    final roomUsers = _userRoomService.streamUsersRoom(room);
 
     roomUsers.forEach((elements) async {
       for (final element in elements) {
@@ -239,7 +242,7 @@ class RoomService {
 
         final elementDoc = attendanceUsersCollection.doc(element.uid);
 
-        final map = element.toMapAttendanceUsers();
+        final map = element.toMapAttendanceUser();
 
         await elementDoc.set(map);
       }
@@ -334,19 +337,21 @@ class RoomService {
     final model.User currentUser = model.User.fromFirebaseAuth(firebaseUser!);
 
     // stream attendance users
+    final UserAttendanceService userAttendanceService = UserAttendanceService();
     final Stream<QuerySnapshot<Map<String, dynamic>>>
         streamAttendanceUsersReference =
-        streamUsersAttendanceReference(room, attendance);
+        userAttendanceService.streamUsersAttendanceReference(room, attendance);
 
     streamAttendanceUsersReference.forEach((snapshot) async {
       for (final doc in snapshot.docs) {
-        final model.User user = model.User.fromMap(doc.data());
+        final UserAttendance userAttendance =
+            UserAttendance.fromMap(doc.data());
 
-        if (user.uid != currentUser.uid) return;
+        if (userAttendance.uid != currentUser.uid) return;
 
-        user.setAbsent = false;
+        userAttendance.setAbsent = false;
 
-        Map<String, dynamic> userMap = user.toMapAttendanceUsers();
+        Map<String, dynamic> userMap = userAttendance.toMap();
 
         final DocumentReference<Map<String, dynamic>> userDoc = doc.reference;
 

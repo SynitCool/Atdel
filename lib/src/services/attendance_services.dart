@@ -25,4 +25,18 @@ class AttendanceService {
     // check if absent
     return userAttendance;  
   }
+
+  // sream user attendance
+  Stream<UserAttendance> streamUserAttendance(User user, Room room, Attendance attendance) {
+    // user attendance
+    final collectionPath =
+        "rooms/${room.id}/attendance_list/${attendance.id}/users";
+    final collection = _db.collection(collectionPath);
+    final doc = collection.doc(user.uid);
+
+    // stream
+    final stream = doc.snapshots().map((data) => UserAttendance.fromMap(data.data()!));
+
+    return stream;
+  } 
 }
