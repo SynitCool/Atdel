@@ -80,4 +80,26 @@ class UserPhotoMetricService {
 
     return smallestUserUid;
   }
+
+  // delete room user photo metric
+  Future deleteRoomUserPhotoMetric(Room room) async {
+    // database reference
+    final DatabaseReference reference = _db.ref(rootRoomReference);
+    final DatabaseReference referenceChild = reference.child(room.id);
+
+    // delete room user photo metric
+    await referenceChild.remove();
+  }
+
+  // delete user photo metric based on user
+  Future deleteUserPhotoMetricCurrentUser(Room room) async {
+    // database reference
+    final String referencePath =
+        "$rootRoomReference/${room.id}/$usersPhotoMetricReference";
+    final DatabaseReference reference = _db.ref(referencePath);
+    final DatabaseReference referenceChild = reference.child(_authUser!.uid);
+
+    // delete current user photo metric
+    await referenceChild.remove();
+  }
 }
