@@ -1,11 +1,11 @@
 // flutter
-import 'package:atdel/src/services/user_room_services.dart';
+import 'package:atdel/src/model/user_attendance.dart';
+import 'package:atdel/src/services/user_attendance_services.dart';
 import 'package:flutter/material.dart';
 
 // model
 import 'package:atdel/src/model/attendance.dart';
 import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/user_room.dart';
 
 class MembersAttendanceListPage extends StatefulWidget {
   const MembersAttendanceListPage(
@@ -21,7 +21,7 @@ class MembersAttendanceListPage extends StatefulWidget {
 }
 
 class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
-  final UserRoomService _userRoomService = UserRoomService();
+  final UserAttendanceService _userAttendanceService = UserAttendanceService();
 
   // scaffold appbar
   PreferredSizeWidget scaffoldAppBar() =>
@@ -31,9 +31,9 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: scaffoldAppBar(),
-      body: StreamBuilder<List<UserRoom>>(
+      body: StreamBuilder<List<UserAttendance>>(
         stream:
-            _userRoomService.streamUsersAttendance(widget.room, widget.attendance),
+            _userAttendanceService.streamUsersAttendance(widget.room, widget.attendance),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -60,7 +60,7 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
 class MemberInfoWidget extends StatelessWidget {
   const MemberInfoWidget({Key? key, required this.user}) : super(key: key);
 
-  final UserRoom user;
+  final UserAttendance user;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class MemberInfoWidget extends StatelessWidget {
 class MemberView extends StatelessWidget {
   const MemberView({Key? key, required this.users}) : super(key: key);
 
-  final List<UserRoom> users;
+  final List<UserAttendance> users;
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +124,7 @@ class MemberView extends StatelessWidget {
           child: ListView.builder(
             itemCount: users.length,
             itemBuilder: (context, index) {
-              final UserRoom currentUser = users[index];
+              final UserAttendance currentUser = users[index];
 
               return MemberInfoWidget(user: currentUser);
             },

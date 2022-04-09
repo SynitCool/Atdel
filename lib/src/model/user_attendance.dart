@@ -1,6 +1,9 @@
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// model
+import 'package:atdel/src/model/user_room.dart';
+
 class UserAttendance {
   final String displayName;
   final String email;
@@ -42,6 +45,15 @@ class UserAttendance {
       uid: map["uid"],
       userReference: map["user_reference"],
       absent: map["absent"]);
+
+  factory UserAttendance.fromUserRoom(UserRoom user) => UserAttendance(
+      alias: user.alias,
+      displayName: user.displayName,
+      email: user.email,
+      photoUrl: user.photoUrl,
+      uid: user.uid,
+      userReference: user.userReference,
+      absent: true);
 
   Map<String, dynamic> toMap() => {
         "absent": absent,

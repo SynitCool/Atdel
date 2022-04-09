@@ -1,5 +1,6 @@
 // flutter
 import 'package:atdel/src/providers/selected_room_providers.dart';
+import 'package:atdel/src/services/attendance_list_services.dart';
 import 'package:flutter/material.dart';
 
 // custom widgets
@@ -14,7 +15,6 @@ import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/attendance.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // attendance list screen
@@ -39,7 +39,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
   final Widget errorScene = const Center(child: Text("ERROR"));
 
   // services
-  final RoomService _roomService = RoomService();
+  final AttendanceListService _attendanceListService = AttendanceListService();
 
   @override
   void initState() {
@@ -57,37 +57,37 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
 
   // add attendance button
   Bubble addAttendanceButton() => Bubble(
-        icon: Icons.add,
-        iconColor: Colors.white,
-        title: "Add",
-        titleStyle: const TextStyle(color: Colors.white),
-        bubbleColor: Colors.blue,
-        onPress: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AddAttendanceListPage(
-                        room: widget.room,
-                      )));
-        });
+      icon: Icons.add,
+      iconColor: Colors.white,
+      title: "Add",
+      titleStyle: const TextStyle(color: Colors.white),
+      bubbleColor: Colors.blue,
+      onPress: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AddAttendanceListPage(
+                      room: widget.room,
+                    )));
+      });
 
   // floating action button of attendance list screen
   Widget floatingActionButtonWidget() => FloatingActionBubble(
-        items: [addAttendanceButton()],
-        onPress: () => _animationController.isCompleted
-            ? _animationController.reverse()
-            : _animationController.forward(),
-        iconColor: Colors.white,
-        backGroundColor: Colors.blue,
-        animation: _animation,
-        iconData: Icons.menu);
+      items: [addAttendanceButton()],
+      onPress: () => _animationController.isCompleted
+          ? _animationController.reverse()
+          : _animationController.forward(),
+      iconColor: Colors.white,
+      backGroundColor: Colors.blue,
+      animation: _animation,
+      iconData: Icons.menu);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
         body: StreamBuilder<List<Attendance>>(
-          stream: _roomService.streamAttendanceList(widget.room),
+          stream: _attendanceListService.streamAttendanceList(widget.room),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return loadingScene;
@@ -115,7 +115,8 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
 
 // attendance button
 class AttendanceButtonWidget extends ConsumerWidget {
-  const AttendanceButtonWidget({Key? key, required this.attendance}) : super(key: key);
+  const AttendanceButtonWidget({Key? key, required this.attendance})
+      : super(key: key);
 
   final Attendance attendance;
 

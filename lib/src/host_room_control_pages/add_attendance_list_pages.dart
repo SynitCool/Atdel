@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/attendance_services.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
@@ -48,9 +48,9 @@ class _AddAttendanceListPageState extends State<AddAttendanceListPage> {
     if (startDate == null || endDate == null) return;
     if (signAddButton == "error") return;
 
-    final RoomService roomService = RoomService();
+    final AttendanceService attendanceService = AttendanceService();
 
-    roomService.addAttendanceToDatabase(widget.room, startDate!, endDate!);
+    attendanceService.addAttendanceToDatabase(widget.room, startDate!, endDate!);
 
     Navigator.pop(context);
   }
