@@ -9,6 +9,7 @@ import 'package:atdel/src/model/user_room.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
+import 'package:atdel/src/services/user_photo_metrics_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -193,7 +194,7 @@ class RoomService {
 
     await doc.update(map);
   }
-  
+
   // delete room
   Future deleteRoomFromDatabase(Room room) async {
     // room doc
@@ -272,6 +273,12 @@ class RoomService {
         snap.reference.delete();
       }
     });
+
+    // delete room user photo metric
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
+    userPhotoMetricService.deleteRoomUserPhotoMetric(room);
   }
 
   // leave room
@@ -304,6 +311,12 @@ class RoomService {
 
     // delete user in room users
     await roomUserDoc.delete();
+
+    // delete user photo metric by current user
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
+    userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
   }
 
   // stream global rooms
