@@ -209,7 +209,7 @@ class RoomButtonWidget extends ConsumerWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HostRoomPages(room: room)));
+                      builder: (context) => const HostRoomPages()));
               return;
             }
 

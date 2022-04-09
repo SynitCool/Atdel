@@ -9,19 +9,20 @@ import 'package:html_editor_enhanced/html_editor.dart';
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 
-// model
-import 'package:atdel/src/model/room.dart';
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EditHome extends StatefulWidget {
-  const EditHome({Key? key, required this.room}) : super(key: key);
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
 
-  final Room room;
+class EditHome extends ConsumerStatefulWidget {
+  const EditHome({Key? key}) : super(key: key);
 
   @override
   _EditHomeState createState() => _EditHomeState();
 }
 
-class _EditHomeState extends State<EditHome>
+class _EditHomeState extends ConsumerState<EditHome>
     with SingleTickerProviderStateMixin {
   final HtmlEditorController controller = HtmlEditorController();
 
@@ -66,9 +67,11 @@ class _EditHomeState extends State<EditHome>
       titleStyle: const TextStyle(color: Colors.white),
       bubbleColor: Colors.blue,
       onPress: () async {
+        final _selectedRoomProvider = ref.watch(selectedRoom);
+
         final text = await controller.getText();
 
-        _roomService.changeRoomDesc(widget.room.id, text);
+        _roomService.changeRoomDesc(_selectedRoomProvider.room!.id, text);
 
         Navigator.pop(context);
       });

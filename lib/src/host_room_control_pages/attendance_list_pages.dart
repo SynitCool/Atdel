@@ -11,24 +11,20 @@ import 'package:atdel/src/host_room_control_pages/add_attendance_list_pages.dart
 import 'package:atdel/src/host_room_control_pages/members_attendance_list_pages.dart';
 
 // model
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/attendance.dart';
 
 // services
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // attendance list screen
-class AttedanceListScreen extends StatefulWidget {
-  const AttedanceListScreen({Key? key, required this.room}) : super(key: key);
-
-  // final String roomId;
-  final Room room;
+class AttedanceListScreen extends ConsumerStatefulWidget {
+  const AttedanceListScreen({Key? key}) : super(key: key);
 
   @override
-  State<AttedanceListScreen> createState() => _AttedanceListScreenState();
+  ConsumerState<AttedanceListScreen> createState() => _AttedanceListScreenState();
 }
 
-class _AttedanceListScreenState extends State<AttedanceListScreen>
+class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
     with SingleTickerProviderStateMixin {
   // floating action button animation
   late Animation<double> _animation;
@@ -56,6 +52,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
   }
 
   // add attendance button
+        
   Bubble addAttendanceButton() => Bubble(
       icon: Icons.add,
       iconColor: Colors.white,
@@ -66,9 +63,7 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => AddAttendanceListPage(
-                      room: widget.room,
-                    )));
+                builder: (context) => const AddAttendanceListPage()));
       });
 
   // floating action button of attendance list screen
@@ -84,10 +79,11 @@ class _AttedanceListScreenState extends State<AttedanceListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
         body: StreamBuilder<List<Attendance>>(
-          stream: _attendanceListService.streamAttendanceList(widget.room),
+          stream: _attendanceListService.streamAttendanceList(_selectedRoomProvider.room!),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return loadingScene;
