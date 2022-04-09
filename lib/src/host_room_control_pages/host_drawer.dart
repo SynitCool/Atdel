@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/user.dart';
+import 'package:atdel/src/model/user_room.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/user_room_services.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key, required this.room}) : super(key: key);
@@ -58,7 +58,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   // avatar info
-  Widget avatarInfoWidget(User user) =>
+  Widget avatarInfoWidget(UserRoom user) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(
           children: [
@@ -68,7 +68,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
             const SizedBox(width: 4),
             Text(
-              user.displayName,
+              user.alias,
               style: const TextStyle(fontSize: 20, color: Colors.white),
             )
           ],
@@ -81,7 +81,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       ]);
 
   // drawer host room
-  Widget materialHeader(User user) => InkWell(
+  Widget materialHeader(UserRoom user) => InkWell(
         child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20)
                 .add(const EdgeInsets.symmetric(vertical: 40)),
@@ -94,9 +94,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ],
             )),
       );
-      
+
   // drawer member room
-  Widget materialContentButton(User user) => ListTile(
+  Widget materialContentButton(UserRoom user) => ListTile(
         leading: CircleAvatar(
             radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -108,7 +108,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               const SizedBox(width: 4),
               Text(
-                user.displayName,
+                user.alias,
                 style: const TextStyle(fontSize: 16, color: Colors.white),
               )
             ],
@@ -122,7 +122,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       );
 
   // drawer content
-  Widget materialDrawer(List<User> users) {
+  Widget materialDrawer(List<UserRoom> users) {
     materialDrawerWidget = [];
     materialDrawerButtons = [
       space12,
@@ -158,10 +158,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     // return materialDrawer();
-    final RoomService roomService = RoomService();
-
-    return StreamBuilder<List<User>>(
-        stream: roomService.streamUsersRoom(widget.room),
+    final UserRoomService userRoomService = UserRoomService();
+    return StreamBuilder<List<UserRoom>>(
+        stream: userRoomService.streamUsersRoom(widget.room),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;

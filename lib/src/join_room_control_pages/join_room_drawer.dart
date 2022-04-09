@@ -1,10 +1,11 @@
+// flutter
 import 'package:flutter/material.dart';
 
 // model
-import 'package:atdel/src/model/user.dart';
+import 'package:atdel/src/model/user_room.dart';
 
 // services
-import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/user_room_services.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,10 +29,10 @@ class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     // return materialDrawer();
-    final RoomService roomService = RoomService();
+    final UserRoomService _userRoomService = UserRoomService();
     final _selectedRoomProvider = ref.watch(selectedRoom);
-    return StreamBuilder<List<User>>(
-        stream: roomService.streamUsersRoom(_selectedRoomProvider.room!),
+    return StreamBuilder<List<UserRoom>>(
+        stream: _userRoomService.streamUsersRoom(_selectedRoomProvider.room!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
@@ -50,7 +51,7 @@ class _DrawerWidgetState extends ConsumerState<DrawerWidget> {
 class ContentDrawer extends ConsumerStatefulWidget {
   const ContentDrawer({Key? key, required this.users}) : super(key: key);
 
-  final List<User> users;
+  final List<UserRoom> users;
 
   @override
   ConsumerState<ContentDrawer> createState() => _ContentDrawerState();
@@ -133,7 +134,7 @@ class _ContentDrawerState extends ConsumerState<ContentDrawer> {
 class MemberButton extends StatelessWidget {
   const MemberButton({Key? key, required this.user}) : super(key: key);
 
-  final User user;
+  final UserRoom user;
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +150,7 @@ class MemberButton extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              user.displayName,
+              user.alias,
               style: const TextStyle(fontSize: 16, color: Colors.white),
             )
           ],
@@ -168,7 +169,7 @@ class MemberButton extends StatelessWidget {
 class HostButton extends StatelessWidget {
   const HostButton({Key? key, required this.user}) : super(key: key);
 
-  final User user;
+  final UserRoom user;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +191,7 @@ class HostButton extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      user.displayName,
+                      user.alias,
                       style: const TextStyle(fontSize: 20, color: Colors.white),
                     )
                   ],
