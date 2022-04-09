@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
+import 'package:atdel/src/services/user_attendance_services.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
@@ -13,6 +14,9 @@ class AttendanceService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final String rootRoomsCollection = "rooms";
+
+  /// services
+  final UserAttendanceService _userAttendanceService = UserAttendanceService();
 
   // add attendance
   Future addAttendanceToDatabase(
@@ -56,6 +60,29 @@ class AttendanceService {
         final map = userAttendance.toMap();
 
         await elementDoc.set(map);
+      }
+    });
+  }
+
+  // delete attendance
+  Future deleteAttendance(Room room, Attendance attendance) async {
+    // attendance collection
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list";
+    final attendanceCollection = _db.collection(collectionPath);
+
+    final attendanceDoc = attendanceCollection.doc(attendance.id);
+    
+    // delete attendance
+    await attendanceDoc.delete();
+
+    // delete attendance users
+    final streamAttenceUsers =
+        _userAttendanceService.streamUsersAttendanceReference(room, attendance);
+
+    streamAttenceUsers.forEach((element) { 
+      for (final doc in element.docs) {
+        doc.reference.delete();
       }
     });
   }

@@ -1,11 +1,16 @@
 // flutter
-import 'package:atdel/src/model/user_attendance.dart';
-import 'package:atdel/src/services/user_attendance_services.dart';
 import 'package:flutter/material.dart';
+
+// pages
+import 'package:atdel/src/host_room_control_pages/settings_attendance.dart';
+
+// services
+import 'package:atdel/src/services/user_attendance_services.dart';
 
 // model
 import 'package:atdel/src/model/attendance.dart';
 import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/user_attendance.dart';
 
 class MembersAttendanceListPage extends StatefulWidget {
   const MembersAttendanceListPage(
@@ -24,16 +29,18 @@ class _MembersAttendanceListPageState extends State<MembersAttendanceListPage> {
   final UserAttendanceService _userAttendanceService = UserAttendanceService();
 
   // scaffold appbar
-  PreferredSizeWidget scaffoldAppBar() =>
-      AppBar(title: const Text("Attendance"));
+  PreferredSizeWidget scaffoldAppBar() => AppBar(
+        title: const Text("Attendance"),
+        actions: const [SettingsButton()],
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: scaffoldAppBar(),
       body: StreamBuilder<List<UserAttendance>>(
-        stream:
-            _userAttendanceService.streamUsersAttendance(widget.room, widget.attendance),
+        stream: _userAttendanceService.streamUsersAttendance(
+            widget.room, widget.attendance),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -131,6 +138,25 @@ class MemberView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// settings button
+class SettingsButton extends StatelessWidget {
+  const SettingsButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => const SettingsAttendancePage())));
+      },
+      icon: const Icon(Icons.settings),
+      padding: const EdgeInsets.all(15.0),
     );
   }
 }
