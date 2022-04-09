@@ -1,6 +1,4 @@
 // flutter
-import 'package:atdel/src/providers/selected_room_providers.dart';
-import 'package:atdel/src/services/attendance_list_services.dart';
 import 'package:flutter/material.dart';
 
 // custom widgets
@@ -15,13 +13,19 @@ import 'package:atdel/src/model/attendance.dart';
 
 // services
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:atdel/src/services/attendance_list_services.dart';
+
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+import 'package:atdel/src/providers/selected_attendance_providers.dart';
 
 // attendance list screen
 class AttedanceListScreen extends ConsumerStatefulWidget {
   const AttedanceListScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<AttedanceListScreen> createState() => _AttedanceListScreenState();
+  ConsumerState<AttedanceListScreen> createState() =>
+      _AttedanceListScreenState();
 }
 
 class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
@@ -52,7 +56,7 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
   }
 
   // add attendance button
-        
+
   Bubble addAttendanceButton() => Bubble(
       icon: Icons.add,
       iconColor: Colors.white,
@@ -83,7 +87,8 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
         body: StreamBuilder<List<Attendance>>(
-          stream: _attendanceListService.streamAttendanceList(_selectedRoomProvider.room!),
+          stream: _attendanceListService
+              .streamAttendanceList(_selectedRoomProvider.room!),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return loadingScene;
@@ -119,8 +124,11 @@ class AttendanceButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
     return ListTile(
       onTap: () {
+        _selectedAttendanceProvider.setAttendance = attendance;
+
         Navigator.push(
             context,
             MaterialPageRoute(
