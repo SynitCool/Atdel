@@ -11,13 +11,19 @@ import 'package:atdel/src/host_room_control_pages/members_attendance_list_pages.
 // model
 import 'package:atdel/src/model/attendance.dart';
 
-// services
+// state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// services
 import 'package:atdel/src/services/attendance_list_services.dart';
+import 'package:atdel/src/services/convert2excel_services.dart';
 
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
+
+// icons
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // attendance list screen
 class AttedanceListScreen extends ConsumerStatefulWidget {
@@ -56,7 +62,6 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
   }
 
   // add attendance button
-
   Bubble addAttendanceButton() => Bubble(
       icon: Icons.add,
       iconColor: Colors.white,
@@ -70,9 +75,26 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
                 builder: (context) => const AddAttendanceListPage()));
       });
 
+  // convert attendance to excel button
+  Bubble convertToExcel() {
+    final _selectedRoomProvider = ref.watch(selectedRoom); 
+    return Bubble(
+        icon: FontAwesomeIcons.fileExcel,
+        iconColor: Colors.white,
+        title: "Convert2Excel",
+        titleStyle: const TextStyle(color: Colors.white),
+        bubbleColor: Colors.blue,
+        onPress: () {
+          final ConvertToExcelService convertToExcelService =
+              ConvertToExcelService();
+
+          convertToExcelService.convertByAttendanceList(_selectedRoomProvider.room!);
+        });
+  }
+
   // floating action button of attendance list screen
   Widget floatingActionButtonWidget() => FloatingActionBubble(
-      items: [addAttendanceButton()],
+      items: [addAttendanceButton(), convertToExcel()],
       onPress: () => _animationController.isCompleted
           ? _animationController.reverse()
           : _animationController.forward(),

@@ -15,6 +15,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:atdel/src/services/ml_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
 
+// permission
+import 'package:permission_handler/permission_handler.dart';
+
 // providers
 import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
@@ -152,6 +155,14 @@ class AttendByCameraButton extends ConsumerWidget {
         leading: const Icon(Icons.camera),
         title: const Text("Attend With Camera"),
         onTap: () async {
+          const permission = Permission.camera;
+
+          if (await permission.isDenied) {
+            final permissionStatus = await permission.request();
+
+            if (permissionStatus.isDenied) return;
+          }
+
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.camera);
 
@@ -171,8 +182,8 @@ class AttendByCameraButton extends ConsumerWidget {
           }
 
           _userAttendanceService.updateAbsentUser(
-            _selectedCurrentUserProvider.user!,
-            _selectedRoomProvider.room!,
+              _selectedCurrentUserProvider.user!,
+              _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
         });
   }

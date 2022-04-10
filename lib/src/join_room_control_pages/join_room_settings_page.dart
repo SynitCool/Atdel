@@ -90,7 +90,7 @@ class SetImageButton extends ConsumerWidget {
 
         if (imageXFile == null) return;
 
-        _storageService.uploadFile(File(imageXFile.path));
+        _storageService.uploadFile(File(imageXFile.path), imageXFile.name);
 
         final detectedFace =
             await _mlService.runDetector(File(imageXFile.path));
