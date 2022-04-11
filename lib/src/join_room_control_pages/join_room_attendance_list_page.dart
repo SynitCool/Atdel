@@ -43,7 +43,8 @@ class _JoinRoomAttendanceListState
     final _selectedRoomProvider = ref.watch(selectedRoom);
     return Scaffold(
         body: StreamBuilder<List<Attendance>>(
-      stream: _attendanceListService.streamAttendanceList(_selectedRoomProvider.room!),
+      stream: _attendanceListService
+          .streamAttendanceList(_selectedRoomProvider.room!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingScene;
@@ -146,6 +147,8 @@ class AttendanceListButtonWidget extends ConsumerWidget {
             _selectedRoomProvider.room!,
             attendance),
         builder: (context, snapshot) {
+          if (snapshot.data == null) return const Text("");
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return loadingScene;
           }
@@ -154,29 +157,32 @@ class AttendanceListButtonWidget extends ConsumerWidget {
 
           final data = snapshot.data;
 
-          return ListTile(
-            tileColor: listTileColor(data!),
-            onTap: () {
-              if (!data.absent) attendanceNotAbsentError(context);
-              if (!data.absent) return;
-              if (!attendance.attendanceActive) attendanceActiveError(context);
-              if (!attendance.attendanceActive) return;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              tileColor: listTileColor(data!),
+              onTap: () {
+                if (!data.absent) attendanceNotAbsentError(context);
+                if (!data.absent) return;
+                if (!attendance.attendanceActive) attendanceActiveError(context);
+                if (!attendance.attendanceActive) return;
 
-              _selectedAttendanceProvider.setAttendance = attendance;
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const JoinRoomAttendance()));
-            },
-            leading: const Icon(Icons.date_range, color: Colors.white),
-            title: Column(children: [
-              Text(
-                "Start: " + attendance.dateStart.toString(),
-                style: const TextStyle(color: Colors.white),
-              ),
-              Text("End: " + attendance.dateEnd.toString(),
-                  style: const TextStyle(color: Colors.white))
-            ]),
+                _selectedAttendanceProvider.setAttendance = attendance;
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const JoinRoomAttendance()));
+              },
+              leading: const Icon(Icons.date_range, color: Colors.white),
+              title: Column(children: [
+                Text(
+                  "Start: " + attendance.dateStart.toString(),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text("End: " + attendance.dateEnd.toString(),
+                    style: const TextStyle(color: Colors.white))
+              ]),
+            ),
           );
         });
   }

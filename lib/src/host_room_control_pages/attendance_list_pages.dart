@@ -147,22 +147,25 @@ class AttendanceButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final _selectedRoomProvider = ref.watch(selectedRoom);
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
-    return ListTile(
-      onTap: () {
-        _selectedAttendanceProvider.setAttendance = attendance;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        onTap: () {
+          _selectedAttendanceProvider.setAttendance = attendance;
 
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MembersAttendanceListPage(
-                    room: _selectedRoomProvider.room!,
-                    attendance: attendance)));
-      },
-      leading: const Icon(Icons.date_range),
-      title: Column(children: [
-        Text("Start: " + attendance.dateStart.toString()),
-        Text("End: " + attendance.dateEnd.toString())
-      ]),
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MembersAttendanceListPage(
+                      room: _selectedRoomProvider.room!,
+                      attendance: attendance)));
+        },
+        leading: const Icon(Icons.date_range),
+        title: Column(children: [
+          Text("Start: " + attendance.dateStart.toString()),
+          Text("End: " + attendance.dateEnd.toString())
+        ]),
+      ),
     );
   }
 }

@@ -16,7 +16,7 @@ class AttendanceListService {
   final String rootRoomsCollection = "rooms";
 
   // get attendance list
-  Future getAttendanceListUsers(Room room) async {
+  Future<Map<Attendance, List<UserAttendance>>> getAttendanceListUsers(Room room) async {
     final UserAttendanceService userAttendanceService = UserAttendanceService();
 
     Map<Attendance, List<UserAttendance>> attendanceListUsers = {};
