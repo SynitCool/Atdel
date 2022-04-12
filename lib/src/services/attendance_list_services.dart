@@ -1,5 +1,4 @@
 // firebase
-import 'package:atdel/src/model/user.dart';
 import 'package:atdel/src/model/user_attendance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -29,9 +28,7 @@ class AttendanceListService {
 
       attendanceListUsers[attendance] = usersAttendance;
     }
-
-    print(attendanceListUsers);
-
+    
     return attendanceListUsers;
   }
 

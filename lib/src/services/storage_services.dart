@@ -25,9 +25,9 @@ class StorageService {
 
     final uploadTask = refChild.putFile(file);
 
-    uploadTask.asStream().forEach((element) {
-      print(element.bytesTransferred / element.totalBytes);
-    });
+    // uploadTask.asStream().forEach((element) {
+    //   print(element.bytesTransferred / element.totalBytes);
+    // });
 
     return uploadTask.snapshot.ref;
   }
@@ -48,12 +48,12 @@ class StorageService {
 
     if (downloadFile.existsSync()) await downloadFile.delete();
 
-    final downloadTask = ref.writeToFile(downloadFile);
+    // final downloadTask = ref.writeToFile(downloadFile);
 
-    print(await ref.getDownloadURL());
+    // print(await ref.getDownloadURL());
 
-    downloadTask.asStream().forEach((element) {
-      print(element.bytesTransferred / element.totalBytes);
-    });
+    // downloadTask.asStream().forEach((element) {
+    //   print(element.bytesTransferred / element.totalBytes);
+    // });
   }
 }

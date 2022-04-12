@@ -40,10 +40,12 @@ class ConvertToExcelService {
     // make excel in main_sheet
     await addListNumber(usersRoom.length, mainSheet);
 
-    await addUsersRoom(usersRoom, mainSheet);
+    final uidRowNum = await addUsersRoom(usersRoom, mainSheet);
+
+    await addDateAbsent(attendanceUsers, mainSheet, uidRowNum);
 
     // encode to excel
-    saveToDownloadDirectory(excel.encode()!, "test_excel.xlsx");
+    saveToDownloadDirectory(excel.encode()!, "test_excel_2.xlsx");
   }
 
   // add list number to excel
@@ -58,14 +60,18 @@ class ConvertToExcelService {
 
     // add number list
     for (var i = 0; i < length; i++) {
-      var numberCell =
-          sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i + 1));
+      var numberCell = sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i + 1));
       numberCell.value = i + 1;
     }
   }
 
   // add users room
-  Future addUsersRoom(List<UserRoom> usersRoom, String nameSheet) async {
+  Future<Map<String, int>> addUsersRoom(
+      List<UserRoom> usersRoom, String nameSheet) async {
+    // make users room uid and row num
+    Map<String, int> uidRowNum = {};
+
     // get sheet
     final sheet = excel[nameSheet];
 
@@ -76,10 +82,41 @@ class ConvertToExcelService {
 
     // add number list
     for (var i = 0; i < usersRoom.length; i++) {
-      var numberCell =
-          sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i + 1));
-      
+      var numberCell = sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i + 1));
+
       numberCell.value = usersRoom[i].alias;
+
+      uidRowNum[usersRoom[i].uid] = i + 1;
+    }
+
+    return uidRowNum;
+  }
+
+  // make date absent room
+  Future addDateAbsent(Map<Attendance, List<UserAttendance>> attendanceUsers,
+      String nameSheet, Map<String, int> uidRowNum) async {
+    // excel sheet
+    final sheet = excel[nameSheet];
+
+    // add date column
+    int columnStart = 2;
+    for (final attendanceKey in attendanceUsers.keys) {
+      Data attendanceCell = sheet.cell(
+          CellIndex.indexByColumnRow(columnIndex: columnStart, rowIndex: 0));
+
+      final dateSign = "${attendanceKey.dateStart} - ${attendanceKey.dateEnd}";
+
+      attendanceCell.value = dateSign;
+      for (int i = 0; i < attendanceUsers[attendanceKey]!.length; i++) {
+        final userRowIndex = uidRowNum[attendanceUsers[attendanceKey]![i].uid];
+        Data userCell = sheet.cell(CellIndex.indexByColumnRow(
+            columnIndex: columnStart, rowIndex: userRowIndex));
+
+        userCell.value = attendanceUsers[attendanceKey]![i].absent.toString();
+      }
+
+      columnStart++;
     }
   }
 
@@ -101,7 +138,5 @@ class ConvertToExcelService {
     final excelFile = File(downloadsFilePath);
 
     await excelFile.writeAsBytes(encodedExcel);
-
-    print("DONE");
   }
 }

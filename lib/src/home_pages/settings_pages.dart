@@ -83,9 +83,9 @@ class DevButton extends StatelessWidget {
         final _localFile = File(join(_localPath.path, "test_file.txt"));
 
         // make and read file
-        final writeFile = _localFile.writeAsString("test string\nwow");
+        // final writeFile = _localFile.writeAsString("test string\nwow");
 
-        final contents = await _localFile.readAsString();
+        // final contents = await _localFile.readAsString();
 
         // upload the file
         final uploadReference =
@@ -94,7 +94,7 @@ class DevButton extends StatelessWidget {
         // download the file
         storageService.downloadFile(uploadReference);
 
-        print(contents);
+        // print(contents);
       },
     );
   }
