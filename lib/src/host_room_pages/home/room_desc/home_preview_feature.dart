@@ -8,7 +8,7 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 // pages
-import 'package:atdel/src/host_room_control_pages/home_feature.dart';
+import 'package:atdel/src/host_room_pages/home/room_desc/home_feature.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';

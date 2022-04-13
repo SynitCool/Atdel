@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/join_room_control_pages/join_room_attendance.dart';
+import 'package:atdel/src/join_room_pages/home/attendance/join_room_attendance.dart';
 
 // model
 import 'package:atdel/src/model/attendance.dart';
