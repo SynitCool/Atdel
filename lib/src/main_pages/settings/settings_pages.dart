@@ -9,7 +9,7 @@ import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/home_pages/permission_pages.dart';
+import 'package:atdel/src/main_pages/home/feature/permission_pages.dart';
 
 // services
 import 'package:atdel/src/services/storage_services.dart';

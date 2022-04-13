@@ -6,11 +6,11 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 // join room feature
-import 'package:atdel/src/join_room_control_pages/join_room_home_preview.dart';
-import 'package:atdel/src/join_room_control_pages/join_room_drawer.dart';
-import 'package:atdel/src/join_room_control_pages/join_room_attendance_list_page.dart';
-import 'package:atdel/src/join_room_control_pages/join_room_settings_page.dart';
-import 'package:atdel/src/join_room_control_pages/join_room_info.dart';
+import 'package:atdel/src/join_room_pages/home/room_desc/join_room_home_preview.dart';
+import 'package:atdel/src/join_room_pages/home/feature/join_room_drawer.dart';
+import 'package:atdel/src/join_room_pages/home/attendance/join_room_attendance_list_page.dart';
+import 'package:atdel/src/join_room_pages/settings/join_room_settings_page.dart';
+import 'package:atdel/src/join_room_pages/home/room_info/join_room_info.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/user_pages/user_pages.dart';
+import 'package:atdel/src/user_pages/home.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';

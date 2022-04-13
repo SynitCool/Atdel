@@ -1,5 +1,5 @@
 // flutter
-import 'package:atdel/src/home_pages/specify_joiner.dart';
+import 'package:atdel/src/main_pages/settings/feature/specify_joiner.dart';
 import 'package:flutter/material.dart';
 
 

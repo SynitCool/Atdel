@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/host_room_control_pages/settings_attendance.dart';
+import 'package:atdel/src/host_room_pages/settings/attendance/settings_attendance.dart';
 
 // services
 import 'package:atdel/src/services/user_attendance_services.dart';
