@@ -6,6 +6,10 @@
 
     <!-- Permission of camera group -->
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!-- Editing read and write storage -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
    <application
         android:label="Atdel"
         android:icon="@mipmap/ic_launcher">

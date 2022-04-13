@@ -10,6 +10,36 @@ class UserRoomService {
 
   final String rootRoomsCollection = "rooms";
 
+  // get members room
+  Future<List<UserRoom>> getMembersRoom(Room room) async {
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final getCollection = await collection.get();
+
+    final usersRoom =
+        getCollection.docs.map((data) => UserRoom.fromMap(data.data()));
+
+    return usersRoom.toList();
+  }
+
+  // get users room
+  Future<List<UserRoom>> getUsersRoom(Room room) async {
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final getCollection = await collection.get();
+
+    final usersRoom =
+        getCollection.docs.map((data) => UserRoom.fromMap(data.data()));
+
+    return usersRoom.toList();
+  }
+
   // stream user room
   Stream<List<UserRoom>> streamUsersRoom(Room room) {
     final String collectionPath = "$rootRoomsCollection/${room.id}/users";

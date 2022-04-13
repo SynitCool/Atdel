@@ -76,4 +76,19 @@ class UserAttendanceService {
 
     return stream;
   }
+
+  // get users attendance
+  Future<List<UserAttendance>> getUsersAttendance(Room room, Attendance attendance) async {
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final getCollection =
+        await collection.get();
+
+    return getCollection.docs
+        .map((data) => UserAttendance.fromMap(data.data()))
+        .toList();
+  }
 }

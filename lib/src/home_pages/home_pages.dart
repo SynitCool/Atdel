@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:atdel/src/home_pages/create_room_pages.dart';
 import 'package:atdel/src/home_pages/join_room_page.dart';
 import 'package:atdel/src/home_pages/home_drawer.dart';
+import 'package:atdel/src/home_pages/settings_pages.dart';
 
 // host room control
 import 'package:atdel/src/host_room_control_pages/host_room_pages.dart';
@@ -46,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   PreferredSizeWidget appBarWidget() => AppBar(
         title: const Text("Atdel Demo"),
         elevation: 5,
+        actions: const [SettingsButton()],
       );
 
   @override
@@ -234,5 +236,20 @@ class RoomButtonWidget extends ConsumerWidget {
             ),
           ]),
         ));
+  }
+}
+
+// settings button
+class SettingsButton extends StatelessWidget {
+  const SettingsButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const SettingsPages()));
+        },
+        icon: const Icon(Icons.settings));
   }
 }
