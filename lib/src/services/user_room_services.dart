@@ -40,6 +40,29 @@ class UserRoomService {
     return usersRoom.toList();
   }
 
+  // get users room no host
+  Future<List<UserRoom>> getUsersRoomNoHost(Room room) async {
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final getCollection = await collection.get();
+
+    final usersRoom = getCollection.docs.map((data) {
+      if (room.hostUid == data.data()["uid"]) return null;
+
+
+      return UserRoom.fromMap(data.data());
+    });
+
+    final List<dynamic> usersRoomNoHost = usersRoom.toList();
+
+    usersRoomNoHost.remove(null);
+
+    return List<UserRoom>.from(usersRoomNoHost);
+  }
+
   // stream user room
   Stream<List<UserRoom>> streamUsersRoom(Room room) {
     final String collectionPath = "$rootRoomsCollection/${room.id}/users";

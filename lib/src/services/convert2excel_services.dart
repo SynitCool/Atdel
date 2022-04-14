@@ -35,7 +35,7 @@ class ConvertToExcelService {
     final Map<Attendance, List<UserAttendance>> attendanceUsers =
         await attendanceListService.getAttendanceListUsers(room);
 
-    final usersRoom = await userRoomService.getUsersRoom(room);
+    final usersRoom = await userRoomService.getUsersRoomNoHost(room);
 
     // make excel in main_sheet
     await addListNumber(usersRoom.length, mainSheet);
