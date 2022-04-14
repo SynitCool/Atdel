@@ -56,7 +56,8 @@ class RoomService {
 
     // codes collection
     final CollectionReference<Map<String, dynamic>> codesCollection =
-        _db.collection(rootCodesCollection);
+        _db.collection
+            (rootCodesCollection);
 
     final DocumentReference<Map<String, dynamic>> codesDoc =
         codesCollection.doc(roomCodesDoc);
@@ -108,7 +109,7 @@ class RoomService {
 
     // add to room codes
     final DocumentSnapshot<Map<String, dynamic>> getCodes =
-        await codesDoc.get();
+    await codesDoc.get();
 
     final Map<String, dynamic>? codesMap = getCodes.data();
 
@@ -139,11 +140,12 @@ class RoomService {
     // get reference with code
     final DocumentSnapshot<Map<String, dynamic>> getRoomCodesDoc =
         await codesDoc.get();
-
+        
     final Map<String, dynamic> roomCodesMap = getRoomCodesDoc.data()!;
 
     // check valid code
     if (!roomCodesMap.containsKey(code)) return;
+
 
     // room users doc and update room users
     final CollectionReference<Map<String, dynamic>> roomUsersCollection =
