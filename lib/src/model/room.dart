@@ -7,7 +7,8 @@ class Room {
   final String hostPhotoUrl;
   final String hostName;
   final String hostUid;
-  final int memberCounts;
+  
+  int memberCounts;
   String roomDesc;
   String roomName;
   String id;

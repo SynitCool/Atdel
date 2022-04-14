@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // services
 import 'package:atdel/src/services/user_services.dart';
+import 'package:atdel/src/services/room_services.dart';
 
 // model
 import 'package:atdel/src/model/user_room.dart';
@@ -47,6 +48,7 @@ class UserRoomService {
   Future removeUserRoom(Room room, UserRoom userRoom) async {
     // services
     final userService = UserService();
+    final roomService = RoomService();
 
     // collection
     final String collectionPath = "$rootRoomsCollection/${room.id}/users";
@@ -62,6 +64,9 @@ class UserRoomService {
 
     // remove room reference
     await userService.removeRoomReference(userRoom.uid, room);
+
+    // decrease member counts
+    await roomService.updateMembersCount(room, false);
   }
 
   // get users room no host
