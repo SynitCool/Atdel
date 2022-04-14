@@ -61,6 +61,18 @@ class Room {
       id: map["id"],
       roomCode: map["room_code"]);
 
+  factory Room.copy(Room room) => Room(
+      roomName: room.roomName,
+      roomDesc: room.roomDesc,
+      roomCode: room.roomCode,
+      id: room.id,
+      hostEmail: room.hostEmail,
+      hostPhotoUrl: room.hostPhotoUrl,
+      hostName: room.hostName,
+      hostUid: room.hostUid,
+      memberCounts: room.memberCounts
+      );
+
   Map<String, dynamic> toMap() => {
         "host_email": hostEmail,
         "host_photo_url": hostPhotoUrl,

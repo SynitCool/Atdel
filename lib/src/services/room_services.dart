@@ -319,6 +319,18 @@ class RoomService {
     userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
   }
 
+  // update room info
+  Future updateRoomInfo(Room oldRoom, Room newRoom) async {
+    // room collection
+    final roomCollection = _db.collection(rootRoomsCollection);
+    final roomDoc = roomCollection.doc(oldRoom.id);
+
+    // update room
+    Map<String, dynamic> newRoomMap = newRoom.toMap();
+
+    await roomDoc.update(newRoomMap);
+  }
+
   // stream global rooms
   Stream<List<Room>> streamGlobalRooms() {
     final CollectionReference<Map<String, dynamic>> collection =
