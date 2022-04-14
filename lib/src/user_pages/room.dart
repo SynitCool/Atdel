@@ -10,9 +10,11 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
+import 'package:atdel/src/services/room_services.dart';
 
 // model
 import 'package:atdel/src/model/user_room.dart';
+import 'package:atdel/src/model/room.dart';
 
 // user room page
 class UserRoomPage extends StatelessWidget {
@@ -55,7 +57,8 @@ class BuildContent extends ConsumerWidget {
       const SizedBox(height: 16),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(children: const [KickUserRoomButton()]),
+        child: Column(
+            children: const [MakeHostRoomButton(), KickUserRoomButton()]),
       )
     ]);
   }
@@ -107,7 +110,7 @@ class KickUserRoomButton extends ConsumerWidget {
     // providers
     final selectedUserRoomProvider = ref.watch(selectedUserRoom);
     final selectedRoomProvider = ref.watch(selectedRoom);
-    
+
     return ElevatedButton.icon(
         onPressed: () {
           userRoomService.removeUserRoom(
@@ -118,5 +121,44 @@ class KickUserRoomButton extends ConsumerWidget {
         icon: const Icon(Icons.person_remove),
         style: ElevatedButton.styleFrom(primary: Colors.red),
         label: const Text("Kick From The Room"));
+  }
+}
+
+// make as host room
+class MakeHostRoomButton extends ConsumerWidget {
+  const MakeHostRoomButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final RoomService roomService = RoomService();
+
+    // providers
+    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
+    final selectedRoomProvider = ref.watch(selectedRoom);
+
+    return ElevatedButton.icon(
+        onPressed: () {
+          final Room oldRoom = Room.copy(selectedRoomProvider.room!);
+
+          final Room newRoom = Room(
+              hostEmail: selectedUserRoomProvider.userRoom!.email,
+              hostPhotoUrl: selectedUserRoomProvider.userRoom!.photoUrl,
+              hostName: selectedUserRoomProvider.userRoom!.displayName,
+              hostUid: selectedUserRoomProvider.userRoom!.uid,
+              memberCounts: selectedRoomProvider.room!.memberCounts,
+              roomDesc: selectedRoomProvider.room!.roomDesc,
+              roomName: selectedRoomProvider.room!.roomName,
+              id: selectedRoomProvider.room!.id,
+              roomCode: selectedRoomProvider.room!.roomCode);
+
+          roomService.updateRoomInfo(oldRoom, newRoom);
+
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.person_add_alt),
+        style: ElevatedButton.styleFrom(primary: Colors.grey),
+        label: const Text("Make as Host Room"));
   }
 }
