@@ -7,11 +7,15 @@ import 'package:atdel/src/model/user_room.dart';
 // services
 import 'package:atdel/src/services/user_room_services.dart';
 
+// pages
+import 'package:atdel/src/user_pages/room.dart';
+
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
+import 'package:atdel/src/providers/selected_user_room_providers.dart';
 
 class DrawerWidget extends ConsumerStatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -131,14 +135,22 @@ class _ContentDrawerState extends ConsumerState<ContentDrawer> {
 }
 
 // member button
-class MemberButton extends StatelessWidget {
+class MemberButton extends ConsumerWidget {
   const MemberButton({Key? key, required this.user}) : super(key: key);
 
   final UserRoom user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
     return ListTile(
+      onTap: () {
+        selectedUserRoomProvider.setUserRoom = user;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => UserRoomPage(userRoom: user)));
+      },
       leading: CircleAvatar(
           radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
       title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
