@@ -56,8 +56,7 @@ class RoomService {
 
     // codes collection
     final CollectionReference<Map<String, dynamic>> codesCollection =
-        _db.collection
-            (rootCodesCollection);
+        _db.collection(rootCodesCollection);
 
     final DocumentReference<Map<String, dynamic>> codesDoc =
         codesCollection.doc(roomCodesDoc);
@@ -109,7 +108,7 @@ class RoomService {
 
     // add to room codes
     final DocumentSnapshot<Map<String, dynamic>> getCodes =
-    await codesDoc.get();
+        await codesDoc.get();
 
     final Map<String, dynamic>? codesMap = getCodes.data();
 
@@ -140,12 +139,11 @@ class RoomService {
     // get reference with code
     final DocumentSnapshot<Map<String, dynamic>> getRoomCodesDoc =
         await codesDoc.get();
-        
+
     final Map<String, dynamic> roomCodesMap = getRoomCodesDoc.data()!;
 
     // check valid code
     if (!roomCodesMap.containsKey(code)) return;
-
 
     // room users doc and update room users
     final CollectionReference<Map<String, dynamic>> roomUsersCollection =
@@ -177,6 +175,12 @@ class RoomService {
     Map<String, dynamic> userRoomMap = userRoom.toMap();
 
     await roomUsersDoc.set(userRoomMap);
+
+    // update room info
+    final roomDoc = await roomCodesMap[code].get();
+    final room = Room.fromFirestore(roomDoc);
+
+    updateMembersCount(room, true);
   }
 
   // change room desc
@@ -319,6 +323,9 @@ class RoomService {
         UserPhotoMetricService();
 
     userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+
+    // decrease member counts
+    updateMembersCount(room, false);
   }
 
   // update room info
@@ -331,6 +338,19 @@ class RoomService {
     Map<String, dynamic> newRoomMap = newRoom.toMap();
 
     await roomDoc.update(newRoomMap);
+  }
+
+  // update member count
+  Future updateMembersCount(Room room, bool add) async {
+    final roomInfo = await getRoomInfo(room.id);
+
+    final oldRoom = Room.copy(roomInfo);
+
+    if (add) roomInfo.memberCounts++;
+    if (!add) roomInfo.memberCounts--;
+
+    // update
+    await updateRoomInfo(oldRoom, roomInfo);
   }
 
   // stream global rooms
