@@ -13,10 +13,12 @@ class UserAttendanceService {
   final String rootRoomsCollection = "rooms";
 
   // update absent user
-  Future updateAbsentUser(User currentUser, Room room, Attendance attendance) async {
+  Future updateAbsentUser(
+      User currentUser, Room room, Attendance attendance) async {
     // stream attendance users
     final Stream<QuerySnapshot<Map<String, dynamic>>>
-        streamAttendanceUsersReference = streamUsersAttendanceReference(room, attendance);
+        streamAttendanceUsersReference =
+        streamUsersAttendanceReference(room, attendance);
 
     streamAttendanceUsersReference.forEach((snapshot) async {
       for (final doc in snapshot.docs) {
@@ -36,6 +38,53 @@ class UserAttendanceService {
     });
   }
 
+  // get users attendance
+  Future<List<UserAttendance>> getUsersAttendance(
+      Room room, Attendance attendance) async {
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final getCollection = await collection.get();
+
+    return getCollection.docs
+        .map((data) => UserAttendance.fromMap(data.data()))
+        .toList();
+  }
+
+  // update user attendance
+  Future updateUserAttendance(UserAttendance oldUser, UserAttendance newUser,
+      Room room, Attendance attendance) async {
+    // collection
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
+
+    final collection = _db.collection(collectionPath);
+
+    final doc = collection.doc(oldUser.uid);
+
+    // update old user to new user
+    await doc.set(newUser.toMap());
+  }
+
+  // update users attendance
+  Future updateUsersAttendance(List<UserAttendance> newUsersAttendance, Room room,
+      Attendance attendance) async {
+    // collection
+    final String collectionPath =
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
+
+    final collection = _db.collection(collectionPath);
+
+    // update all users attendance
+    for (int i = 0; i < newUsersAttendance.length; i++) {
+      final doc = collection.doc(newUsersAttendance[i].uid);
+
+      await doc.set(newUsersAttendance[i].toMap());
+    }
+  }
+
   // stream users attendance with reference
   Stream<QuerySnapshot<Map<String, dynamic>>> streamUsersAttendanceReference(
       Room room, Attendance attendance) {
@@ -53,7 +102,7 @@ class UserAttendanceService {
       User user, Room room, Attendance attendance) {
     // user attendance
     final collectionPath =
-        "rooms/${room.id}/attendance_list/${attendance.id}/users";
+        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
     final collection = _db.collection(collectionPath);
     final doc = collection.doc(user.uid);
 
@@ -75,20 +124,5 @@ class UserAttendanceService {
         data.docs.map((data) => UserAttendance.fromMap(data.data())).toList());
 
     return stream;
-  }
-
-  // get users attendance
-  Future<List<UserAttendance>> getUsersAttendance(Room room, Attendance attendance) async {
-    final String collectionPath =
-        "$rootRoomsCollection/${room.id}/attendance_list/${attendance.id}/users";
-    final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(collectionPath);
-
-    final getCollection =
-        await collection.get();
-
-    return getCollection.docs
-        .map((data) => UserAttendance.fromMap(data.data()))
-        .toList();
   }
 }
