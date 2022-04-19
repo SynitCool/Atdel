@@ -10,12 +10,18 @@ import 'package:atdel/src/model/user_room.dart';
 // services
 import 'package:atdel/src/services/user_room_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
+import 'package:atdel/src/services/room_codes_services.dart';
+import 'package:atdel/src/services/user_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
 
 class RoomService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
+
+  final RoomCodesService _roomCodesService = RoomCodesService();
+  final UserService _userService = UserService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -36,10 +42,8 @@ class RoomService {
   }
 
   // add room to database
-  Future addRoomToDatabase(String roomName, String hostAlias) async {
-    // current user
-    final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
-
+  Future addRoomToDatabase(
+      String roomName, String hostAlias, bool privateRoom) async {
     // room collections
     final CollectionReference<Map<String, dynamic>> roomCollection =
         _db.collection(rootRoomsCollection);
@@ -54,13 +58,6 @@ class RoomService {
     final DocumentReference<Map<String, dynamic>> usersDoc =
         usersCollection.doc(authUser!.uid);
 
-    // codes collection
-    final CollectionReference<Map<String, dynamic>> codesCollection =
-        _db.collection(rootCodesCollection);
-
-    final DocumentReference<Map<String, dynamic>> codesDoc =
-        codesCollection.doc(roomCodesDoc);
-
     // room users collections
     final String roomUsersPath = "$rootRoomsCollection/${roomDoc.id}/users";
 
@@ -68,15 +65,16 @@ class RoomService {
         _db.collection(roomUsersPath);
 
     final DocumentReference<Map<String, dynamic>> roomUsersDoc =
-        roomUsersCollection.doc(authUser.uid);
+        roomUsersCollection.doc(authUser!.uid);
 
     // settings room object and add to room Doc
-    Room room = Room.fromFirebaseAuth(authUser);
+    Room room = Room.fromFirebaseAuth(authUser!);
 
     room.setRoomDesc = "<h1>Welcome</h1>";
     room.setRoomName = roomName;
     room.setId = roomDoc.id;
     room.setRoomCode = makeRandomCode();
+    room.setPrivateRoom = privateRoom;
 
     final Map<String, dynamic> roomMap = room.toMap();
 
@@ -85,36 +83,29 @@ class RoomService {
     // settings room users
     UserRoom hostUser = UserRoom(
         alias: hostAlias,
-        displayName: authUser.displayName!,
-        email: authUser.email!,
-        photoUrl: authUser.photoURL!,
-        uid: authUser.uid,
+        displayName: authUser!.displayName!,
+        email: authUser!.email!,
+        photoUrl: authUser!.photoURL!,
+        uid: authUser!.uid,
         userReference: usersDoc);
 
     Map<String, dynamic> hostUserMap = hostUser.toMap();
 
     await roomUsersDoc.set(hostUserMap);
 
-    // update users rooms
+    // update user room reference
     final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
 
-    model.User user = model.User.fromFirestore(getDoc);
+    model.User oldUser = model.User.fromFirestore(getDoc);
+    model.User newUser = model.User.copy(oldUser);
 
-    user.roomReferences.add(roomDoc);
+    newUser.roomReferences.add(roomDoc);
 
-    Map<String, dynamic> usersInfo = user.toMap();
-
-    await usersDoc.update(usersInfo);
+    await _userService.updateUser(oldUser, newUser);
 
     // add to room codes
-    final DocumentSnapshot<Map<String, dynamic>> getCodes =
-        await codesDoc.get();
-
-    final Map<String, dynamic>? codesMap = getCodes.data();
-
-    codesMap!.addAll({room.roomCode: roomDoc});
-
-    await codesDoc.update(codesMap);
+    await _roomCodesService
+        .addRoomCodes({"room_code": room.roomCode, "room_reference": roomDoc});
   }
 
   // join room with code

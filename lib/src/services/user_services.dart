@@ -28,7 +28,8 @@ class UserService {
     final CollectionReference<Map<String, dynamic>> collectionUsers =
         _db.collection(rootUsersPath);
 
-    final DocumentReference<Map<String, dynamic>> docUser = collectionUsers.doc(userUid);
+    final DocumentReference<Map<String, dynamic>> docUser =
+        collectionUsers.doc(userUid);
 
     // remove room reference
     final getDocUser = await docUser.get();
@@ -63,6 +64,17 @@ class UserService {
     if (getDoc.exists) return;
 
     await doc.set(userInfo);
+  }
+
+  // update user
+  Future updateUser(model.User oldUser, model.User newUser) async {
+    // collection
+    final collection = _db.collection(rootUsersPath);
+
+    final doc = collection.doc(oldUser.uid);
+
+    // update user
+    await doc.update(newUser.toMap());
   }
 
   // stream user

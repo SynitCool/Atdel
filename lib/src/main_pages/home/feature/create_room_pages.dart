@@ -12,9 +12,12 @@ class CreateRoomPage extends StatefulWidget {
 }
 
 class _CreateRoomPageState extends State<CreateRoomPage> {
-  // widget related
+  // name text controller
   final TextEditingController nameTextFieldController = TextEditingController();
   String nameText = '';
+
+  // private room
+  bool privateRoom = false;
 
   @override
   void dispose() {
@@ -41,7 +44,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   PreferredSizeWidget appBarWidget() => AppBar(
         backgroundColor: Colors.white38,
         title: const Text("Setting Room"),
-        actions: [NextRoomButton(nameRoom: nameText)],
+        actions: [NextRoomButton(nameRoom: nameText, privateRoom: privateRoom)],
       );
 
   // name room text field widget
@@ -60,8 +63,24 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   Widget contentWidget() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
       child: ListView(
-        children: [nameTextFieldWidget()],
+        children: [
+          nameTextFieldWidget(),
+          const SizedBox(height: 15),
+          privateRoomCheckBox()
+        ],
       ));
+
+  // private room checkbox
+  Widget privateRoomCheckBox() => CheckboxListTile(
+      shape: const OutlineInputBorder(),
+      value: privateRoom,
+      title: const Text("Make as Private"),
+      subtitle: const Text("The host can specify who can enter the room"),
+      onChanged: (value) {
+        setState(() {
+          privateRoom = value!;
+        });
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +93,10 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
 // next room button
 class NextRoomButton extends StatelessWidget {
-  const NextRoomButton({Key? key, required this.nameRoom}) : super(key: key);
+  const NextRoomButton({Key? key, required this.nameRoom, required this.privateRoom}) : super(key: key);
 
   final String nameRoom;
+  final bool privateRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +112,7 @@ class NextRoomButton extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) => SpecifyHost(
                             nameRoom: nameRoom,
+                            privateRoom: privateRoom
                           )));
             },
             child: const Text("Next")));

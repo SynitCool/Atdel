@@ -1,15 +1,9 @@
 // flutter
 import 'package:flutter/material.dart';
-
-// pages
-import 'package:atdel/src/host_room_pages/settings/attendance/settings_attendance.dart';
-
 // services
 import 'package:atdel/src/services/user_attendance_services.dart';
 
 // model
-import 'package:atdel/src/model/attendance.dart';
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_attendance.dart';
 
 // state management
