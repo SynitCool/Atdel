@@ -87,13 +87,40 @@ class UpdateRoomButton extends ConsumerWidget {
 
   final Map<String, dynamic> newRoomInfo;
 
-  // check if valid
+  // check room name valid
   bool newRoomNameValid(String roomName) {
     if (roomName.isEmpty) return false;
     if (roomName.length < 4) return false;
     if (roomName.length > 12) return false;
 
     return true;
+  }
+
+  // check if new data is valid
+  bool newDataValid() {
+    if (newRoomInfo["room_name"] == null) return false;
+
+    return true;
+  }
+
+  // data not valid error
+  Future showDataNotValidError(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text("Data input must be valid!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -104,6 +131,9 @@ class UpdateRoomButton extends ConsumerWidget {
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
         onPressed: () {
+          if (!newDataValid()) showDataNotValidError(context);
+          if (!newDataValid()) return;
+          
           if (!newRoomNameValid(newRoomInfo["room_name"])) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
