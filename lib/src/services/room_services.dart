@@ -157,8 +157,6 @@ class RoomService {
     await usersDoc.update(userModelInfo);
 
     // update room users
-    // Map<String, dynamic> userInfo = userModel.toMapRoomUsers();
-
     final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser);
     userRoom.setUserReference = usersDoc;
     userRoom.setAlias = userAlias;

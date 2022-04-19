@@ -28,7 +28,7 @@ class _SetRoomPagesState extends ConsumerState<SetRoomPages> {
   // appbar
   PreferredSizeWidget? scaffoldAppBar() => AppBar(
         title: const Text("Update Room"),
-        actions: [UpdateRoomButton(newRoominfo: newRoomInfo)],
+        actions: [UpdateRoomButton(newRoomInfo: newRoomInfo)],
       );
 
   @override
@@ -46,6 +46,14 @@ class _SetRoomPagesState extends ConsumerState<SetRoomPages> {
                   newRoomInfo["room_name"] = newRoomName;
                 });
               }),
+              const SizedBox(height: 15),
+              PrivateRoomSettings(
+                callback: (newPrivateRoom) {
+                  setState(() {
+                    newRoomInfo["private_room"] = newPrivateRoom;
+                  });
+                },
+              )
             ],
           ),
         ));
@@ -74,10 +82,10 @@ class OldRoomTextField extends ConsumerWidget {
 
 // update room button
 class UpdateRoomButton extends ConsumerWidget {
-  const UpdateRoomButton({Key? key, required this.newRoominfo})
+  const UpdateRoomButton({Key? key, required this.newRoomInfo})
       : super(key: key);
 
-  final Map<String, dynamic> newRoominfo;
+  final Map<String, dynamic> newRoomInfo;
 
   // check if valid
   bool newRoomNameValid(String roomName) {
@@ -96,11 +104,13 @@ class UpdateRoomButton extends ConsumerWidget {
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
         onPressed: () {
-          if (!newRoomNameValid(newRoominfo["room_name"])) return;
+          if (!newRoomNameValid(newRoomInfo["room_name"])) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 
-          selectedRoomProvider.room!.setRoomName = newRoominfo["room_name"];
+          selectedRoomProvider.room!.setRoomName = newRoomInfo["room_name"];
+          selectedRoomProvider.room!.setPrivateRoom =
+              newRoomInfo["private_room"];
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
@@ -165,5 +175,56 @@ class _RoomNameSettingsState extends State<RoomNameSettings> {
         ),
       ],
     );
+  }
+}
+
+// private room settings
+class PrivateRoomSettings extends StatefulWidget {
+  const PrivateRoomSettings({Key? key, required this.callback})
+      : super(key: key);
+
+  final Function callback;
+
+  @override
+  State<PrivateRoomSettings> createState() => _PrivateRoomSettingsState();
+}
+
+class _PrivateRoomSettingsState extends State<PrivateRoomSettings> {
+  bool privateRoomValue = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const OldPrivateRoomSetting(),
+        const SizedBox(height: 5),
+        CheckboxListTile(
+            shape: const OutlineInputBorder(),
+            value: privateRoomValue,
+            title: const Text("New Private Room Settings"),
+            subtitle: const Text("The host can specify who can enter the room"),
+            onChanged: (value) => setState(() {
+                  privateRoomValue = value!;
+                  widget.callback(privateRoomValue);
+                }))
+      ],
+    );
+  }
+}
+
+// old private room settings
+class OldPrivateRoomSetting extends ConsumerWidget {
+  const OldPrivateRoomSetting({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedRoomProvider = ref.watch(selectedRoom);
+    final privateRoomValue = selectedRoomProvider.room!.privateRoom;
+    return CheckboxListTile(
+        shape: const OutlineInputBorder(),
+        value: privateRoomValue,
+        title: const Text("Old Private Room Settings"),
+        subtitle: const Text("The host can specify who can enter the room"),
+        onChanged: (value) {});
   }
 }
