@@ -12,6 +12,6 @@ class PrivateRoom extends StatefulWidget {
 class _PrivateRoomState extends State<PrivateRoom> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold(body: Center(child: Text("Private Room")));
   }
 }

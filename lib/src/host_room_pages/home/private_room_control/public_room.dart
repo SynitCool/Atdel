@@ -13,6 +13,6 @@ class _PublicRoomState extends State<PublicRoom> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold(body: Center(child: Text("Coming Soon!")));
   }
 }
