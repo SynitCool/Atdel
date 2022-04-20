@@ -23,24 +23,55 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
-class JoinRoomAttendance extends StatefulWidget {
+// join room
+class JoinRoomAttendance extends ConsumerStatefulWidget {
   const JoinRoomAttendance({Key? key}) : super(key: key);
 
   @override
-  State<JoinRoomAttendance> createState() => _JoinRoomAttendanceState();
+  ConsumerState<JoinRoomAttendance> createState() => _JoinRoomAttendanceState();
 }
 
-class _JoinRoomAttendanceState extends State<JoinRoomAttendance> {
+class _JoinRoomAttendanceState extends ConsumerState<JoinRoomAttendance> {
   @override
   Widget build(BuildContext context) {
+    final selectedRoomProvider = ref.watch(selectedRoom);
+    final attendanceWithMl = selectedRoomProvider.room!.attendanceWithMl;
     return Scaffold(
       appBar: AppBar(title: const Text("Join Room Attendance")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          children: const [AttendByGalleryButton(), AttendByCameraButton()],
-        ),
+        child: attendanceWithMl ? const AttendWithML() : const AttendWithNoMl(),
       ),
+    );
+  }
+}
+
+// attend with ml
+class AttendWithML extends StatelessWidget {
+  const AttendWithML({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: const [
+        AttendByGalleryButton(),
+        SizedBox(
+          height: 10,
+        ),
+        AttendByCameraButton()
+      ],
+    );
+  }
+}
+
+// attend with no ml
+class AttendWithNoMl extends StatelessWidget {
+  const AttendWithNoMl({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: const [AttendWithNoMlButton()],
     );
   }
 }
@@ -84,6 +115,7 @@ class AttendByGalleryButton extends ConsumerWidget {
     final _selectedCurrentUserProvider = ref.watch(currentUser);
 
     return ListTile(
+        shape: const OutlineInputBorder(),
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
         onTap: () async {
@@ -109,6 +141,8 @@ class AttendByGalleryButton extends ConsumerWidget {
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
+
+          Navigator.pop(context);
         });
   }
 }
@@ -152,6 +186,7 @@ class AttendByCameraButton extends ConsumerWidget {
     final _selectedCurrentUserProvider = ref.watch(currentUser);
 
     return ListTile(
+        shape: const OutlineInputBorder(),
         leading: const Icon(Icons.camera),
         title: const Text("Attend With Camera"),
         onTap: () async {
@@ -185,6 +220,38 @@ class AttendByCameraButton extends ConsumerWidget {
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
+
+          Navigator.pop(context);
         });
+  }
+}
+
+// attend with no ml
+class AttendWithNoMlButton extends ConsumerWidget {
+  const AttendWithNoMlButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final _userAttendanceService = UserAttendanceService();
+
+    // states
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+    final _selectedCurrentUserProvider = ref.watch(currentUser);
+
+    return ListTile(
+      shape: const OutlineInputBorder(),
+      leading: const Icon(Icons.check),
+      title: const Text("Attend"),
+      onTap: () async {
+        _userAttendanceService.updateAbsentUser(
+            _selectedCurrentUserProvider.user!,
+            _selectedRoomProvider.room!,
+            _selectedAttendanceProvider.attendance!);
+
+        Navigator.pop(context);
+      },
+    );
   }
 }
