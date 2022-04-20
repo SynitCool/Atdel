@@ -7,12 +7,13 @@ class Room {
   final String hostPhotoUrl;
   final String hostName;
   final String hostUid;
-  
+
   int memberCounts;
   String roomDesc;
   String roomName;
   String id;
   String roomCode;
+  bool privateRoom;
 
   Room(
       {required this.hostEmail,
@@ -23,7 +24,8 @@ class Room {
       required this.roomDesc,
       required this.roomName,
       required this.id,
-      required this.roomCode});
+      required this.roomCode,
+      required this.privateRoom});
 
   factory Room.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic>? data = doc.data();
@@ -37,7 +39,8 @@ class Room {
         roomDesc: data["room_desc"],
         roomName: data["room_name"],
         id: data["id"],
-        roomCode: data["room_code"]);
+        roomCode: data["room_code"],
+        privateRoom: data["private_room"]);
   }
 
   factory Room.fromFirebaseAuth(auth.User authUser) => Room(
@@ -49,7 +52,8 @@ class Room {
       roomDesc: "",
       roomName: "",
       id: "",
-      roomCode: "");
+      roomCode: "",
+      privateRoom: false);
 
   factory Room.fromMap(Map<String, dynamic> map) => Room(
       hostEmail: map["host_email"],
@@ -60,7 +64,8 @@ class Room {
       roomDesc: map["room_desc"],
       roomName: map["room_name"],
       id: map["id"],
-      roomCode: map["room_code"]);
+      roomCode: map["room_code"],
+      privateRoom: map["private_room"]);
 
   factory Room.copy(Room room) => Room(
       roomName: room.roomName,
@@ -71,8 +76,8 @@ class Room {
       hostPhotoUrl: room.hostPhotoUrl,
       hostName: room.hostName,
       hostUid: room.hostUid,
-      memberCounts: room.memberCounts
-      );
+      memberCounts: room.memberCounts,
+      privateRoom: room.privateRoom);
 
   Map<String, dynamic> toMap() => {
         "host_email": hostEmail,
@@ -83,7 +88,8 @@ class Room {
         "room_desc": roomDesc,
         "room_name": roomName,
         "id": id,
-        "room_code": roomCode
+        "room_code": roomCode,
+        "private_room": privateRoom
       };
 
   set setRoomDesc(String newRoomDesc) {
@@ -100,5 +106,9 @@ class Room {
 
   set setRoomCode(String newCode) {
     roomCode = newCode;
+  }
+
+  set setPrivateRoom(bool newPrivateRoom) {
+    privateRoom = newPrivateRoom;
   }
 }

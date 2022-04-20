@@ -150,7 +150,8 @@ class MakeHostRoomButton extends ConsumerWidget {
               roomDesc: selectedRoomProvider.room!.roomDesc,
               roomName: selectedRoomProvider.room!.roomName,
               id: selectedRoomProvider.room!.id,
-              roomCode: selectedRoomProvider.room!.roomCode);
+              roomCode: selectedRoomProvider.room!.roomCode,
+              privateRoom: selectedRoomProvider.room!.privateRoom);
 
           roomService.updateRoomInfo(oldRoom, newRoom);
 

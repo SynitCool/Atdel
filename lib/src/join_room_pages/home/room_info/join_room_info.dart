@@ -84,6 +84,7 @@ class ContentInfo extends ConsumerWidget {
           roomInfoTable("Member Counts", _selectedRoomProvider.room!.memberCounts.toString()),
           roomInfoTable("Host Name", _selectedRoomProvider.room!.hostName),
           roomInfoTable("Host Email", _selectedRoomProvider.room!.hostEmail),
+          roomInfoTable("Private Room", _selectedRoomProvider.room!.privateRoom ? "yes" : "no")
         ],
       ),
     );

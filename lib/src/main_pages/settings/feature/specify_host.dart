@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:atdel/src/services/room_services.dart';
 
 class SpecifyHost extends StatefulWidget {
-  const SpecifyHost({Key? key, required this.nameRoom}) : super(key: key);
+  const SpecifyHost(
+      {Key? key, required this.nameRoom, required this.privateRoom})
+      : super(key: key);
 
   final String nameRoom;
+  final bool privateRoom;
 
   @override
   State<SpecifyHost> createState() => _SpecifyHostState();
@@ -29,7 +32,7 @@ class _SpecifyHostState extends State<SpecifyHost> {
         backgroundColor: Colors.white38,
         title: const Text("Specify Host"),
         actions: [
-          CreateRoomButton(nameRoom: widget.nameRoom, hostAlias: nameText)
+          CreateRoomButton(nameRoom: widget.nameRoom, hostAlias: nameText, privateRoom: widget.privateRoom)
         ],
       );
 
@@ -79,11 +82,12 @@ class _SpecifyHostState extends State<SpecifyHost> {
 // create room button
 class CreateRoomButton extends StatelessWidget {
   const CreateRoomButton(
-      {Key? key, required this.nameRoom, required this.hostAlias})
+      {Key? key, required this.nameRoom, required this.hostAlias, required this.privateRoom})
       : super(key: key);
 
   final String nameRoom;
   final String hostAlias;
+  final bool privateRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +99,7 @@ class CreateRoomButton extends StatelessWidget {
               if (nameRoom.isEmpty || nameRoom.length < 4) return;
               if (nameRoom.length > 12) return;
 
-              roomService.addRoomToDatabase(nameRoom, hostAlias);
+              roomService.addRoomToDatabase(nameRoom, hostAlias, privateRoom);
 
               Navigator.pop(context);
               Navigator.pop(context);

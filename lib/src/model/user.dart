@@ -54,6 +54,15 @@ class User {
       roomReferences: map["room_references"] ?? [],
       userReference: map["user_reference"]);
 
+  factory User.copy(User user) => User(
+      displayName: user.displayName,
+      email: user.email,
+      isAnonymous: user.isAnonymous,
+      photoUrl: user.photoUrl,
+      uid: user.uid,
+      roomReferences: user.roomReferences,
+      userReference: user.userReference);
+
   Map<String, dynamic> toMap() => {
         "display_name": displayName,
         "email": email,
