@@ -11,6 +11,7 @@ import 'package:atdel/src/host_room_pages/home/feature/host_drawer.dart';
 import 'package:atdel/src/host_room_pages/home/attendance/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_pages/settings/host_settings_pages.dart';
 import 'package:atdel/src/host_room_pages/home/room_info/host_room_info.dart';
+import 'package:atdel/src/host_room_pages/home/private_room_control/private_room_control.dart';
 
 // page
 class HostRoomPages extends StatefulWidget {
@@ -25,9 +26,10 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   final List<Widget> featurePage = [
     const HomePreviewPage(),
     const AttedanceListScreen(),
+    const PrivateRoomControlPage(),
     const RoomInfo()
   ];
-  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.info];
+  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.control_point, Icons.info];
 
   int bottomNavIndex = 0;
 
