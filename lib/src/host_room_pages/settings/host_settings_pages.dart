@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:atdel/src/host_room_pages/settings/room/settings.dart';
 import 'package:atdel/src/host_room_pages/settings/room/private_room_settings.dart';
 import 'package:atdel/src/host_room_pages/settings/room/attendance_with_ml_settings.dart';
+import 'package:atdel/src/host_room_pages/settings/room/room_name_settings.dart';
 
 // settings page
 class HostSettingsPage extends StatefulWidget {
@@ -50,6 +51,10 @@ class ContentSettings extends StatelessWidget {
           Text("Options",
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.black54)),
+          RoomNameOptionButton(),
+          SizedBox(
+            height: 10,
+          ),
           PrivateRoomOptionButton(),
           SizedBox(
             height: 10,
@@ -143,6 +148,26 @@ class AttendanceWithMlOptionButton extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => const AttendanceWithMlOptionPage()));
+      },
+    );
+  }
+}
+
+// room name option button
+class RoomNameOptionButton extends StatelessWidget {
+  const RoomNameOptionButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      shape: const OutlineInputBorder(),
+      leading: const Icon(Icons.settings_applications),
+      title: const Text("Room Name"),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const RoomNameOptionPage()));
       },
     );
   }
