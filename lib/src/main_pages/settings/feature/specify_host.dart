@@ -5,12 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:atdel/src/services/room_services.dart';
 
 class SpecifyHost extends StatefulWidget {
-  const SpecifyHost(
-      {Key? key, required this.nameRoom, required this.privateRoom})
-      : super(key: key);
+  const SpecifyHost({Key? key, required this.roomInfo}) : super(key: key);
 
-  final String nameRoom;
-  final bool privateRoom;
+  final Map<String, dynamic> roomInfo;
 
   @override
   State<SpecifyHost> createState() => _SpecifyHostState();
@@ -32,7 +29,9 @@ class _SpecifyHostState extends State<SpecifyHost> {
         backgroundColor: Colors.white38,
         title: const Text("Specify Host"),
         actions: [
-          CreateRoomButton(nameRoom: widget.nameRoom, hostAlias: nameText, privateRoom: widget.privateRoom)
+          CreateRoomButton(
+              roomInfo: widget.roomInfo,
+              hostAlias: nameText,)
         ],
       );
 
@@ -81,13 +80,14 @@ class _SpecifyHostState extends State<SpecifyHost> {
 
 // create room button
 class CreateRoomButton extends StatelessWidget {
-  const CreateRoomButton(
-      {Key? key, required this.nameRoom, required this.hostAlias, required this.privateRoom})
-      : super(key: key);
+  const CreateRoomButton({
+    Key? key,
+    required this.roomInfo,
+    required this.hostAlias,
+  }) : super(key: key);
 
-  final String nameRoom;
   final String hostAlias;
-  final bool privateRoom;
+  final Map<String, dynamic> roomInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +96,10 @@ class CreateRoomButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
             onPressed: () {
-              if (nameRoom.isEmpty || nameRoom.length < 4) return;
-              if (nameRoom.length > 12) return;
+              if (roomInfo["room_name"].isEmpty || roomInfo["room_name"].length < 4) return;
+              if (roomInfo["room_name"].length > 12) return;
 
-              roomService.addRoomToDatabase(nameRoom, hostAlias, privateRoom);
+              roomService.addRoomToDatabase(roomInfo, hostAlias);
 
               Navigator.pop(context);
               Navigator.pop(context);
