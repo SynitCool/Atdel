@@ -23,7 +23,11 @@ class SetRoomPages extends ConsumerStatefulWidget {
 
 class _SetRoomPagesState extends ConsumerState<SetRoomPages> {
   // room info set
-  Map<String, dynamic> newRoomInfo = {};
+  Map<String, dynamic> newRoomInfo = {
+    "room_name": '',
+    "private_room": false,
+    "attendance_with_ml": false
+  };
 
   // appbar
   PreferredSizeWidget? scaffoldAppBar() => AppBar(
@@ -46,14 +50,20 @@ class _SetRoomPagesState extends ConsumerState<SetRoomPages> {
                   newRoomInfo["room_name"] = newRoomName;
                 });
               }),
-              const SizedBox(height: 15),
+              const SizedBox(height: 30),
               PrivateRoomSettings(
                 callback: (newPrivateRoom) {
                   setState(() {
                     newRoomInfo["private_room"] = newPrivateRoom;
                   });
                 },
-              )
+              ),
+              const SizedBox(height: 10),
+              AttendanceWithMlSettings(callback: (newAttendanceWithMl) {
+                setState(() {
+                  newRoomInfo["attendance_with_ml"] = newAttendanceWithMl;
+                });
+              })
             ],
           ),
         ));
@@ -133,7 +143,7 @@ class UpdateRoomButton extends ConsumerWidget {
         onPressed: () {
           if (!newDataValid()) showDataNotValidError(context);
           if (!newDataValid()) return;
-          
+
           if (!newRoomNameValid(newRoomInfo["room_name"])) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
@@ -141,6 +151,8 @@ class UpdateRoomButton extends ConsumerWidget {
           selectedRoomProvider.room!.setRoomName = newRoomInfo["room_name"];
           selectedRoomProvider.room!.setPrivateRoom =
               newRoomInfo["private_room"];
+          selectedRoomProvider.room!.setAttendanceWithMl =
+              newRoomInfo["attendance_with_ml"];
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
@@ -242,6 +254,40 @@ class _PrivateRoomSettingsState extends State<PrivateRoomSettings> {
   }
 }
 
+// private room settings
+class AttendanceWithMlSettings extends StatefulWidget {
+  const AttendanceWithMlSettings({Key? key, required this.callback})
+      : super(key: key);
+
+  final Function callback;
+
+  @override
+  State<AttendanceWithMlSettings> createState() => _AttendanceWithMlSettings();
+}
+
+class _AttendanceWithMlSettings extends State<AttendanceWithMlSettings> {
+  bool attendanceWithMlValue = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const OldAttendanceWithMlSetting(),
+        const SizedBox(height: 5),
+        CheckboxListTile(
+            shape: const OutlineInputBorder(),
+            value: attendanceWithMlValue,
+            title: const Text("New Attendance With ML Settings"),
+            subtitle: const Text("Take attendance with machine learning."),
+            onChanged: (value) => setState(() {
+                  attendanceWithMlValue = value!;
+                  widget.callback(attendanceWithMlValue);
+                }))
+      ],
+    );
+  }
+}
+
 // old private room settings
 class OldPrivateRoomSetting extends ConsumerWidget {
   const OldPrivateRoomSetting({Key? key}) : super(key: key);
@@ -255,6 +301,23 @@ class OldPrivateRoomSetting extends ConsumerWidget {
         value: privateRoomValue,
         title: const Text("Old Private Room Settings"),
         subtitle: const Text("The host can specify who can enter the room"),
+        onChanged: (value) {});
+  }
+}
+
+// old attendance with ml settings
+class OldAttendanceWithMlSetting extends ConsumerWidget {
+  const OldAttendanceWithMlSetting({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedRoomProvider = ref.watch(selectedRoom);
+    final attendanceWithMlValue = selectedRoomProvider.room!.attendanceWithMl;
+    return CheckboxListTile(
+        shape: const OutlineInputBorder(),
+        value: attendanceWithMlValue,
+        title: const Text("Old Attendance With ML Settings"),
+        subtitle: const Text("Take attendance with machine learning."),
         onChanged: (value) {});
   }
 }

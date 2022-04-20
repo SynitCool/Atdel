@@ -19,6 +19,9 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   // private room
   bool privateRoom = false;
 
+  // attendance with ml
+  bool attendanceWithMl = false;
+
   @override
   void dispose() {
     nameTextFieldController.dispose();
@@ -44,7 +47,13 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   PreferredSizeWidget appBarWidget() => AppBar(
         backgroundColor: Colors.white38,
         title: const Text("Setting Room"),
-        actions: [NextRoomButton(nameRoom: nameText, privateRoom: privateRoom)],
+        actions: [
+          NextRoomButton(
+            nameRoom: nameText,
+            privateRoom: privateRoom,
+            attendanceWithMl: attendanceWithMl,
+          )
+        ],
       );
 
   // name room text field widget
@@ -65,8 +74,10 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       child: ListView(
         children: [
           nameTextFieldWidget(),
-          const SizedBox(height: 15),
-          privateRoomCheckBox()
+          const SizedBox(height: 30),
+          privateRoomCheckBox(),
+          const SizedBox(height: 10),
+          attendanceWithMlCheckBox()
         ],
       ));
 
@@ -82,6 +93,18 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
         });
       });
 
+  // private room checkbox
+  Widget attendanceWithMlCheckBox() => CheckboxListTile(
+      shape: const OutlineInputBorder(),
+      value: attendanceWithMl,
+      title: const Text("Attendance With ML"),
+      subtitle: const Text("Take attendance with machine learning."),
+      onChanged: (value) {
+        setState(() {
+          attendanceWithMl = value!;
+        });
+      });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,10 +116,16 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
 
 // next room button
 class NextRoomButton extends StatelessWidget {
-  const NextRoomButton({Key? key, required this.nameRoom, required this.privateRoom}) : super(key: key);
+  const NextRoomButton(
+      {Key? key,
+      required this.nameRoom,
+      required this.privateRoom,
+      required this.attendanceWithMl})
+      : super(key: key);
 
   final String nameRoom;
   final bool privateRoom;
+  final bool attendanceWithMl;
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +136,17 @@ class NextRoomButton extends StatelessWidget {
               if (nameRoom.isEmpty || nameRoom.length < 4) return;
               if (nameRoom.length > 12) return;
 
+              final Map<String, dynamic> roomInfoMap = {
+                "room_name": nameRoom,
+                "private_room": privateRoom,
+                "attendance_with_ml": attendanceWithMl
+              };
+
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => SpecifyHost(
-                            nameRoom: nameRoom,
-                            privateRoom: privateRoom
-                          )));
+                          roomInfo: roomInfoMap)));
             },
             child: const Text("Next")));
   }

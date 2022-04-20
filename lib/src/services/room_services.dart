@@ -43,7 +43,7 @@ class RoomService {
 
   // add room to database
   Future addRoomToDatabase(
-      String roomName, String hostAlias, bool privateRoom) async {
+      Map<String, dynamic> roomInfo, String hostAlias) async {
     // room collections
     final CollectionReference<Map<String, dynamic>> roomCollection =
         _db.collection(rootRoomsCollection);
@@ -71,10 +71,11 @@ class RoomService {
     Room room = Room.fromFirebaseAuth(authUser!);
 
     room.setRoomDesc = "<h1>Welcome</h1>";
-    room.setRoomName = roomName;
+    room.setRoomName = roomInfo["room_name"];
     room.setId = roomDoc.id;
     room.setRoomCode = makeRandomCode();
-    room.setPrivateRoom = privateRoom;
+    room.setPrivateRoom = roomInfo["private_room"];
+    room.setAttendanceWithMl = roomInfo["attendance_with_ml"];
 
     final Map<String, dynamic> roomMap = room.toMap();
 
