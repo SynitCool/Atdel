@@ -92,9 +92,10 @@ class UpdateAttendanceWithMlButton extends ConsumerWidget {
           if (selectedRoomProvider.room!.attendanceWithMl == attendanceWithMl) {
             Navigator.pop(context);
           }
-          ;
-          if (selectedRoomProvider.room!.attendanceWithMl == attendanceWithMl)
+          
+          if (selectedRoomProvider.room!.attendanceWithMl == attendanceWithMl) {
             return;
+          }
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 

@@ -91,7 +91,7 @@ class UpdatePrivateRoomButton extends ConsumerWidget {
           if (selectedRoomProvider.room!.privateRoom == privateRoom) {
             Navigator.pop(context);
           }
-          ;
+          
           if (selectedRoomProvider.room!.privateRoom == privateRoom) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
