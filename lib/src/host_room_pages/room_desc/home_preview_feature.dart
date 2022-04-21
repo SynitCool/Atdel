@@ -4,23 +4,14 @@ import 'package:flutter/material.dart';
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 
-// html
-import 'package:flutter_html/flutter_html.dart';
-
 // pages
 import 'package:atdel/src/host_room_pages/room_desc/home_feature.dart';
-
-// model
-import 'package:atdel/src/model/room.dart';
-
-// services
-import 'package:atdel/src/services/room_services.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// providers
-import 'package:atdel/src/providers/selected_room_providers.dart';
+// widgets
+import 'package:atdel/src/host_room_pages/room_desc/widgets/home_preview.dart';
 
 // home preview page
 class HomePreviewPage extends ConsumerStatefulWidget {
@@ -58,9 +49,7 @@ class _HomePreviewPageState extends ConsumerState<HomePreviewPage>
       bubbleColor: Colors.blue,
       onPress: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const EditHome()));
+            context, MaterialPageRoute(builder: (context) => const EditHome()));
       });
 
   // floating action button
@@ -82,31 +71,3 @@ class _HomePreviewPageState extends ConsumerState<HomePreviewPage>
   }
 }
 
-// view html
-class ViewHtml extends ConsumerWidget {
-  const ViewHtml({Key? key}) : super(key: key);
-
-  // scene
-  final Widget loadingScene = const Center(child: CircularProgressIndicator());
-  final Widget errorScene = const Center(child: Text("Something went wrong!"));
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final _selectedRoomProvider = ref.watch(selectedRoom);
-    final _roomService = RoomService();
-    return StreamBuilder<Room>(
-      stream: _roomService.streamGetRoomInfo(_selectedRoomProvider.room!.id),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return loadingScene;
-        }
-
-        if (snapshot.hasError) return errorScene;
-
-        final data = snapshot.data;
-
-        return SingleChildScrollView(child: Html(data: data!.roomDesc));
-      },
-    );
-  }
-}
