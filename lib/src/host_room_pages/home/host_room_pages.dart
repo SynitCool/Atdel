@@ -25,7 +25,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
     const HomePreviewPage(),
-    const AttedanceListScreen(),
+    const AttendanceListPage(),
     const PrivateRoomControlPage(),
     const RoomInfo()
   ];

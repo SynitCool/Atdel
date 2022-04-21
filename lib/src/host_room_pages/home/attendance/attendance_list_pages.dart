@@ -10,6 +10,7 @@ import 'package:atdel/src/host_room_pages/home/attendance/members_attendance_lis
 
 // model
 import 'package:atdel/src/model/attendance.dart';
+import 'package:atdel/src/model/room.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // services
 import 'package:atdel/src/services/attendance_list_services.dart';
 import 'package:atdel/src/services/convert2excel_services.dart';
+import 'package:atdel/src/services/room_services.dart';
 
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
@@ -26,15 +28,95 @@ import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // attendance list screen
-class AttedanceListScreen extends ConsumerStatefulWidget {
-  const AttedanceListScreen({Key? key}) : super(key: key);
+class AttendanceListPage extends ConsumerWidget {
+  const AttendanceListPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<AttedanceListScreen> createState() =>
-      _AttedanceListScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    // provider
+    final selectedRoomProvider = ref.watch(selectedRoom);
+
+    // services
+    final roomService = RoomService();
+    return FutureBuilder<Room>(
+        future: roomService.getRoomInfo(selectedRoomProvider.room!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const AttendancePageLoadingScreen();
+          }
+
+          if (snapshot.hasError) return const AttendancePageErrorScreen();
+
+          final data = snapshot.data;
+
+          if (data == null) return const AttendancePageLoadingScreen();
+
+          if (data.privateRoom) return const AttendancePagePrivateRoom();
+
+          return const AttendancePagePublicRoom();
+        });
+  }
 }
 
-class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
+// attendance button
+class AttendanceButtonWidget extends ConsumerWidget {
+  const AttendanceButtonWidget({Key? key, required this.attendance})
+      : super(key: key);
+
+  final Attendance attendance;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        onTap: () {
+          _selectedAttendanceProvider.setAttendance = attendance;
+
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MembersAttendanceListPage(
+                      room: _selectedRoomProvider.room!,
+                      attendance: attendance)));
+        },
+        leading: const Icon(Icons.date_range),
+        title: Column(children: [
+          Text("Start: " + attendance.dateStart.toString()),
+          Text("End: " + attendance.dateEnd.toString())
+        ]),
+      ),
+    );
+  }
+}
+
+// attendance page for private room
+class AttendancePagePrivateRoom extends StatelessWidget {
+  const AttendancePagePrivateRoom({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text("Set the private room first to use attendance list."),
+      ),
+    );
+  }
+}
+
+// attendance page for public room
+class AttendancePagePublicRoom extends ConsumerStatefulWidget {
+  const AttendancePagePublicRoom({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<AttendancePagePublicRoom> createState() =>
+      _AttendancePagePublicRoomState();
+}
+
+class _AttendancePagePublicRoomState
+    extends ConsumerState<AttendancePagePublicRoom>
     with SingleTickerProviderStateMixin {
   // floating action button animation
   late Animation<double> _animation;
@@ -77,7 +159,7 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
 
   // convert attendance to excel button
   Bubble convertToExcel() {
-    final _selectedRoomProvider = ref.watch(selectedRoom); 
+    final _selectedRoomProvider = ref.watch(selectedRoom);
     return Bubble(
         icon: FontAwesomeIcons.fileExcel,
         iconColor: Colors.white,
@@ -88,7 +170,8 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
           final ConvertToExcelService convertToExcelService =
               ConvertToExcelService();
 
-          convertToExcelService.convertByAttendanceList(_selectedRoomProvider.room!);
+          convertToExcelService
+              .convertByAttendanceList(_selectedRoomProvider.room!);
         });
   }
 
@@ -136,36 +219,24 @@ class _AttedanceListScreenState extends ConsumerState<AttedanceListScreen>
   }
 }
 
-// attendance button
-class AttendanceButtonWidget extends ConsumerWidget {
-  const AttendanceButtonWidget({Key? key, required this.attendance})
-      : super(key: key);
-
-  final Attendance attendance;
+// attendance page loading screen
+class AttendancePageLoadingScreen extends StatelessWidget {
+  const AttendancePageLoadingScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final _selectedRoomProvider = ref.watch(selectedRoom);
-    final _selectedAttendanceProvider = ref.watch(selectedAttendance);
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        onTap: () {
-          _selectedAttendanceProvider.setAttendance = attendance;
+  Widget build(BuildContext context) {
+    return const Scaffold(body: CircularProgressIndicator());
+  }
+}
 
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MembersAttendanceListPage(
-                      room: _selectedRoomProvider.room!,
-                      attendance: attendance)));
-        },
-        leading: const Icon(Icons.date_range),
-        title: Column(children: [
-          Text("Start: " + attendance.dateStart.toString()),
-          Text("End: " + attendance.dateEnd.toString())
-        ]),
-      ),
+// attendance page error scene
+class AttendancePageErrorScreen extends StatelessWidget {
+  const AttendancePageErrorScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Text("Error"),
     );
   }
 }
