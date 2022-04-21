@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 
 // pages
-import 'package:atdel/src/host_room_pages/home/attendance/add_attendance_list_pages.dart';
-import 'package:atdel/src/host_room_pages/home/attendance/members_attendance_list_pages.dart';
+import 'package:atdel/src/host_room_pages/attendance/add_attendance_list_pages.dart';
+import 'package:atdel/src/host_room_pages/attendance/members_attendance_list_pages.dart';
 
 // model
 import 'package:atdel/src/model/attendance.dart';

@@ -1,6 +1,6 @@
 // flutter
 import 'package:atdel/src/auth_pages/signin.dart';
-import 'package:atdel/src/main_pages/home/home_pages.dart';
+import 'package:atdel/src/main_pages/home_pages.dart';
 import 'package:flutter/material.dart';
 
 // firebase

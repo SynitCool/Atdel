@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/host_room_pages/settings/attendance/settings_attendance.dart';
-import 'package:atdel/src/host_room_pages/home/attendance/members_edit_attendance.dart';
+import 'package:atdel/src/host_room_pages/attendance/settings_attendance.dart';
+import 'package:atdel/src/host_room_pages/attendance/members_edit_attendance.dart';
 
 // services
 import 'package:atdel/src/services/user_attendance_services.dart';

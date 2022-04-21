@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // pages
-import 'package:atdel/src/main_pages/settings/feature/specify_host.dart';
+import 'package:atdel/src/main_pages/widgets/specify_host.dart';
 
 class CreateRoomPage extends StatefulWidget {
   const CreateRoomPage({Key? key}) : super(key: key);
