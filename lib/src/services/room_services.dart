@@ -30,11 +30,11 @@ class RoomService {
   final String roomCodesDoc = "room_codes";
 
   // get user info from database
-  Future<Room> getRoomInfo(String roomid) async {
+  Future<Room> getRoomInfo(Room room) async {
     final CollectionReference<Map<String, dynamic>> collection =
         _db.collection(rootRoomsCollection);
 
-    final DocumentReference<Map<String, dynamic>> doc = collection.doc(roomid);
+    final DocumentReference<Map<String, dynamic>> doc = collection.doc(room.id);
 
     final DocumentSnapshot<Map<String, dynamic>> getDoc = await doc.get();
 
@@ -332,7 +332,7 @@ class RoomService {
 
   // update member count
   Future updateMembersCount(Room room, bool add) async {
-    final roomInfo = await getRoomInfo(room.id);
+    final roomInfo = await getRoomInfo(room);
 
     final oldRoom = Room.copy(roomInfo);
 

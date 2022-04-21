@@ -7,10 +7,10 @@ import 'package:atdel/src/services/room_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // features
-import 'package:atdel/src/host_room_pages/settings/room/settings.dart';
-import 'package:atdel/src/host_room_pages/settings/room/private_room_settings.dart';
-import 'package:atdel/src/host_room_pages/settings/room/attendance_with_ml_settings.dart';
-import 'package:atdel/src/host_room_pages/settings/room/room_name_settings.dart';
+import 'package:atdel/src/host_room_pages/room_settings/settings.dart';
+import 'package:atdel/src/host_room_pages/room_settings/private_room_settings.dart';
+import 'package:atdel/src/host_room_pages/room_settings/attendance_with_ml_settings.dart';
+import 'package:atdel/src/host_room_pages/room_settings/room_name_settings.dart';
 
 // settings page
 class HostSettingsPage extends StatefulWidget {

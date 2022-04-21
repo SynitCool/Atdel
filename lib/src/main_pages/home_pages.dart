@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // home pages feature
-import 'package:atdel/src/main_pages/home/feature/create_room_pages.dart';
-import 'package:atdel/src/main_pages/home/feature/join_room_page.dart';
-import 'package:atdel/src/main_pages/home/feature/home_drawer.dart';
-import 'package:atdel/src/main_pages/settings/settings_pages.dart';
+import 'package:atdel/src/main_pages/widgets/create_room_pages.dart';
+import 'package:atdel/src/main_pages/widgets/join_room_page.dart';
+import 'package:atdel/src/main_pages/widgets/home_drawer.dart';
+import 'package:atdel/src/main_pages/home_settings/settings_pages.dart';
 
 // host room control
-import 'package:atdel/src/host_room_pages/home/host_room_pages.dart';
+import 'package:atdel/src/host_room_pages/host_room_pages.dart';
 
 // join room control
-import 'package:atdel/src/join_room_pages/home/join_room_control_page.dart';
+import 'package:atdel/src/join_room_pages/join_room_control_page.dart';
 
 // custom widget
 import 'package:fab_circular_menu/fab_circular_menu.dart';

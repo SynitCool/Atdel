@@ -6,12 +6,12 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 // host room feature
-import 'package:atdel/src/host_room_pages/home/room_desc/home_preview_feature.dart';
-import 'package:atdel/src/host_room_pages/home/feature/host_drawer.dart';
-import 'package:atdel/src/host_room_pages/home/attendance/attendance_list_pages.dart';
-import 'package:atdel/src/host_room_pages/settings/host_settings_pages.dart';
-import 'package:atdel/src/host_room_pages/home/room_info/host_room_info.dart';
-import 'package:atdel/src/host_room_pages/home/private_room_control/private_room_control.dart';
+import 'package:atdel/src/host_room_pages/room_desc/home_preview_feature.dart';
+import 'package:atdel/src/host_room_pages/widgets/host_drawer.dart';
+import 'package:atdel/src/host_room_pages/attendance/attendance_list_pages.dart';
+import 'package:atdel/src/host_room_pages/room_settings/host_settings_pages.dart';
+import 'package:atdel/src/host_room_pages/room_info/host_room_info.dart';
+import 'package:atdel/src/host_room_pages/private_room_control/private_room_control.dart';
 
 // page
 class HostRoomPages extends StatefulWidget {
@@ -25,7 +25,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   // widgets bottom navigation bar
   final List<Widget> featurePage = [
     const HomePreviewPage(),
-    const AttedanceListScreen(),
+    const AttendanceListPage(),
     const PrivateRoomControlPage(),
     const RoomInfo()
   ];
