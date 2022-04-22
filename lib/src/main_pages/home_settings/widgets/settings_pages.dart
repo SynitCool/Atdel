@@ -43,24 +43,7 @@ class DevButton extends StatelessWidget {
     return ListTile(
       leading: const Icon(Icons.developer_mode),
       title: const Text("DEV BUTTON"),
-      onTap: () async {
-        final StorageService storageService = StorageService();
-        final _localPath = await getTemporaryDirectory();
-        final _localFile = File(join(_localPath.path, "test_file.txt"));
-
-        // make and read file
-        // final writeFile = _localFile.writeAsString("test string\nwow");
-
-        // final contents = await _localFile.readAsString();
-
-        // upload the file
-        final uploadReference =
-            await storageService.uploadFile(_localFile, "test_file.txt");
-
-        // download the file
-        storageService.downloadFile(uploadReference);
-
-        // print(contents);
+      onTap: () {
       },
     );
   }
