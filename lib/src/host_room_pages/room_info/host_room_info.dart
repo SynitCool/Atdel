@@ -7,6 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
+// widgets
+import 'package:atdel/src/host_room_pages/room_info/widgets/host_room_info.dart';
+
 // room info pages
 class RoomInfo extends StatelessWidget {
   const RoomInfo({Key? key}) : super(key: key);
@@ -16,20 +19,9 @@ class RoomInfo extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
-        children: const [Title(), ContentInfo()],
+        children: const [TitleRoomInfo(), ContentInfo()],
       ),
     );
-  }
-}
-
-// title room info
-class Title extends StatelessWidget {
-  const Title({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text("Room Info",
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26));
   }
 }
 
@@ -81,11 +73,14 @@ class ContentInfo extends ConsumerWidget {
           roomInfoTable("Room Name", _selectedRoomProvider.room!.roomName),
           roomInfoTable("Room Id", _selectedRoomProvider.room!.id),
           roomInfoTable("Room Code", _selectedRoomProvider.room!.roomCode),
-          roomInfoTable("Member Counts", _selectedRoomProvider.room!.memberCounts.toString()),
+          roomInfoTable("Member Counts",
+              _selectedRoomProvider.room!.memberCounts.toString()),
           roomInfoTable("Host Name", _selectedRoomProvider.room!.hostName),
           roomInfoTable("Host Email", _selectedRoomProvider.room!.hostEmail),
-          roomInfoTable("Private Room", _selectedRoomProvider.room!.privateRoom ? "yes" : "no"),
-          roomInfoTable("Attendance With ML", _selectedRoomProvider.room!.attendanceWithMl ? "yes" : "no")
+          roomInfoTable("Private Room",
+              _selectedRoomProvider.room!.privateRoom ? "yes" : "no"),
+          roomInfoTable("Attendance With ML",
+              _selectedRoomProvider.room!.attendanceWithMl ? "yes" : "no")
         ],
       ),
     );

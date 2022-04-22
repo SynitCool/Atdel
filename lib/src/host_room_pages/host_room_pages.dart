@@ -9,9 +9,11 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:atdel/src/host_room_pages/room_desc/home_preview_feature.dart';
 import 'package:atdel/src/host_room_pages/widgets/host_drawer.dart';
 import 'package:atdel/src/host_room_pages/attendance/attendance_list_pages.dart';
-import 'package:atdel/src/host_room_pages/room_settings/host_settings_pages.dart';
 import 'package:atdel/src/host_room_pages/room_info/host_room_info.dart';
 import 'package:atdel/src/host_room_pages/private_room_control/private_room_control.dart';
+
+// widgets
+import 'package:atdel/src/host_room_pages/widgets/host_room_pages.dart';
 
 // page
 class HostRoomPages extends StatefulWidget {
@@ -29,7 +31,12 @@ class _HostRoomPagesState extends State<HostRoomPages> {
     const PrivateRoomControlPage(),
     const RoomInfo()
   ];
-  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.control_point, Icons.info];
+  final List<IconData> iconsPage = [
+    Icons.home,
+    Icons.people,
+    Icons.control_point,
+    Icons.info
+  ];
 
   int bottomNavIndex = 0;
 
@@ -105,24 +112,5 @@ class _HostRoomPagesState extends State<HostRoomPages> {
         ),
         child: mainContentWidget(),
         drawer: const DrawerWidget());
-  }
-}
-
-// settings button
-class SettingsButton extends StatelessWidget {
-  const SettingsButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: ((context) => const HostSettingsPage())));
-      },
-      icon: const Icon(Icons.settings),
-      padding: const EdgeInsets.all(15.0),
-    );
   }
 }
