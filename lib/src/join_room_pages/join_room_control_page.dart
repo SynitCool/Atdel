@@ -9,11 +9,13 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:atdel/src/join_room_pages/room_desc/join_room_home_preview.dart';
 import 'package:atdel/src/join_room_pages/widgets/join_room_drawer.dart';
 import 'package:atdel/src/join_room_pages/attendance/join_room_attendance_list_page.dart';
-import 'package:atdel/src/join_room_pages/room_settings/join_room_settings_page.dart';
 import 'package:atdel/src/join_room_pages/room_info/join_room_info.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// widgets
+import 'package:atdel/src/join_room_pages/widgets/join_room_control_page.dart';
 
 // page
 class JoinRoomControl extends ConsumerStatefulWidget {
@@ -120,24 +122,5 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
         ),
         child: mainContentWidget(),
         drawer: const DrawerWidget());
-  }
-}
-
-// settings button
-class SettingsButton extends StatelessWidget {
-  const SettingsButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: ((context) => const JoinRoomSettings())));
-      },
-      icon: const Icon(Icons.settings),
-      padding: const EdgeInsets.all(15.0),
-    );
   }
 }

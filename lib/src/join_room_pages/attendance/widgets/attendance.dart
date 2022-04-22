@@ -115,6 +115,10 @@ class AttendByGalleryButton extends ConsumerWidget {
               detectedUid != _selectedCurrentUserProvider.user!.uid) {
             showUserMetricAlert(context);
           }
+          if (detectedUid == null ||
+              detectedUid != _selectedCurrentUserProvider.user!.uid) {
+            return;
+          }
 
           _userAttendanceService.updateAbsentUser(
               _selectedCurrentUserProvider.user!,
@@ -193,6 +197,10 @@ class AttendByCameraButton extends ConsumerWidget {
           if (detectedUid == null ||
               detectedUid != _selectedCurrentUserProvider.user!.uid) {
             showUserMetricAlert(context);
+          }
+          if (detectedUid == null ||
+              detectedUid != _selectedCurrentUserProvider.user!.uid) {
+            return;
           }
 
           _userAttendanceService.updateAbsentUser(
