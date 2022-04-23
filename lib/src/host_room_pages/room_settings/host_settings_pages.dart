@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/host_settings_pages.dart';
-import 'package:atdel/src/host_room_pages/private_room_control/private_room.dart';
 
 // settings page
 class HostSettingsPage extends StatefulWidget {

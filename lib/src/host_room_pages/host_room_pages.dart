@@ -10,7 +10,6 @@ import 'package:atdel/src/host_room_pages/room_desc/home_preview_feature.dart';
 import 'package:atdel/src/host_room_pages/widgets/host_drawer.dart';
 import 'package:atdel/src/host_room_pages/attendance/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_pages/room_info/host_room_info.dart';
-import 'package:atdel/src/host_room_pages/private_room_control/private_room_control.dart';
 
 // widgets
 import 'package:atdel/src/host_room_pages/widgets/host_room_pages.dart';
