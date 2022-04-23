@@ -1,5 +1,6 @@
 // firebase
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 // google
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,28 +20,36 @@ class GoogleSignInProvider {
 
   // google login
   Future googleLogin() async {
-    // google log in
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    try {
+      // google log in
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-    if (googleUser == null) return;
+      if (googleUser == null) return null;
 
-    _user = googleUser;
+      _user = googleUser;
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-    await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
-    final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
-    final model.User modelUser = model.User.fromFirebaseAuth(firebaseUser!);
+      final model.User modelUser = model.User.fromFirebaseAuth(firebaseUser!);
 
-    final UserService service = UserService();
+      final UserService service = UserService();
 
-    service.addUserToDatabase(modelUser);
+      service.addUserToDatabase(modelUser);
+
+      return "success";
+    } on PlatformException {
+      return;
+    } catch (err) {
+      return;
+    }
   }
 
   // google logout

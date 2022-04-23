@@ -7,6 +7,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
 
+// pages
+import 'package:atdel/src/initialize_pages/initialize_pages.dart';
+
 class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
 
@@ -89,17 +92,26 @@ class SignInPage extends StatelessWidget {
                       color: Colors.black54,
                     ),
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.white),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ),
                         ),
                         elevation: MaterialStateProperty.all(8.0)),
-                    onPressed: () {
+                    onPressed: () async {
                       final provider = GoogleSignInProvider();
-                       
-                      provider.googleLogin();
+
+                      final user = await provider.googleLogin();
+
+                      if (user == null) return;
+
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const InitializePages()));
                     },
                     label: Text(
                       "Sign up with Google",
