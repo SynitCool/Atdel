@@ -1,7 +1,9 @@
 // flutter
-import 'package:atdel/src/auth_pages/signin.dart';
-import 'package:atdel/src/main_pages/home_pages.dart';
 import 'package:flutter/material.dart';
+
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+import 'package:atdel/src/on_boarding/on_boarding_screen.dart';
 
 // firebase
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,7 +39,7 @@ class InitializePages extends ConsumerWidget {
           } else if (snapshot.hasError) {
             return errorScene;
           } else {
-            return const SignInPage();
+            return const OnboardingScreen();
           }
         });
   }
