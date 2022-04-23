@@ -187,9 +187,89 @@ class SelectedUsersPicturesMlButton extends StatelessWidget {
       leading: const Icon(Icons.picture_in_picture_sharp),
       title: const Text("Set Selected Users Pictures ML"),
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const PrivatePicturesRoom()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const PrivatePicturesRoom()));
       },
+    );
+  }
+}
+
+// general sections
+class GeneralSections extends StatelessWidget {
+  const GeneralSections({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        GeneralTitle(),
+        SizedBox(
+          height: 5,
+        ),
+        SettingsRoomButton(),
+        SizedBox(
+          height: 15,
+        ),
+      ],
+    );
+  }
+}
+
+// options sections
+class OptionsSections extends StatelessWidget {
+  const OptionsSections({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        OptionsTitle(),
+        SizedBox(
+          height: 5,
+        ),
+        RoomNameOptionButton(),
+        SizedBox(
+          height: 10,
+        ),
+        PrivateRoomOptionButton(),
+        SizedBox(
+          height: 10,
+        ),
+        AttendanceWithMlOptionButton(),
+        SizedBox(
+          height: 15,
+        ),
+      ],
+    );
+  }
+}
+
+// private room control sections
+class PrivateRoomControlSections extends StatelessWidget {
+  const PrivateRoomControlSections({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        PrivateRoomControlTitle(),
+        SizedBox(
+          height: 10,
+        ),
+        SelectedUsersButton(),
+        SizedBox(
+          height: 15,
+        ),
+        SelectedUsersPicturesMlButton(),
+        SizedBox(
+          height: 50,
+        )
+      ],
     );
   }
 }
