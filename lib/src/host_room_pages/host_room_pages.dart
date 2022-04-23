@@ -28,13 +28,11 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   final List<Widget> featurePage = [
     const HomePreviewPage(),
     const AttendanceListPage(),
-    const PrivateRoomControlPage(),
     const RoomInfo()
   ];
   final List<IconData> iconsPage = [
     Icons.home,
     Icons.people,
-    Icons.control_point,
     Icons.info
   ];
 

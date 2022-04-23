@@ -13,77 +13,80 @@ class PrivateRoom extends StatefulWidget {
 }
 
 class _PrivateRoomState extends State<PrivateRoom> {
+  PreferredSizeWidget? scaffoldAppBar() =>
+      AppBar(title: const Text("Set Selected Users"));
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: ContentRoom());
+    return Scaffold(appBar: scaffoldAppBar(), body: const PrivateContentRoom());
   }
 }
 
-// content room
-class ContentRoom extends StatefulWidget {
-  const ContentRoom({ Key? key }) : super(key: key);
+// private content room
+class PrivateContentRoom extends StatefulWidget {
+  const PrivateContentRoom({Key? key}) : super(key: key);
 
   @override
-  State<ContentRoom> createState() => _ContentRoomState();
+  State<PrivateContentRoom> createState() => _PrivateContentRoomState();
 }
 
-class _ContentRoomState extends State<ContentRoom> {
+class _PrivateContentRoomState extends State<PrivateContentRoom> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: const [
-          PrivateRoomContent(),
-          SizedBox(height: 50),
-          PrivatePicturesContent()],
+          ShowSelectedUsersButton(),
+          AddSelectedUsersButton(),
+          SelectedUsersFileButton(),
+        ],
       ),
     );
   }
 }
 
-
-// private room content
-class PrivateRoomContent extends StatefulWidget {
-  const PrivateRoomContent({ Key? key }) : super(key: key);
+// private pictures room
+class PrivatePicturesRoom extends StatefulWidget {
+  const PrivatePicturesRoom({Key? key}) : super(key: key);
 
   @override
-  State<PrivateRoomContent> createState() => _PrivateRoomContentState();
+  State<PrivatePicturesRoom> createState() => _PrivatePicturesRoomState();
 }
 
-class _PrivateRoomContentState extends State<PrivateRoomContent> {
+class _PrivatePicturesRoomState extends State<PrivatePicturesRoom> {
+  PreferredSizeWidget scaffoldAppBar() =>
+      AppBar(title: const Text("Set Selected Users Pictures ML"));
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          SelectedUsersTitle(),
-          ShowSelectedUsersButton(),
-          AddSelectedUsersButton(),
-          SelectedUsersFileButton(),],
-      );
+    return Scaffold(
+        appBar: scaffoldAppBar(), body: const PrivatePicturesContentRoom());
   }
 }
 
-// private pictures content
-class PrivatePicturesContent extends StatefulWidget {
-  const PrivatePicturesContent({ Key? key }) : super(key: key);
+// private pictures content room
+class PrivatePicturesContentRoom extends StatefulWidget {
+  const PrivatePicturesContentRoom({Key? key}) : super(key: key);
 
   @override
-  State<PrivatePicturesContent> createState() => _PrivatePicturesContentState();
+  State<PrivatePicturesContentRoom> createState() =>
+      _PrivatePicturesContentRoomState();
 }
 
-class _PrivatePicturesContentState extends State<PrivatePicturesContent> {
+class _PrivatePicturesContentRoomState
+    extends State<PrivatePicturesContentRoom> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        SelectedUsersMlTitle(),
-        ShowSelectedUsersPicturesMlButton(),
-        AddSelectedUsersPicturesMlButton(),
-        SelectedUsersPicturesMlFileButton(),
-      ]
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: const [
+          ShowSelectedUsersPicturesMlButton(),
+          AddSelectedUsersPicturesMlButton(),
+          SelectedUsersPicturesMlFileButton(),
+        ],
+      ),
     );
   }
 }
