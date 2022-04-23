@@ -58,48 +58,48 @@ class _MembersEditPageState extends ConsumerState<MembersEditPage> {
     return Scaffold(
         floatingActionButton: floatingActionButton(),
         appBar: scaffoldAppBar(),
-        body: Column(
+        body: ListView(
           children: [
             const ColumnTile(),
             const Divider(color: Colors.black),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.usersAttendance.length,
-                itemBuilder: (context, index) {
-                  final UserAttendance currentUser =
-                      widget.usersAttendance[index];
+            ListView.builder(
+              itemCount: widget.usersAttendance.length,
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final UserAttendance currentUser =
+                    widget.usersAttendance[index];
 
-                  return Column(
-                    children: [
-                      ListTile(
-                        onTap: () {
-                          setState(() {
-                            currentUser.setAbsent = !currentUser.absent;
-                          });
-                        },
-                        leading: CircleAvatar(
-                            backgroundImage: NetworkImage(currentUser.photoUrl),
-                            radius: 30),
-                        title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Expanded(child: Text(currentUser.alias)),
-                              const VerticalDivider(),
-                              Expanded(child: Text(currentUser.email)),
-                              const VerticalDivider(),
-                              Expanded(
-                                  child: currentUser.absent
-                                      ? const Icon(Icons.check,
-                                          color: Colors.green)
-                                      : const Icon(Icons.close,
-                                          color: Colors.red)),
-                            ]),
-                      ),
-                      const Divider(color: Colors.black)
-                    ],
-                  );
-                },
-              ),
+                return Column(
+                  children: [
+                    ListTile(
+                      onTap: () {
+                        setState(() {
+                          currentUser.setAbsent = !currentUser.absent;
+                        });
+                      },
+                      leading: CircleAvatar(
+                          backgroundImage: NetworkImage(currentUser.photoUrl),
+                          radius: 30),
+                      title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Expanded(child: Text(currentUser.alias)),
+                            const VerticalDivider(),
+                            Expanded(child: Text(currentUser.email)),
+                            const VerticalDivider(),
+                            Expanded(
+                                child: currentUser.absent
+                                    ? const Icon(Icons.check,
+                                        color: Colors.green)
+                                    : const Icon(Icons.close,
+                                        color: Colors.red)),
+                          ]),
+                    ),
+                    const Divider(color: Colors.black)
+                  ],
+                );
+              },
             ),
           ],
         ));

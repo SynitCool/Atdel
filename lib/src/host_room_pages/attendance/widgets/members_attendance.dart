@@ -67,7 +67,7 @@ class MemberView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
         ListTile(
           leading: const CircleAvatar(
@@ -91,15 +91,15 @@ class MemberView extends StatelessWidget {
               ]),
         ),
         const Divider(color: Colors.black),
-        Expanded(
-          child: ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final UserAttendance currentUser = users[index];
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final UserAttendance currentUser = users[index];
 
-              return MemberInfoWidget(user: currentUser);
-            },
-          ),
+            return MemberInfoWidget(user: currentUser);
+          },
         ),
       ],
     );
