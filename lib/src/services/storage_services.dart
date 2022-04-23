@@ -12,25 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-
-  Future<Reference> uploadFile(File file, String fileName) async {
-    final ref = _storage.ref("files");
-    final refChild = ref.child(fileName);
-
-    // final metadata = SettableMetadata(
-    //   contentType: 'image/jpeg',
-    //   customMetadata: {'picked-file-path': file.path},
-    // );
-
-    final uploadTask = refChild.putFile(file);
-
-    // uploadTask.asStream().forEach((element) {
-    //   print(element.bytesTransferred / element.totalBytes);
-    // });
-
-    return uploadTask.snapshot.ref;
-  }
+  // final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future downloadFile(Reference ref) async {
     // check permission

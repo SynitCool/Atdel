@@ -33,16 +33,18 @@ class ContentSettings extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: const [
-          Text("General",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.black54)),
+          GeneralTitle(),
+          SizedBox(
+            height: 5,
+          ),
           SettingsRoomButton(),
           SizedBox(
-            height: 10,
+            height: 15,
           ),
-          Text("Options",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.black54)),
+          OptionsTitle(),
+          SizedBox(
+            height: 5,
+          ),
           RoomNameOptionButton(),
           SizedBox(
             height: 10,
@@ -53,12 +55,21 @@ class ContentSettings extends StatelessWidget {
           ),
           AttendanceWithMlOptionButton(),
           SizedBox(
+            height: 15,
+          ),
+          PrivateRoomControlTitle(),
+          SizedBox(
+            height: 10,
+          ),
+          SelectedUsersButton(),
+          SizedBox(
+            height: 15,
+          ),
+          SelectedUsersPicturesMlButton(),
+          SizedBox(
             height: 50,
           ),
-          Text(
-            "DANGER ZONE",
-            style: TextStyle(fontSize: 20, color: Colors.red),
-          ),
+          DangerZoneTitle(),
           DisperseButton(),
         ],
       ),

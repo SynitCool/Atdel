@@ -11,7 +11,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:atdel/src/services/room_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
 import 'package:atdel/src/services/ml_services.dart';
-import 'package:atdel/src/services/storage_services.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +28,7 @@ class SetImageButton extends ConsumerWidget {
     final _mlService = MLService();
     final _userPhotoMetricService = UserPhotoMetricService();
     final _selectedRoomProvider = ref.watch(selectedRoom);
-    final _storageService = StorageService();
+    // final _storageService = StorageService();
     return ListTile(
       leading: const Icon(Icons.photo_camera),
       title: const Text("Set Image"),
@@ -40,8 +39,6 @@ class SetImageButton extends ConsumerWidget {
             await _picker.pickImage(source: ImageSource.gallery);
 
         if (imageXFile == null) return;
-
-        _storageService.uploadFile(File(imageXFile.path), imageXFile.name);
 
         final detectedFace =
             await _mlService.runDetector(File(imageXFile.path));
