@@ -267,8 +267,28 @@ class PrivateRoomControlSections extends StatelessWidget {
         ),
         SelectedUsersPicturesMlButton(),
         SizedBox(
-          height: 50,
+          height: 15,
         )
+      ],
+    );
+  }
+}
+
+
+// danger zone sections
+class DangerZoneSections extends StatelessWidget {
+  const DangerZoneSections({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        SizedBox(
+          height: 50,
+        ),
+        DangerZoneTitle(),
+        DisperseButton()
       ],
     );
   }

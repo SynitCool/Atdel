@@ -36,8 +36,7 @@ class ContentSettings extends StatelessWidget {
           GeneralSections(),
           OptionsSections(),
           PrivateRoomControlSections(),
-          DangerZoneTitle(),
-          DisperseButton(),
+          DangerZoneSections(),
         ],
       ),
     );
