@@ -21,16 +21,23 @@ class DisperseButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final _roomService = RoomService();
     final _selectedRoomProvider = ref.watch(selectedRoom);
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(primary: Colors.red),
-        onPressed: () {
-          Navigator.pop(context);
+    return ListTile(
+      tileColor: Colors.red,
+      textColor: Colors.white,
+      iconColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      onTap: () {
+        Navigator.pop(context);
 
-          _roomService.deleteRoomFromDatabase(_selectedRoomProvider.room!);
+        _roomService.deleteRoomFromDatabase(_selectedRoomProvider.room!);
 
-          Navigator.pop(context);
-        },
-        child: const Text("Disperse Room"));
+        Navigator.pop(context);
+      },
+      title: const Text("Disperse Room"),
+      leading: const Icon(Icons.close),
+    );
   }
 }
 
@@ -274,7 +281,6 @@ class PrivateRoomControlSections extends StatelessWidget {
   }
 }
 
-
 // danger zone sections
 class DangerZoneSections extends StatelessWidget {
   const DangerZoneSections({Key? key}) : super(key: key);
@@ -288,6 +294,7 @@ class DangerZoneSections extends StatelessWidget {
           height: 50,
         ),
         DangerZoneTitle(),
+        SizedBox(height: 10),
         DisperseButton()
       ],
     );
