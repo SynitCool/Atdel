@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-        drawer: DrawerWidget(),
+        drawer: CustomDrawer(),
         body: ContentPage(),
         floatingActionButton: AddRoomButton());
   }
