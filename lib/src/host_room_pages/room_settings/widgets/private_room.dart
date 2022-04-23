@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // pages
 import 'package:atdel/src/host_room_pages/room_settings/add_selected_users_settings.dart';
+import 'package:atdel/src/host_room_pages/room_settings/show_selected_users.dart';
 
 // title selected users
 class SelectedUsersTitle extends StatelessWidget {
@@ -107,7 +108,12 @@ class ShowSelectedUsersButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.people_alt_outlined),
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ShowSelectedUsersPage()));
+      },
       title: const Text("Show Selected Users"),
     );
   }
