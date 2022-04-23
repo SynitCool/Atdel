@@ -13,6 +13,9 @@ import 'package:atdel/src/services/room_services.dart';
 // model
 import 'package:atdel/src/model/room.dart';
 
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+
 // old attendance with ml settings
 class OldAttendanceWithMlSetting extends ConsumerWidget {
   const OldAttendanceWithMlSetting({Key? key}) : super(key: key);
@@ -48,7 +51,7 @@ class UpdateAttendanceWithMlButton extends ConsumerWidget {
           if (selectedRoomProvider.room!.attendanceWithMl == attendanceWithMl) {
             Navigator.pop(context);
           }
-          
+
           if (selectedRoomProvider.room!.attendanceWithMl == attendanceWithMl) {
             return;
           }
@@ -59,7 +62,8 @@ class UpdateAttendanceWithMlButton extends ConsumerWidget {
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",

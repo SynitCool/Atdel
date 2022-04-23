@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/host_settings_pages.dart';
 
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
 // settings page
 class HostSettingsPage extends StatefulWidget {
   const HostSettingsPage({Key? key}) : super(key: key);
@@ -24,53 +30,20 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 }
 
 // content settings
-class ContentSettings extends StatelessWidget {
+class ContentSettings extends ConsumerWidget {
   const ContentSettings({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedRoomProvider = ref.watch(selectedRoom);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
-        children: const [
-          GeneralTitle(),
-          SizedBox(
-            height: 5,
-          ),
-          SettingsRoomButton(),
-          SizedBox(
-            height: 15,
-          ),
-          OptionsTitle(),
-          SizedBox(
-            height: 5,
-          ),
-          RoomNameOptionButton(),
-          SizedBox(
-            height: 10,
-          ),
-          PrivateRoomOptionButton(),
-          SizedBox(
-            height: 10,
-          ),
-          AttendanceWithMlOptionButton(),
-          SizedBox(
-            height: 15,
-          ),
-          PrivateRoomControlTitle(),
-          SizedBox(
-            height: 10,
-          ),
-          SelectedUsersButton(),
-          SizedBox(
-            height: 15,
-          ),
-          SelectedUsersPicturesMlButton(),
-          SizedBox(
-            height: 50,
-          ),
-          DangerZoneTitle(),
-          DisperseButton(),
+        children: [
+          const GeneralSections(),
+          const OptionsSections(),
+          selectedRoomProvider.room!.privateRoom ?  const PrivateRoomControlSections() : Column(),
+          const DangerZoneSections(),
         ],
       ),
     );

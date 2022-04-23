@@ -18,6 +18,8 @@ import 'package:atdel/src/host_room_pages/room_settings/widgets/attendance_with_
 import 'package:atdel/src/host_room_pages/room_settings/widgets/private_room_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/widgets/room_name_settings.dart';
 
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
 
 // update room button
 class UpdateRoomButton extends ConsumerWidget {
@@ -85,7 +87,7 @@ class UpdateRoomButton extends ConsumerWidget {
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
-          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",
@@ -216,4 +218,3 @@ class _AttendanceWithMlSettings extends State<AttendanceWithMlSettings> {
     );
   }
 }
-

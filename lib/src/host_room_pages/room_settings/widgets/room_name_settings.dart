@@ -13,6 +13,8 @@ import 'package:atdel/src/services/room_services.dart';
 // model
 import 'package:atdel/src/model/room.dart';
 
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
 
 // old room widget
 class OldRoomTextField extends ConsumerWidget {
@@ -63,7 +65,7 @@ class UpdateRoomNameButton extends ConsumerWidget {
           if (selectedRoomProvider.room!.roomName == roomName) {
             Navigator.pop(context);
           }
-          
+
           if (selectedRoomProvider.room!.roomName == roomName) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
@@ -72,7 +74,8 @@ class UpdateRoomNameButton extends ConsumerWidget {
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",

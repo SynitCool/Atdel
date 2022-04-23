@@ -13,6 +13,9 @@ import 'package:atdel/src/services/room_services.dart';
 // model
 import 'package:atdel/src/model/room.dart';
 
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+
 // old private room settings
 class OldPrivateRoomSetting extends ConsumerWidget {
   const OldPrivateRoomSetting({Key? key}) : super(key: key);
@@ -48,7 +51,7 @@ class UpdatePrivateRoomButton extends ConsumerWidget {
           if (selectedRoomProvider.room!.privateRoom == privateRoom) {
             Navigator.pop(context);
           }
-          
+
           if (selectedRoomProvider.room!.privateRoom == privateRoom) return;
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
@@ -57,7 +60,8 @@ class UpdatePrivateRoomButton extends ConsumerWidget {
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",
