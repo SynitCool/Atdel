@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // widgets
-import 'package:atdel/src/host_room_pages/private_room_control/widgets/private_room.dart';
+import 'package:atdel/src/host_room_pages/room_settings/widgets/private_room.dart';
 
 // private room
 class PrivateRoom extends StatefulWidget {

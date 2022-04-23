@@ -11,7 +11,7 @@ import 'package:atdel/src/host_room_pages/room_settings/settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/private_room_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/attendance_with_ml_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/room_name_settings.dart';
-import 'package:atdel/src/host_room_pages/private_room_control/private_room.dart';
+import 'package:atdel/src/host_room_pages/room_settings/private_room.dart';
 
 // disperse button
 class DisperseButton extends ConsumerWidget {
