@@ -64,7 +64,6 @@ class UpdateAttendanceWithMlButton extends ConsumerWidget {
 
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
-          ;
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",
