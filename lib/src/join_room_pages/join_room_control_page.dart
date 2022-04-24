@@ -17,14 +17,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // widgets
 import 'package:atdel/src/join_room_pages/widgets/join_room_control_page.dart';
 
-// services
-import 'package:atdel/src/services/user_room_services.dart';
-
-// providers
-import 'package:atdel/src/providers/current_user_providers.dart';
-import 'package:atdel/src/providers/selected_room_providers.dart';
-import 'package:atdel/src/providers/selected_user_room_providers.dart';
-
 // page
 class JoinRoomControl extends ConsumerStatefulWidget {
   const JoinRoomControl({Key? key}) : super(key: key);
@@ -47,23 +39,6 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
   // controller
   final AdvancedDrawerController _advancedDrawerController =
       AdvancedDrawerController();
-
-  // set selected user in user room
-  Future setSelectedUserRoom() async {
-    // services
-    final UserRoomService userRoomService = UserRoomService();
-
-    // providers
-    final currentUserProvider = ref.watch(currentUser);
-    final selectedRoomProvider = ref.watch(selectedRoom);
-    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
-
-    // current user in user room
-    final user = await userRoomService.getUserFromUsersRoom(
-        selectedRoomProvider.room!, currentUserProvider.user!);
-
-    selectedUserRoomProvider.setUserRoom = user;
-  }
 
   // leading appbar
   Widget leadingAppBar() => IconButton(
@@ -137,7 +112,6 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
 
   @override
   Widget build(BuildContext context) {
-    setSelectedUserRoom();
     return AdvancedDrawer(
         controller: _advancedDrawerController,
         backdropColor: Colors.blueGrey,

@@ -20,6 +20,7 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 
 // services
 import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/user_room_services.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
@@ -30,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
+import 'package:atdel/src/providers/selected_user_room_providers.dart';
 
 // add room button widget
 class AddRoomButton extends StatelessWidget {
@@ -131,15 +133,26 @@ class RoomButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // provider
     final _currentUserProvider = ref.watch(currentUser);
     final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedUserRoomProvider = ref.watch(selectedUserRoom);
+
+    // services
+    final UserRoomService userRoomService = UserRoomService();
+
     return Card(
         margin: cardPadding,
         shape: shape(),
         child: ListTile(
-          onTap: () {
+          onTap: () async {
+            final user = await userRoomService.getUserFromUsersRoom(
+                room, _currentUserProvider.user!);
+
+            _selectedUserRoomProvider.setUserRoom = user;
+            _selectedRoomProvider.setRoom = room;
+
             if (room.hostUid == _currentUserProvider.user!.uid) {
-              _selectedRoomProvider.setRoom = room;
               _selectedRoomProvider.setTypeRoom = "host";
               Navigator.push(
                   context,
@@ -148,7 +161,6 @@ class RoomButtonWidget extends ConsumerWidget {
               return;
             }
 
-            _selectedRoomProvider.setRoom = room;
             _selectedRoomProvider.setTypeRoom = "join";
 
             Navigator.push(
@@ -158,7 +170,7 @@ class RoomButtonWidget extends ConsumerWidget {
             return;
           },
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(room.hostPhotoUrl), radius: 30), 
+              backgroundImage: NetworkImage(room.hostPhotoUrl), radius: 30),
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
@@ -282,4 +294,3 @@ class TextWidget extends StatelessWidget {
         ));
   }
 }
-
