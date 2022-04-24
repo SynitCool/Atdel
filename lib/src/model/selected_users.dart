@@ -4,20 +4,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class SelectedUsers {
   final String alias;
   final String email;
+  final bool joined;
 
-  SelectedUsers({required this.alias, required this.email});
+  SelectedUsers(
+      {required this.alias, required this.email, required this.joined});
 
   factory SelectedUsers.fromFireStore(
       DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data();
 
-    return SelectedUsers(alias: data!["alias"], email: data["email"]);
+    return SelectedUsers(
+        alias: data!["alias"], email: data["email"], joined: data["joined"]);
   }
 
-  factory SelectedUsers.fromMap(Map<String, dynamic> map) =>
-      SelectedUsers(alias: map["alias"], email: map["email"]);
+  factory SelectedUsers.fromMap(Map<String, dynamic> map) => SelectedUsers(
+      alias: map["alias"], email: map["email"], joined: map["joined"]);
 
-  Map<String, dynamic> toMap() => {"alias": alias, "email": email};
-
-  
+  Map<String, dynamic> toMap() =>
+      {"alias": alias, "email": email, "joined": joined};
 }

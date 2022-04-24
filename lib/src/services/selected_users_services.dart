@@ -26,6 +26,19 @@ class SelectedUsersServices {
     }
   }
 
+  // remove selected users
+  Future removeSelectedUsers(Room room, SelectedUsers selectedUsers) async {
+    // collection
+    final collectionPath = "$rootRoomCollection/${room.id}/selected_users";
+
+    final collection = _db.collection(collectionPath);
+
+    final doc = collection.doc(selectedUsers.email);
+
+    // remove selected user
+    await doc.delete();
+  }
+
   // stream selected users
   Stream<List<SelectedUsers>> streamSelectedUsers(Room room) {
     final collection =
