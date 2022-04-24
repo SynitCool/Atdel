@@ -145,6 +145,7 @@ class RoomButtonWidget extends ConsumerWidget {
     final UserRoomService userRoomService = UserRoomService();
 
     return Card(
+        elevation: 15,
         margin: cardPadding,
         shape: shape(),
         child: ListTile(
