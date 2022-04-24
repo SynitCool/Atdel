@@ -18,6 +18,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
+// pages
+import 'package:atdel/src/user_pages/room.dart';
 
 // set image button
 class SetImageButton extends ConsumerWidget {
@@ -70,6 +72,64 @@ class LeaveRoomButton extends ConsumerWidget {
         _roomService.leaveRoom(_selectedRoomProvider.room!);
 
         Navigator.pop(context);
+      },
+    );
+  }
+}
+
+// machine learning related title
+class MachineLearningRelatedTitle extends StatelessWidget {
+  const MachineLearningRelatedTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      "Machine Learning Related",
+      style: TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),
+    );
+  }
+}
+
+// danger zone title
+class DangerZoneTitle extends StatelessWidget {
+  const DangerZoneTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      "DANGER ZONE",
+      style: TextStyle(fontSize: 20, color: Colors.red),
+    );
+  }
+}
+
+// general
+class GeneralTitle extends StatelessWidget {
+  const GeneralTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      "General",
+      style: TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),
+    );
+  }
+}
+
+// set join user room button
+class SetJoinUserRoomButton extends StatelessWidget {
+  const SetJoinUserRoomButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.person),
+      title: const Text("Set User"),
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const JoinUserRoomPage()));
       },
     );
   }
