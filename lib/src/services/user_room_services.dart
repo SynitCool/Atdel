@@ -91,6 +91,20 @@ class UserRoomService {
     return List<UserRoom>.from(usersRoomNoHost);
   }
 
+  // update user room
+  Future updateUserRoom(
+      Room room, UserRoom oldUserRoom, UserRoom newUserRoom) async {
+    // collection
+    final collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final collection = _db.collection(collectionPath);
+
+    final doc = collection.doc(oldUserRoom.uid);
+
+    // update user room
+    await doc.update(newUserRoom.toMap());
+  }
+
   // stream user room
   Stream<List<UserRoom>> streamUsersRoom(Room room) {
     final String collectionPath = "$rootRoomsCollection/${room.id}/users";

@@ -54,6 +54,13 @@ class _ContentPageState extends State<ContentPage> {
 
   List<Map<String, dynamic>> addedSelectedUsers = [];
 
+  @override
+  void dispose() {
+    userAliasController.dispose();
+    userEmailController.dispose();
+    super.dispose();
+  }
+
   // user alias error text field
   String? get userAliasErrorText {
     final String text = userAliasController.value.text;

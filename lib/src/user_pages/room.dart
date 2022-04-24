@@ -6,15 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // providers
 import 'package:atdel/src/providers/selected_user_room_providers.dart';
-import 'package:atdel/src/providers/selected_room_providers.dart';
-
-// services
-import 'package:atdel/src/services/user_room_services.dart';
-import 'package:atdel/src/services/room_services.dart';
 
 // model
 import 'package:atdel/src/model/user_room.dart';
-import 'package:atdel/src/model/room.dart';
+
+// widgets
+import 'package:atdel/src/user_pages/widgets/room.dart';
 
 // user room page
 class UserRoomPage extends StatelessWidget {
@@ -45,7 +42,7 @@ class BuildContent extends ConsumerWidget {
     final selectedUserRoomProvider = ref.watch(selectedUserRoom);
     return Column(children: [
       const SizedBox(height: 8),
-      Text(selectedUserRoomProvider.userRoom!.displayName,
+      Text(selectedUserRoomProvider.userRoom!.alias,
           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
       const SizedBox(height: 8),
       Text(
@@ -55,112 +52,21 @@ class BuildContent extends ConsumerWidget {
       const SizedBox(height: 16),
       const Divider(),
       const SizedBox(height: 16),
-      Container(
+      Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-            children: const [MakeHostRoomButton(), KickUserRoomButton()]),
+        child: ListView(
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            children: const [
+              SettingsTitle(),
+              SizedBox(height: 10),
+              ChangeUserAliasTextField(),
+              SizedBox(height: 20),
+              OptionsTitle(),
+              MakeHostRoomButton(),
+              KickUserRoomButton(),
+            ]),
       )
     ]);
-  }
-}
-
-// user room page top
-class BuildTop extends ConsumerWidget {
-  const BuildTop({Key? key}) : super(key: key);
-
-  final double coverHeight = 180;
-  final double profileHeight = 144;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final double top = coverHeight - profileHeight / 2;
-    final double bottom = profileHeight / 2;
-
-    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
-
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        Container(
-            margin: EdgeInsets.only(bottom: bottom),
-            child: Container(color: Colors.grey, height: coverHeight)),
-        Positioned(
-            child: CircleAvatar(
-              radius: profileHeight / 2,
-              backgroundColor: Colors.grey.shade800,
-              backgroundImage:
-                  NetworkImage(selectedUserRoomProvider.userRoom!.photoUrl),
-            ),
-            top: top)
-      ],
-    );
-  }
-}
-
-// kick user room button
-class KickUserRoomButton extends ConsumerWidget {
-  const KickUserRoomButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // services
-    final UserRoomService userRoomService = UserRoomService();
-
-    // providers
-    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
-    final selectedRoomProvider = ref.watch(selectedRoom);
-
-    return ElevatedButton.icon(
-        onPressed: () {
-          userRoomService.removeUserRoom(
-              selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
-
-          Navigator.pop(context);
-        },
-        icon: const Icon(Icons.person_remove),
-        style: ElevatedButton.styleFrom(primary: Colors.red),
-        label: const Text("Kick From The Room"));
-  }
-}
-
-// make as host room
-class MakeHostRoomButton extends ConsumerWidget {
-  const MakeHostRoomButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // services
-    final RoomService roomService = RoomService();
-
-    // providers
-    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
-    final selectedRoomProvider = ref.watch(selectedRoom);
-
-    return ElevatedButton.icon(
-        onPressed: () {
-          final Room oldRoom = Room.copy(selectedRoomProvider.room!);
-
-          final Room newRoom = Room(
-              hostEmail: selectedUserRoomProvider.userRoom!.email,
-              hostPhotoUrl: selectedUserRoomProvider.userRoom!.photoUrl,
-              hostName: selectedUserRoomProvider.userRoom!.displayName,
-              hostUid: selectedUserRoomProvider.userRoom!.uid,
-              memberCounts: selectedRoomProvider.room!.memberCounts,
-              roomDesc: selectedRoomProvider.room!.roomDesc,
-              roomName: selectedRoomProvider.room!.roomName,
-              id: selectedRoomProvider.room!.id,
-              roomCode: selectedRoomProvider.room!.roomCode,
-              privateRoom: selectedRoomProvider.room!.privateRoom,
-              attendanceWithMl: selectedRoomProvider.room!.attendanceWithMl);
-
-          roomService.updateRoomInfo(oldRoom, newRoom);
-
-          Navigator.pop(context);
-          Navigator.pop(context);
-        },
-        icon: const Icon(Icons.person_add_alt),
-        style: ElevatedButton.styleFrom(primary: Colors.grey),
-        label: const Text("Make as Host Room"));
   }
 }

@@ -11,13 +11,14 @@ class UserRoom {
   String alias;
   dynamic userReference;
 
-  UserRoom(
-      {required this.alias,
-      required this.displayName,
-      required this.email,
-      required this.photoUrl,
-      required this.uid,
-      required this.userReference,});
+  UserRoom({
+    required this.alias,
+    required this.displayName,
+    required this.email,
+    required this.photoUrl,
+    required this.uid,
+    required this.userReference,
+  });
 
   factory UserRoom.fromFirestore(DocumentSnapshot<Map<String, dynamic>?> doc) {
     final data = doc.data();
@@ -46,6 +47,14 @@ class UserRoom {
       photoUrl: user.photoURL!,
       uid: user.uid,
       userReference: "");
+
+  factory UserRoom.copy(UserRoom userRoom) => UserRoom(
+      alias: userRoom.alias,
+      displayName: userRoom.displayName,
+      email: userRoom.email,
+      photoUrl: userRoom.photoUrl,
+      uid: userRoom.uid,
+      userReference: userRoom.userReference);
 
   Map<String, dynamic> toMap() => {
         "alias": alias,
