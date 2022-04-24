@@ -149,7 +149,7 @@ class MemberButton extends ConsumerWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => UserRoomPage(userRoom: user)));
+                builder: (context) => const UserRoomPage()));
       },
       leading: CircleAvatar(
           radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
@@ -193,7 +193,7 @@ class HostButton extends ConsumerWidget {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    HostUserRoomPage(userRoom: user)));
+                    const HostUserRoomPage()));
       },
       child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20)

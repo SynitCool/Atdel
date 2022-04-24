@@ -15,9 +15,8 @@ import 'package:atdel/src/user_pages/widgets/room.dart';
 
 // user room page
 class UserRoomPage extends StatelessWidget {
-  const UserRoomPage({Key? key, required this.userRoom}) : super(key: key);
+  const UserRoomPage({Key? key}) : super(key: key);
 
-  final UserRoom userRoom;
 
   // app bar
   PreferredSizeWidget appBarWidget() => AppBar();
@@ -74,9 +73,8 @@ class BuildContent extends ConsumerWidget {
 
 // user room page
 class HostUserRoomPage extends StatelessWidget {
-  const HostUserRoomPage({Key? key, required this.userRoom}) : super(key: key);
+  const HostUserRoomPage({Key? key}) : super(key: key);
 
-  final UserRoom userRoom;
 
   // app bar
   PreferredSizeWidget appBarWidget() => AppBar();
@@ -125,3 +123,61 @@ class BuildContentHostUserRoom extends ConsumerWidget {
     ]);
   }
 }
+
+
+
+// join user room page
+class JoinUserRoomPage extends StatelessWidget {
+  const JoinUserRoomPage({Key? key}) : super(key: key);
+
+  // app bar
+  PreferredSizeWidget appBarWidget() => AppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: appBarWidget(),
+      body: ListView(
+          padding: EdgeInsets.zero,
+          children: const [BuildTop(), BuildContentHostUserRoom()]),
+    );
+  }
+}
+
+// join user room build content
+class BuildContentJoinUserRoom extends ConsumerWidget {
+  const BuildContentJoinUserRoom({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
+    return Column(children: [
+      const SizedBox(height: 8),
+      Text(selectedUserRoomProvider.userRoom!.alias,
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 8),
+      Text(
+        selectedUserRoomProvider.userRoom!.email,
+        style: const TextStyle(fontSize: 20, color: Colors.black45),
+      ),
+      const SizedBox(height: 16),
+      const Divider(),
+      const SizedBox(height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ListView(
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            children: const [
+              SettingsTitle(),
+              SizedBox(height: 10),
+              ChangeUserAliasTextField(),
+            ]),
+      )
+    ]);
+  }
+}
+
+
+
+

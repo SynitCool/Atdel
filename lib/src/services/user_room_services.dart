@@ -7,6 +7,7 @@ import 'package:atdel/src/services/room_services.dart';
 
 // model
 import 'package:atdel/src/model/user_room.dart';
+import 'package:atdel/src/model/user.dart';
 import 'package:atdel/src/model/room.dart';
 
 class UserRoomService {
@@ -27,6 +28,22 @@ class UserRoomService {
         getCollection.docs.map((data) => UserRoom.fromMap(data.data()));
 
     return usersRoom.toList();
+  }
+
+  // get user from users room
+  Future<UserRoom> getUserFromUsersRoom(Room room, User user) async {
+    // collection
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final doc = collection.doc(user.uid);
+
+    // get user
+    final getDoc = await doc.get();
+
+    return UserRoom.fromFirestore(getDoc);
   }
 
   // get users room

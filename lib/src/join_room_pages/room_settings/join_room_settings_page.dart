@@ -36,17 +36,13 @@ class _ContentPageState extends State<ContentPage> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: const [
-          Text(
-            "Machine Learning Related",
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),
-          ),
+          GeneralTitle(),
+          SetJoinUserRoomButton(),
+          SizedBox(height: 20),
+          MachineLearningRelatedTitle(),
           SetImageButton(),
-          SizedBox(height: 30),
-          Text(
-            "DANGER ZONE",
-            style: TextStyle(fontSize: 20, color: Colors.red),
-          ),
+          SizedBox(height: 50),
+          DangerZoneTitle(),
           LeaveRoomButton()
         ],
       ),
