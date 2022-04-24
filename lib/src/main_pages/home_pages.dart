@@ -30,18 +30,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // appbar widget
   PreferredSizeWidget appBarWidget() => AppBar(
-        title: const Text("Atdel Demo"),
-        elevation: 5,
+        // title: const Text("Atdel Demo"),
+        elevation: 0,
         actions: const [SettingsButton()],
       );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        drawer: const DrawerWidget(),
-        appBar: appBarWidget(),
-        body: const ContentPage(),
-        floatingActionButton: const AddRoomButton());
+    return const Scaffold(
+        drawer: CustomDrawer(),
+        body: ContentPage(),
+        floatingActionButton: AddRoomButton());
   }
 }
 
@@ -58,27 +57,34 @@ class ContentPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(currentUser);
     final _userService = UserService();
-    return StreamBuilder<src_user.User>(
-        stream: _userService.streamUser(provider.user!),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
-          }
+    return ListView(
+      children: [
+        CustomAppBar(height: MediaQuery.of(context).size.height),
+        StreamBuilder<src_user.User>(
+            stream: _userService.streamUser(provider.user!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return loadingScene;
+              }
 
-          if (snapshot.hasError) return errorScene;
+              if (snapshot.hasError) return errorScene;
 
-          final data = snapshot.data;
-          final references = data!.roomReferences;
+              final data = snapshot.data;
+              final references = data!.roomReferences;
 
-          if (references.isEmpty) return noRoomsScene;
+              if (references.isEmpty) return noRoomsScene;
 
-          return ListView.builder(
-              itemCount: references.length,
-              itemBuilder: (context, index) {
-                final currentReference = references[index];
+              return ListView.builder(
+                  itemCount: references.length,
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final currentReference = references[index];
 
-                return RoomStreamBuilder(reference: currentReference);
-              });
-        });
+                    return RoomStreamBuilder(reference: currentReference);
+                  });
+            }),
+      ],
+    );
   }
 }

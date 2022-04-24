@@ -31,8 +31,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
-
-
 // add room button widget
 class AddRoomButton extends StatelessWidget {
   const AddRoomButton({Key? key}) : super(key: key);
@@ -71,8 +69,6 @@ class AddRoomButton extends StatelessWidget {
   }
 }
 
-
-
 // room stream builder
 class RoomStreamBuilder extends StatelessWidget {
   const RoomStreamBuilder({Key? key, required this.reference})
@@ -102,7 +98,6 @@ class RoomStreamBuilder extends StatelessWidget {
         });
   }
 }
-
 
 // room button widget
 class RoomButtonWidget extends ConsumerWidget {
@@ -162,7 +157,8 @@ class RoomButtonWidget extends ConsumerWidget {
                     builder: (context) => const JoinRoomControl()));
             return;
           },
-          leading: Icon(icon),
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(room.hostPhotoUrl), radius: 30), 
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
@@ -177,7 +173,6 @@ class RoomButtonWidget extends ConsumerWidget {
   }
 }
 
-
 // settings button
 class SettingsButton extends StatelessWidget {
   const SettingsButton({Key? key}) : super(key: key);
@@ -189,6 +184,102 @@ class SettingsButton extends StatelessWidget {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SettingsPages()));
         },
-        icon: const Icon(Icons.settings));
+        icon: const CircleAvatar(
+            backgroundColor: Colors.white,
+            radius: 30,
+            child: Icon(
+              Icons.settings,
+              size: 20,
+            )));
   }
 }
+
+// custom app bar
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({
+    Key? key,
+    required this.height,
+  }) : super(key: key);
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height * 0.28,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(40),
+              bottomLeft: Radius.circular(40))),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(top: 50, left: 23, right: 23, bottom: 23),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                TextWidget(
+                    text: "Atdel",
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600),
+                SettingsButton()
+                // IconButton(
+                //     onPressed: () {
+                //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                //           content: Text(
+                //               'You currently don\'t have any notifications')));
+                //     },
+                //     icon: const CircleAvatar(
+                //         backgroundColor: Colors.white,
+                //         radius: 30,
+                //         child: Icon(
+                //           Icons.add_alert,
+                //           size: 20,
+                //         ))),
+              ],
+            ),
+            Row(
+              children: const [
+                TextWidget(
+                    text: "An amazing app to take attendance.",
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// text widget for custom app bar
+class TextWidget extends StatelessWidget {
+  final String text;
+  final double fontSize;
+  final Color color;
+  final FontWeight fontWeight;
+  const TextWidget(
+      {Key? key,
+      required this.text,
+      required this.fontSize,
+      required this.color,
+      required this.fontWeight})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+        ));
+  }
+}
+
