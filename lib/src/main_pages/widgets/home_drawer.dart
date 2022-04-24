@@ -395,7 +395,13 @@ class BottomUserInfo extends ConsumerWidget {
                 ),
                 Expanded(
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final provider = GoogleSignInProvider();
+
+                      provider.googleLogout();
+
+                      Navigator.pop(context);
+                    },
                     icon: const Icon(
                       Icons.logout,
                       color: Colors.white,
