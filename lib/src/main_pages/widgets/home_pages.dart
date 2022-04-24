@@ -157,7 +157,8 @@ class RoomButtonWidget extends ConsumerWidget {
                     builder: (context) => const JoinRoomControl()));
             return;
           },
-          leading: Icon(icon),
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(room.hostPhotoUrl), radius: 30), 
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
