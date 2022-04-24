@@ -70,3 +70,58 @@ class BuildContent extends ConsumerWidget {
     ]);
   }
 }
+
+
+// user room page
+class HostUserRoomPage extends StatelessWidget {
+  const HostUserRoomPage({Key? key, required this.userRoom}) : super(key: key);
+
+  final UserRoom userRoom;
+
+  // app bar
+  PreferredSizeWidget appBarWidget() => AppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: appBarWidget(),
+      body: ListView(
+          padding: EdgeInsets.zero,
+          children: const [BuildTop(), BuildContentHostUserRoom()]),
+    );
+  }
+}
+
+// build content
+class BuildContentHostUserRoom extends ConsumerWidget {
+  const BuildContentHostUserRoom({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
+    return Column(children: [
+      const SizedBox(height: 8),
+      Text(selectedUserRoomProvider.userRoom!.alias,
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 8),
+      Text(
+        selectedUserRoomProvider.userRoom!.email,
+        style: const TextStyle(fontSize: 20, color: Colors.black45),
+      ),
+      const SizedBox(height: 16),
+      const Divider(),
+      const SizedBox(height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ListView(
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            children: const [
+              SettingsTitle(),
+              SizedBox(height: 10),
+              ChangeUserAliasTextField(),
+            ]),
+      )
+    ]);
+  }
+}

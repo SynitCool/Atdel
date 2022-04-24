@@ -178,14 +178,23 @@ class MemberButton extends ConsumerWidget {
 }
 
 // host button
-class HostButton extends StatelessWidget {
+class HostButton extends ConsumerWidget {
   const HostButton({Key? key, required this.user}) : super(key: key);
 
   final UserRoom user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedUserRoomProvider = ref.watch(selectedUserRoom);
     return InkWell(
+      onTap: () {
+        selectedUserRoomProvider.setUserRoom = user;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    HostUserRoomPage(userRoom: user)));
+      },
       child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20)
               .add(const EdgeInsets.symmetric(vertical: 40)),
