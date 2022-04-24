@@ -111,9 +111,6 @@ class RoomService {
 
   // join room with code
   Future joinRoomWithCode(String code, String userAlias) async {
-    // current user
-    final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
-
     // room codes doc
     final CollectionReference<Map<String, dynamic>> roomCodesCollection =
         _db.collection(rootCodesCollection);
@@ -135,30 +132,34 @@ class RoomService {
     final Map<String, dynamic> roomCodesMap = getRoomCodesDoc.data()!;
 
     // check valid code
-    if (!roomCodesMap.containsKey(code)) return;
+    if (!roomCodesMap.containsKey(code)) return "code_not_valid";
+
+    // room doc
+    final roomDoc = await roomCodesMap[code].get();
+    final room = Room.fromFirestore(roomDoc);
+
+    // check if room is private
+    if (room.privateRoom) return "room_is_private";
 
     // room users doc and update room users
     final CollectionReference<Map<String, dynamic>> roomUsersCollection =
         _db.collection("${roomCodesMap[code].path}/users");
 
     final DocumentReference<Map<String, dynamic>> roomUsersDoc =
-        roomUsersCollection.doc(authUser.uid);
+        roomUsersCollection.doc(authUser!.uid);
 
     // update the user references
-    final DocumentSnapshot<Map<String, dynamic>> getUsersDoc =
-        await usersDoc.get();
+    final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
 
-    final model.User userModel = model.User.fromFirestore(getUsersDoc);
+    model.User oldUser = model.User.fromFirestore(getDoc);
+    model.User newUser = model.User.copy(oldUser);
 
-    userModel.roomReferences.add(roomCodesMap[code]);
-    userModel.setUserReference = usersDoc;
+    newUser.roomReferences.add(roomCodesMap[code]);
 
-    Map<String, dynamic> userModelInfo = userModel.toMap();
-
-    await usersDoc.update(userModelInfo);
+    await _userService.updateUser(oldUser, newUser);
 
     // update room users
-    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser);
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
     userRoom.setUserReference = usersDoc;
     userRoom.setAlias = userAlias;
 
@@ -167,9 +168,6 @@ class RoomService {
     await roomUsersDoc.set(userRoomMap);
 
     // update room info
-    final roomDoc = await roomCodesMap[code].get();
-    final room = Room.fromFirestore(roomDoc);
-
     updateMembersCount(room, true);
   }
 
