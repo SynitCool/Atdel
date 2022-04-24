@@ -126,10 +126,10 @@ class JoinRoomButton extends StatelessWidget {
               if (status == "code_not_valid") return;
               
 
-              if (status == "room_is_private") {
-                showDialogError(context, "room_is_private");
+              if (status == "user_not_include") {
+                showDialogError(context, "user_not_include");
               }
-              if (status == "room_is_private") return;
+              if (status == "user_not_include") return;
 
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const HomePage()));

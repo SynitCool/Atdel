@@ -1,5 +1,6 @@
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 // model
 import 'package:atdel/src/model/user.dart' as model;
@@ -7,13 +8,14 @@ import 'package:atdel/src/model/room.dart';
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final auth.User? authUser = auth.FirebaseAuth.instance.currentUser; 
 
-  final String rootUsersPath = "users";
+  final String rootUsersCollection = "users";
 
   // get user info from database
   Future<model.User> getUserInfo(String userUid) async {
     final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootUsersPath);
+        _db.collection(rootUsersCollection);
 
     final DocumentReference<Map<String, dynamic>> doc = collection.doc(userUid);
 
@@ -26,7 +28,7 @@ class UserService {
   Future removeRoomReference(String userUid, Room room) async {
     // collection users
     final CollectionReference<Map<String, dynamic>> collectionUsers =
-        _db.collection(rootUsersPath);
+        _db.collection(rootUsersCollection);
 
     final DocumentReference<Map<String, dynamic>> docUser =
         collectionUsers.doc(userUid);
@@ -48,7 +50,7 @@ class UserService {
   Future addUserToDatabase(model.User user) async {
     // make collection
     final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootUsersPath);
+        _db.collection(rootUsersCollection);
 
     final DocumentReference<Map<String, dynamic>> doc =
         collection.doc(user.uid);
@@ -66,10 +68,20 @@ class UserService {
     await doc.set(userInfo);
   }
 
+  // update room preferences
+  Future addRoomPreferences(
+      DocumentReference<Map<String, dynamic>> roomReference, model.User oldUser) async {
+    model.User newUser = model.User.copy(oldUser);
+
+    newUser.roomReferences.add(roomReference);
+
+    await updateUser(oldUser, newUser);
+  }
+
   // update user
   Future updateUser(model.User oldUser, model.User newUser) async {
     // collection
-    final collection = _db.collection(rootUsersPath);
+    final collection = _db.collection(rootUsersCollection);
 
     final doc = collection.doc(oldUser.uid);
 
@@ -80,7 +92,7 @@ class UserService {
   // stream user
   Stream<model.User> streamUser(model.User user) {
     final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootUsersPath);
+        _db.collection(rootUsersCollection);
 
     final DocumentReference<Map<String, dynamic>> doc =
         collection.doc(user.uid);

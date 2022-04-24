@@ -1,4 +1,5 @@
 // firebase
+import 'package:atdel/src/model/selected_users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
@@ -12,6 +13,7 @@ import 'package:atdel/src/services/user_room_services.dart';
 import 'package:atdel/src/services/user_photo_metrics_services.dart';
 import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
+import 'package:atdel/src/services/selected_users_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -22,6 +24,8 @@ class RoomService {
 
   final RoomCodesService _roomCodesService = RoomCodesService();
   final UserService _userService = UserService();
+  final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+  final UserRoomService _userRoomService = UserRoomService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -139,33 +143,46 @@ class RoomService {
     final room = Room.fromFirestore(roomDoc);
 
     // check if room is private
-    if (room.privateRoom) return "room_is_private";
+    if (room.privateRoom) {
+      final user = await _selectedUsersServices.getSelectedUsersByEmail(
+          room, model.User.fromFirebaseAuth(authUser!));
 
-    // room users doc and update room users
-    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
-        _db.collection("${roomCodesMap[code].path}/users");
+      if (user == null) return "user_not_include";
 
-    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
-        roomUsersCollection.doc(authUser!.uid);
+      // update the user references
+      _userService.addRoomPreferences(
+          roomCodesMap[code], model.User.fromFirestore(await usersDoc.get()));
+
+      // update room users
+      final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
+      userRoom.setUserReference = usersDoc;
+      userRoom.setAlias = user.alias;
+
+      _userRoomService.addUserRoomByReference(roomCodesMap[code], userRoom);
+
+      // update room info
+      updateMembersCount(room, true);
+
+      // update selected users
+      SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
+
+      user.setJoined = true;
+
+      _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+
+      return;
+    }
 
     // update the user references
-    final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
-
-    model.User oldUser = model.User.fromFirestore(getDoc);
-    model.User newUser = model.User.copy(oldUser);
-
-    newUser.roomReferences.add(roomCodesMap[code]);
-
-    await _userService.updateUser(oldUser, newUser);
+    _userService.addRoomPreferences(
+        roomCodesMap[code], model.User.fromFirestore(await usersDoc.get()));
 
     // update room users
     final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
     userRoom.setUserReference = usersDoc;
     userRoom.setAlias = userAlias;
 
-    Map<String, dynamic> userRoomMap = userRoom.toMap();
-
-    await roomUsersDoc.set(userRoomMap);
+    _userRoomService.addUserRoomByReference(roomCodesMap[code], userRoom);
 
     // update room info
     updateMembersCount(room, true);

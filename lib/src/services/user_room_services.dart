@@ -1,5 +1,6 @@
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 // services
 import 'package:atdel/src/services/user_services.dart';
@@ -12,8 +13,24 @@ import 'package:atdel/src/model/room.dart';
 
 class UserRoomService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
   final String rootRoomsCollection = "rooms";
+
+  // add user room
+  Future addUserRoomByReference(
+      DocumentReference<Map<String, dynamic>> roomReference,
+      UserRoom userRoom) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection("${roomReference.path}/users");
+
+    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
+        roomUsersCollection.doc(userRoom.uid);
+
+    // set to user room
+    await roomUsersDoc.set(userRoom.toMap());
+  }
 
   // get members room
   Future<List<UserRoom>> getMembersRoom(Room room) async {

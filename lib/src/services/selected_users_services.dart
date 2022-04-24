@@ -4,11 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // model
 import 'package:atdel/src/model/selected_users.dart';
 import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/user.dart';
 
 class SelectedUsersServices {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final String rootRoomCollection = "rooms";
+
+  // check selected users
+  Future<SelectedUsers?> getSelectedUsersByEmail(Room room, User user) async {
+    // collection
+    final collection =
+        _db.collection("$rootRoomCollection/${room.id}/selected_users");
+
+    final doc = collection.doc(user.email);
+
+    // check doc
+    final getDoc = await doc.get();
+
+    if (!getDoc.exists) return null;
+
+    return SelectedUsers.fromFireStore(getDoc);
+  }
 
   // add selected users to database
   Future addSelectedUsers(
@@ -37,6 +54,20 @@ class SelectedUsersServices {
 
     // remove selected user
     await doc.delete();
+  }
+
+  // update selected user
+  Future updateSelectedUser(Room room, SelectedUsers oldSelectedUsers,
+      SelectedUsers newSelectedUsers) async {
+    // collection
+    final collectionPath = "$rootRoomCollection/${room.id}/selected_users";
+
+    final collection = _db.collection(collectionPath);
+
+    final doc = collection.doc(oldSelectedUsers.email);
+
+    // update
+    await doc.update(newSelectedUsers.toMap());
   }
 
   // stream selected users
