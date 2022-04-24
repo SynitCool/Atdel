@@ -7,9 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/selected_user_room_providers.dart';
 
-// model
-import 'package:atdel/src/model/user_room.dart';
-
 // widgets
 import 'package:atdel/src/user_pages/widgets/room.dart';
 

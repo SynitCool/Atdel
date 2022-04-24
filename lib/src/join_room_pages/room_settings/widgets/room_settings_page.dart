@@ -2,7 +2,6 @@
 import 'dart:io';
 
 // flutter
-import 'package:atdel/src/providers/selected_user_room_providers.dart';
 import 'package:flutter/material.dart';
 
 // picker
