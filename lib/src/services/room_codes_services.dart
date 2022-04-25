@@ -48,4 +48,25 @@ class RoomCodesService {
 
     return Room.fromFirestore(await roomCodesMap[code].get());
   }
+
+
+  // delete room code
+  Future deleteRoomCode(Room room) async {
+    // room codes collection
+    final CollectionReference<Map<String, dynamic>> roomCodesCollection =
+        _db.collection(rootCodesCollection);
+
+    final DocumentReference<Map<String, dynamic>> roomCodesDoc =
+        roomCodesCollection.doc(docRoomCodes);
+
+    // delete room code
+    final DocumentSnapshot<Map<String, dynamic>> getRoomCodes =
+        await roomCodesDoc.get();
+
+    final Map<String, dynamic>? roomCodesMap = getRoomCodes.data();
+
+    roomCodesMap!.remove(room.roomCode);
+
+    await roomCodesDoc.set(roomCodesMap);
+  }
 }

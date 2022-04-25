@@ -19,6 +19,42 @@ class UserRoomService {
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
 
+  // delete all users room
+  Future deleteUsersRooms(Room room) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/users");
+
+    // delete all users rooms
+    roomUsersCollection.get().then((snapshot) {
+      for (final snap in snapshot.docs) {
+        snap.reference.delete();
+      }
+    });
+  }
+
+  // delete user rooms room reference
+  Future deleteUserRoomRoomReference(Room room) async {
+    // stream
+    final Stream<List<UserRoom>> streamRoomUsers = streamUsersRoom(room);
+
+    streamRoomUsers.forEach((elements) async {
+      for (final element in elements) {
+        final DocumentSnapshot<Map<String, dynamic>> getUserReference =
+            await element.userReference.get();
+
+        final User user = User.fromMap(getUserReference.data()!);
+
+        user.roomReferences
+            .remove(_db.collection(rootRoomsCollection).doc(room.id));
+
+        final Map<String, dynamic> map = user.toMap();
+
+        await element.userReference.update(map);
+      }
+    });
+  }
+
   // set host user as user room
   Future setHostUserRoom(Room room, String hostAlias) async {
     // room users collections

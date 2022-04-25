@@ -14,6 +14,7 @@ import 'package:atdel/src/services/user_photo_metrics_services.dart';
 import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/services/selected_users_services.dart';
+import 'package:atdel/src/services/attendance_list_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -28,6 +29,7 @@ class RoomService {
   final UserRoomService _userRoomService = UserRoomService();
   final UserPhotoMetricService _userPhotoMetricService =
       UserPhotoMetricService();
+  final AttendanceListService _attendanceListService = AttendanceListService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -190,8 +192,8 @@ class RoomService {
     await doc.update(map);
   }
 
-  // delete room
-  Future deleteRoomFromDatabase(Room room) async {
+  // delete room doc
+  Future deleteRoomDoc(Room room) async {
     // room doc
     final CollectionReference<Map<String, dynamic>> roomCollection =
         _db.collection(rootRoomsCollection);
@@ -199,81 +201,29 @@ class RoomService {
     final DocumentReference<Map<String, dynamic>> roomDoc =
         roomCollection.doc(room.id);
 
-    // room codes code
-    final CollectionReference<Map<String, dynamic>> roomCodesCollection =
-        _db.collection(rootCodesCollection);
-
-    final DocumentReference<Map<String, dynamic>> roomCodesDoc =
-        roomCodesCollection.doc("room_codes");
-
-    // delete room code
-    final DocumentSnapshot<Map<String, dynamic>> getRoomCodes =
-        await roomCodesDoc.get();
-
-    final Map<String, dynamic>? roomCodesMap = getRoomCodes.data();
-
-    roomCodesMap!.remove(room.roomCode);
-
-    await roomCodesDoc.set(roomCodesMap);
-
-    // delete users room references
-    final userRoomService = UserRoomService();
-    final Stream<List<UserRoom>> streamRoomUsers =
-        userRoomService.streamUsersRoom(room);
-
-    streamRoomUsers.forEach((elements) async {
-      for (final element in elements) {
-        final DocumentSnapshot<Map<String, dynamic>> getUserReference =
-            await element.userReference.get();
-
-        final model.User user = model.User.fromMap(getUserReference.data()!);
-
-        user.roomReferences.remove(roomDoc);
-
-        final Map<String, dynamic> map = user.toMap();
-
-        await element.userReference.update(map);
-      }
-    });
-
     // delete room from database
     await roomDoc.delete();
+  }
+
+  // delete room
+  Future deleteRoomFromDatabase(Room room) async {
+    // delete room code
+    await _roomCodesService.deleteRoomCode(room);
+
+    // delete users room references
+    await _userRoomService.deleteUserRoomRoomReference(room);
+
+    // delete room from database
+    await deleteRoomDoc(room);
 
     // delete all room users
-    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
-        _db.collection("$rootRoomsCollection/${room.id}/users");
-
-    roomUsersCollection.get().then((snapshot) {
-      for (final snap in snapshot.docs) {
-        snap.reference.delete();
-      }
-    });
+    await _userRoomService.deleteUsersRooms(room);
 
     // delete all attendance list
-    final CollectionReference<Map<String, dynamic>> attendanceListCollection =
-        _db.collection("$rootRoomsCollection/${room.id}/attendance_list");
-
-    attendanceListCollection.get().then((snapshot) {
-      for (final snap in snapshot.docs) {
-        final referencePath = snap.reference.path;
-
-        final collectionUsersReference = _db.collection("$referencePath/users");
-
-        collectionUsersReference.get().then((usersSnapshot) {
-          for (final userSnap in usersSnapshot.docs) {
-            userSnap.reference.delete();
-          }
-        });
-
-        snap.reference.delete();
-      }
-    });
+    await _attendanceListService.deleteAttendancesList(room);
 
     // delete room user photo metric
-    final UserPhotoMetricService userPhotoMetricService =
-        UserPhotoMetricService();
-
-    userPhotoMetricService.deleteRoomUserPhotoMetric(room);
+    _userPhotoMetricService.deleteRoomUserPhotoMetric(room);
   }
 
   // leave room
