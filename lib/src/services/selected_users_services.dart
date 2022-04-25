@@ -17,7 +17,6 @@ class SelectedUsersServices {
     final CollectionReference<Map<String, dynamic>> selectedUsersCollection =
         _db.collection("$rootRoomsCollection/${room.id}/selected_users");
 
-
     // delete all attendance list
     selectedUsersCollection.get().then((snapshot) {
       for (final snap in snapshot.docs) {
@@ -83,6 +82,20 @@ class SelectedUsersServices {
 
     // update
     await doc.update(newSelectedUsers.toMap());
+  }
+
+  // check selected users exist
+  Future<bool> checkSelectedUsersExist(Room room) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> selectedUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/selected_users");
+
+    // get collection and check
+    final getCollection = await selectedUsersCollection.get();
+
+    if (getCollection.docs.isEmpty) return false;
+
+    return true;
   }
 
   // stream selected users
