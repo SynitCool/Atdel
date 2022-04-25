@@ -26,6 +26,8 @@ class RoomService {
   final UserService _userService = UserService();
   final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
   final UserRoomService _userRoomService = UserRoomService();
+  final UserPhotoMetricService _userPhotoMetricService =
+      UserPhotoMetricService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -144,34 +146,9 @@ class RoomService {
 
     // check if room is private
     if (room.privateRoom) {
-      final user = await _selectedUsersServices.getSelectedUsersByEmail(
-          room, model.User.fromFirebaseAuth(authUser!));
-
-      if (user == null) return "user_not_include";
-
-      // update the user references
-      _userService.addRoomPreferences(
-          roomCodesMap[code], model.User.fromFirestore(await usersDoc.get()));
-
-      // update room users
-      final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
-      userRoom.setUserReference = usersDoc;
-      userRoom.setAlias = user.alias;
-
-      _userRoomService.addUserRoomByReference(roomCodesMap[code], userRoom);
-
-      // update room info
-      updateMembersCount(room, true);
-
-      // update selected users
-      SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
-
-      user.setJoined = true;
-
-      _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
-
-      return;
+      joinRoomPrivateRoom(room, roomCodesMap[code], usersDoc);
     }
+    if (room.privateRoom) return;
 
     // update the user references
     _userService.addRoomPreferences(
@@ -186,6 +163,68 @@ class RoomService {
 
     // update room info
     updateMembersCount(room, true);
+  }
+
+  // join room private room
+  Future joinRoomPrivateRoom(
+      Room room,
+      DocumentReference<Map<String, dynamic>> roomReference,
+      DocumentReference<Map<String, dynamic>> usersDoc) async {
+    // get selected users by email
+    final user = await _selectedUsersServices.getSelectedUsersByEmail(
+        room, model.User.fromFirebaseAuth(authUser!));
+
+    if (user == null) return "user_not_include";
+
+    // update the user room references
+    _userService.addRoomPreferences(
+        roomReference, model.User.fromFirestore(await usersDoc.get()));
+
+    // update room users
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
+    userRoom.setUserReference = usersDoc;
+    userRoom.setAlias = user.alias;
+
+    _userRoomService.addUserRoomByReference(roomReference, userRoom);
+
+    // update room info
+    updateMembersCount(room, true);
+
+    // update selected users
+    SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
+
+    user.setJoined = true;
+
+    _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+  }
+
+  // leave room private room
+  Future leaveRoomPrivateRoom(Room room,
+    DocumentReference<Map<String, dynamic>> usersDoc) async {
+    // get selected users by email
+    final user = await _selectedUsersServices.getSelectedUsersByEmail(
+        room, model.User.fromFirebaseAuth(authUser!));
+
+    // remove the user room references
+    _userService.removeRoomReference(
+        model.User.fromFirestore(await usersDoc.get()).uid, room);
+
+    // update room users
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
+    userRoom.setUserReference = usersDoc;
+    userRoom.setAlias = user!.alias;
+
+    _userRoomService.removeUserRoom(room, userRoom);
+
+    // delete user photo metric by current user
+    _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+
+    // update selected users
+    SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
+
+    user.setJoined = false;
+
+    _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
   }
 
   // change room desc
@@ -294,9 +333,6 @@ class RoomService {
 
   // leave room
   Future leaveRoom(Room room) async {
-    // auth user
-    final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
-
     // room collection
     final roomCollection = _db.collection(rootRoomsCollection);
     final roomDoc = roomCollection.doc(room.id);
@@ -308,15 +344,21 @@ class RoomService {
 
     // users collection
     final usersCollection = _db.collection(rootUsersCollection);
-    final userDoc = usersCollection.doc(authUser.uid);
+    final userDoc = usersCollection.doc(authUser!.uid);
+
+    // if room private
+    if (room.privateRoom) leaveRoomPrivateRoom(room, userDoc);
+    if (room.privateRoom) return;
 
     // remove room reference
     final getUserDoc = await userDoc.get();
-    final user = model.User.fromMap(getUserDoc.data()!);
+    final oldUser = model.User.fromMap(getUserDoc.data()!);
 
-    user.roomReferences.remove(roomDoc);
+    final newUser = model.User.copy(oldUser);
 
-    final userMap = user.toMap();
+    newUser.roomReferences.remove(roomDoc);
+
+    final userMap = newUser.toMap();
 
     await userDoc.update(userMap);
 
@@ -324,10 +366,7 @@ class RoomService {
     await roomUserDoc.delete();
 
     // delete user photo metric by current user
-    final UserPhotoMetricService userPhotoMetricService =
-        UserPhotoMetricService();
-
-    userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+    _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
 
     // decrease member counts
     updateMembersCount(room, false);

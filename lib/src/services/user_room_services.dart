@@ -17,7 +17,7 @@ class UserRoomService {
 
   final String rootRoomsCollection = "rooms";
 
-  // add user room
+  // add user room with reference
   Future addUserRoomByReference(
       DocumentReference<Map<String, dynamic>> roomReference,
       UserRoom userRoom) async {
