@@ -145,8 +145,9 @@ class SelectedUsersInfoTile extends ConsumerWidget {
     return Column(
       children: [
         ListTile(
-          leading: const CircleAvatar(
-              backgroundColor: Colors.transparent, radius: 30),
+          leading: user.photoUrl == null ? const CircleAvatar(
+              backgroundColor: Colors.transparent, radius: 30) : CircleAvatar(
+              backgroundImage: NetworkImage(user.photoUrl!), radius: 30,),
           title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[

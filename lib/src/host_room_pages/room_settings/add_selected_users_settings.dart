@@ -129,7 +129,8 @@ class _ContentPageState extends State<ContentPage> {
         Map<String, dynamic> selectedUser = {
           "alias": userAliasText,
           "email": userEmailText,
-          "joined": false
+          "joined": false,
+          "photo_url": null
         };
 
         setState(() {
