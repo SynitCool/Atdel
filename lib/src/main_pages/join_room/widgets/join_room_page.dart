@@ -220,18 +220,17 @@ class _UserAliasTextFieldState extends State<UserAliasTextField> {
   }
 }
 
-
 // join room button
 class JoinRoomButton extends StatelessWidget {
   const JoinRoomButton({
     Key? key,
-    required this.roomInfo,
-    required this.hostAlias,
+    required this.roomCode,
+    required this.userAlias,
     required this.width,
   }) : super(key: key);
 
-  final String hostAlias;
-  final Map<String, dynamic> roomInfo;
+  final String roomCode;
+  final String userAlias;
   final double width;
 
   @override
@@ -241,16 +240,16 @@ class JoinRoomButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
           onPressed: () {
-            if (roomInfo["room_name"].isEmpty ||
-                roomInfo["room_name"].length < 4) return;
-            if (roomInfo["room_name"].length > 12) return;
+            if (roomCode.isEmpty ||
+                roomCode.length != 6) return;
+            if (userAlias.isEmpty || userAlias.length < 4 || userAlias.length > 12) return;
 
-            roomService.addRoomToDatabase(roomInfo, hostAlias);
+            roomService.joinRoomWithCode(roomCode, userAlias);
 
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));
           },
-          child: const Text("Create"),
+          child: const Text("Join"),
           style: ElevatedButton.styleFrom(
             primary: Colors.black,
             shape: RoundedRectangleBorder(

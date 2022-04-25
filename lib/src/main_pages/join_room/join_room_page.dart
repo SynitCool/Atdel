@@ -143,8 +143,8 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                                 },
                                 width: width),
                             JoinRoomButton(
-                                hostAlias: userAlias,
-                                roomInfo: {},
+                                roomCode: roomCode,
+                                userAlias: userAlias,
                                 width: width),
                           ],
                         ),
