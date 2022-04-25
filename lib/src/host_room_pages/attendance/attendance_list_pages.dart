@@ -1,4 +1,5 @@
 // flutter
+import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:flutter/material.dart';
 
 // custom widgets
@@ -39,6 +40,7 @@ class AttendanceListPage extends ConsumerWidget {
 
     // services
     final roomService = RoomService();
+
     return FutureBuilder<Room>(
         future: roomService.getRoomInfo(selectedRoomProvider.room!),
         builder: (context, snapshot) {
@@ -60,18 +62,42 @@ class AttendanceListPage extends ConsumerWidget {
 }
 
 // attendance page for private room
-class AttendancePagePrivateRoom extends StatelessWidget {
+class AttendancePagePrivateRoom extends ConsumerWidget {
   const AttendancePagePrivateRoom({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text("Set the private room first to use attendance list."),
-      ),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final selectedUsersServices = SelectedUsersServices();
+
+    // providers
+    final selectedRoomProvider = ref.watch(selectedRoom);
+
+    return FutureBuilder<bool>(
+          future: selectedUsersServices
+              .checkSelectedUsersExist(selectedRoomProvider.room!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) return const Center(child: Text("ERROR"));
+
+            final exist = snapshot.data;
+
+            if (exist == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (exist) return const AttendancePagePublicRoom();
+
+            return const Center(
+              child: Text("Set the private room first to use attendance list."),
+            );
+          });
   }
 }
+
 
 // attendance page for public room
 class AttendancePagePublicRoom extends ConsumerStatefulWidget {
