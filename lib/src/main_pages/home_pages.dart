@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     return const Scaffold(
         drawer: CustomDrawer(),
         body: ContentPage(),
-        floatingActionButton: AddRoomButton());
+        floatingActionButton: OptionRoomButton());
   }
 }
 

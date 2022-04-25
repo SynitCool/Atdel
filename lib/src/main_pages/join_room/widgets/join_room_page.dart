@@ -7,9 +7,9 @@ import 'package:atdel/src/services/room_services.dart';
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
-// create room title
-class CreateRoomTitle extends StatelessWidget {
-  const CreateRoomTitle({Key? key, required this.title, required this.width})
+// join room title
+class JoinRoomTitle extends StatelessWidget {
+  const JoinRoomTitle({Key? key, required this.title, required this.width})
       : super(key: key);
 
   final String title;
@@ -29,9 +29,9 @@ class CreateRoomTitle extends StatelessWidget {
   }
 }
 
-// create room desc
-class CreateRoomDesc extends StatelessWidget {
-  const CreateRoomDesc({Key? key, required this.desc, required this.width})
+// join room desc
+class JoinRoomDesc extends StatelessWidget {
+  const JoinRoomDesc({Key? key, required this.desc, required this.width})
       : super(key: key);
 
   final String desc;
@@ -51,9 +51,9 @@ class CreateRoomDesc extends StatelessWidget {
   }
 }
 
-// create room back button
-class CreateRoomBackButton extends StatelessWidget {
-  const CreateRoomBackButton(
+// join room back button
+class JoinRoomBackButton extends StatelessWidget {
+  const JoinRoomBackButton(
       {Key? key, required this.onPressed, required this.width})
       : super(key: key);
 
@@ -79,9 +79,9 @@ class CreateRoomBackButton extends StatelessWidget {
   }
 }
 
-// create room next button
-class CreateRoomNextButton extends StatelessWidget {
-  const CreateRoomNextButton(
+// join room next button
+class JoinRoomNextButton extends StatelessWidget {
+  const JoinRoomNextButton(
       {Key? key, required this.onPressed, required this.width})
       : super(key: key);
 
@@ -165,92 +165,9 @@ class _RoomNameTextFieldState extends State<RoomNameTextField> {
   }
 }
 
-// private room check box
-class PrivateRoomCheckbox extends StatefulWidget {
-  const PrivateRoomCheckbox(
-      {Key? key, required this.callback, required this.callbackPrivateRoom})
-      : super(key: key);
-
-  final Function callback;
-  final Function callbackPrivateRoom;
-
-  @override
-  State<PrivateRoomCheckbox> createState() => _PrivateRoomCheckboxState();
-}
-
-class _PrivateRoomCheckboxState extends State<PrivateRoomCheckbox> {
-  late bool privateRoom;
-
-  @override
-  void initState() {
-    super.initState();
-
-    privateRoom = widget.callbackPrivateRoom();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-        shape: const OutlineInputBorder(),
-        value: privateRoom,
-        title: const Text("Make as Private"),
-        subtitle: const Text("The host can specify who can enter the room"),
-        onChanged: (value) {
-          setState(() {
-            privateRoom = value!;
-
-            widget.callback(privateRoom);
-          });
-        });
-  }
-}
-
-// attendance with ml check box
-class AttendanceWithMlCheckbox extends StatefulWidget {
-  const AttendanceWithMlCheckbox(
-      {Key? key,
-      required this.callback,
-      required this.callbackAttendanceWithMl})
-      : super(key: key);
-
-  final Function callback;
-  final Function callbackAttendanceWithMl;
-
-  @override
-  State<AttendanceWithMlCheckbox> createState() =>
-      _AttendanceWithMlCheckboxState();
-}
-
-class _AttendanceWithMlCheckboxState extends State<AttendanceWithMlCheckbox> {
-  late bool attendanceWithMl;
-
-  @override
-  void initState() {
-    super.initState();
-
-    attendanceWithMl = widget.callbackAttendanceWithMl();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-        shape: const OutlineInputBorder(),
-        value: attendanceWithMl,
-        title: const Text("Attendance With ML"),
-        subtitle: const Text("Take attendance with machine learning."),
-        onChanged: (value) {
-          setState(() {
-            attendanceWithMl = value!;
-
-            widget.callback(attendanceWithMl);
-          });
-        });
-  }
-}
-
-// host alias text field
-class HostAliasTextField extends StatefulWidget {
-  const HostAliasTextField(
+// user alias text field
+class UserAliasTextField extends StatefulWidget {
+  const UserAliasTextField(
       {Key? key, required this.callback, required this.controller})
       : super(key: key);
 
@@ -258,10 +175,10 @@ class HostAliasTextField extends StatefulWidget {
   final TextEditingController controller;
 
   @override
-  State<HostAliasTextField> createState() => _HostAliasTextFieldState();
+  State<UserAliasTextField> createState() => _UserAliasTextFieldState();
 }
 
-class _HostAliasTextFieldState extends State<HostAliasTextField> {
+class _UserAliasTextFieldState extends State<UserAliasTextField> {
   // name text controller
   final TextEditingController nameTextFieldController = TextEditingController();
   String nameText = '';
@@ -294,7 +211,7 @@ class _HostAliasTextFieldState extends State<HostAliasTextField> {
     return TextField(
       controller: widget.controller,
       decoration: InputDecoration(
-          label: const Text("Host alias"),
+          label: const Text("User alias"),
           border: const OutlineInputBorder(),
           errorText: errorText),
       onChanged: (text) => setState(() {

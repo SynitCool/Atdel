@@ -2,31 +2,29 @@
 import 'package:flutter/material.dart';
 
 // widgets
-import 'package:atdel/src/main_pages/create_room/widgets/create_room_page.dart';
+import 'package:atdel/src/main_pages/join_room/widgets/join_room_page.dart';
 
 // util
-import 'package:atdel/src/main_pages/create_room/size_config.dart';
-import 'package:atdel/src/main_pages/create_room/create_room_contents.dart';
+import 'package:atdel/src/main_pages/join_room/size_config.dart';
+import 'package:atdel/src/main_pages/join_room/join_room_contents.dart';
 
-// create room on boarding
-class CreateRoomPage extends StatefulWidget {
-  const CreateRoomPage({Key? key}) : super(key: key);
+// join room on boarding
+class JoinRoomPage extends StatefulWidget {
+  const JoinRoomPage({Key? key}) : super(key: key);
 
   @override
-  State<CreateRoomPage> createState() => _CreateRoomPageState();
+  State<JoinRoomPage> createState() => _JoinRoomPageState();
 }
 
-class _CreateRoomPageState extends State<CreateRoomPage> {
+class _JoinRoomPageState extends State<JoinRoomPage> {
   // form
-  String roomName = '';
-  bool privateRoom = false;
-  bool attendanceWithMl = false;
-  String hostAlias = '';
+  String roomCode = '';
+  String userAlias = '';
 
   // page view
   final _controller = PageController();
   int _currentPage = 0;
-  List colors = const [Color(0xffDAD3C8), Color(0xffFFE5DE), Color(0xffDCF6E6)];
+  List colors = const [Color(0xffDAD3C8), Color(0xffFFE5DE)];
 
   AnimatedContainer _buildDots({int? index}) {
     return AnimatedContainer(
@@ -48,65 +46,36 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   List<Widget> widgets = [];
 
   // controller
-  final TextEditingController roomNameController = TextEditingController();
-  final TextEditingController hostAliasController = TextEditingController();
+  final TextEditingController roomCodeController = TextEditingController();
+  final TextEditingController userAliasController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    widgets.add(roomNamePage());
-    widgets.add(optionsPage());
-    widgets.add(hostAliasPage());
+    widgets.add(roomCodePage());
+    widgets.add(userAliasPage());
   }
 
   // room name page
-  Widget roomNamePage() => Center(
+  Widget roomCodePage() => Center(
         child: RoomNameTextField(
           callback: (value) {
-            roomName = value;
+            roomCode = value;
           },
-          controller: roomNameController,
+          controller: roomCodeController,
         ),
       );
 
-  // options page
-  Widget optionsPage() => Column(
-        children: [
-          privateRoomCheckbox(),
-          const SizedBox(height: 15),
-          attendanceWithMlCheckbox()
-        ],
-      );
-
-  // private room checkbox
-  Widget privateRoomCheckbox() => PrivateRoomCheckbox(
-        callback: (value) {
-          setState(() {
-            privateRoom = value;
-          });
-        },
-        callbackPrivateRoom: () => privateRoom,
-      );
-
-  // attendance with ml checbox
-  Widget attendanceWithMlCheckbox() => AttendanceWithMlCheckbox(
-      callback: (value) {
-        setState(() {
-          attendanceWithMl = value;
-        });
-      },
-      callbackAttendanceWithMl: () => attendanceWithMl);
-
-  // host alias page
-  Widget hostAliasPage() => Center(
-      child: HostAliasTextField(
+  // user alias page
+  Widget userAliasPage() => Center(
+      child: UserAliasTextField(
           callback: (value) {
             setState(() {
-              hostAlias = value;
+              userAlias = value;
             });
           },
-          controller: hostAliasController));
+          controller: userAliasController));
 
   @override
   Widget build(BuildContext context) {
@@ -131,12 +100,12 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                       padding: const EdgeInsets.all(40.0),
                       child: Column(
                         children: [
-                          CreateRoomTitle(
+                          JoinRoomTitle(
                               title: contents[i].title, width: width),
                           const SizedBox(
                             height: 15,
                           ),
-                          CreateRoomDesc(desc: contents[i].desc, width: width),
+                          JoinRoomDesc(desc: contents[i].desc, width: width),
                           const SizedBox(
                             height: 30,
                           ),
@@ -164,7 +133,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CreateRoomBackButton(
+                            JoinRoomBackButton(
                                 onPressed: () {
                                   _controller.previousPage(
                                     duration: const Duration(milliseconds: 200),
@@ -175,12 +144,8 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                                 },
                                 width: width),
                             CreateRoomButton(
-                                hostAlias: hostAlias,
-                                roomInfo: {
-                                  "room_name": roomName,
-                                  "private_room": privateRoom,
-                                  "attendance_with_ml": attendanceWithMl
-                                },
+                                hostAlias: userAlias,
+                                roomInfo: {},
                                 width: width),
                           ],
                         ),
@@ -190,7 +155,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CreateRoomBackButton(
+                            JoinRoomBackButton(
                                 onPressed: () {
                                   _controller.previousPage(
                                     duration: const Duration(milliseconds: 200),
@@ -199,7 +164,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                                   FocusScope.of(context).unfocus();
                                 },
                                 width: width),
-                            CreateRoomNextButton(
+                            JoinRoomNextButton(
                                 onPressed: () {
                                   _controller.nextPage(
                                     duration: const Duration(milliseconds: 200),

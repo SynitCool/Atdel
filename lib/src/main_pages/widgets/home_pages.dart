@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // home pages feature
 // import 'package:atdel/src/main_pages/widgets/create_room_pages.dart';
-import 'package:atdel/src/main_pages/widgets/join_room_page.dart';
+// import 'package:atdel/src/main_pages/widgets/join_room_page.dart';
 import 'package:atdel/src/main_pages/home_settings/settings_pages.dart';
 
 // host room control
@@ -35,10 +35,11 @@ import 'package:atdel/src/providers/selected_user_room_providers.dart';
 
 // pages
 import 'package:atdel/src/main_pages/create_room/create_room_page.dart';
+import 'package:atdel/src/main_pages/join_room/join_room_page.dart';
 
-// add room button widget
-class AddRoomButton extends StatelessWidget {
-  const AddRoomButton({Key? key}) : super(key: key);
+// option room button widget
+class OptionRoomButton extends StatelessWidget {
+  const OptionRoomButton({Key? key}) : super(key: key);
 
   final Widget fabOpenIcon = const Icon(Icons.menu, color: Colors.white);
   final Color fabOpenColor = Colors.white;
