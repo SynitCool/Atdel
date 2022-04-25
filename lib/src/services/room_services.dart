@@ -222,6 +222,9 @@ class RoomService {
     // delete all attendance list
     await _attendanceListService.deleteAttendancesList(room);
 
+    // delete all selected users
+    await _selectedUsersServices.deleteSelectedUsers(room);
+
     // delete room user photo metric
     _userPhotoMetricService.deleteRoomUserPhotoMetric(room);
   }
