@@ -37,6 +37,9 @@ import 'package:atdel/src/providers/selected_user_room_providers.dart';
 import 'package:atdel/src/main_pages/create_room/create_room_page.dart';
 import 'package:atdel/src/main_pages/join_room/join_room_page.dart';
 
+// skeleton
+import 'package:skeleton_text/skeleton_text.dart';
+
 // option room button widget
 class OptionRoomButton extends StatelessWidget {
   const OptionRoomButton({Key? key}) : super(key: key);
@@ -93,7 +96,7 @@ class RoomStreamBuilder extends StatelessWidget {
         stream: _roomService.streamReferenceRoom(reference),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return loadingScene;
+            return const RoomButtonSkeleton();
           }
 
           if (snapshot.hasError) return errorScene;
@@ -102,6 +105,67 @@ class RoomStreamBuilder extends StatelessWidget {
 
           return RoomButtonWidget(room: data!);
         });
+  }
+}
+
+// room button skeleton
+class RoomButtonSkeleton extends StatelessWidget {
+  const RoomButtonSkeleton({Key? key}) : super(key: key);
+
+  final EdgeInsets cardPadding =
+      const EdgeInsets.symmetric(vertical: 10, horizontal: 20);
+
+  final EdgeInsets titlePadding = const EdgeInsets.fromLTRB(0, 10, 0, 30);
+
+  // shape of card
+  RoundedRectangleBorder shape() => RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 15,
+      margin: cardPadding,
+      shape: shape(),
+      child: ListTile(
+        onTap: () async {},
+        leading: SkeletonAnimation(
+            child: CircleAvatar(
+          child: Container(height: 100, width: 100, color: Colors.grey),
+          radius: 30,
+        )),
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+              padding: titlePadding,
+              child: FittedBox(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SkeletonAnimation(
+                      child: Container(
+                          height: 15,
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          color: Colors.grey)),
+                  const SizedBox(height: 10),
+                  SkeletonAnimation(
+                      child: Container(
+                          height: 10,
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          color: Colors.grey))
+                ],
+              ))),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: SkeletonAnimation(
+                child: Container(
+                    height: 10,
+                    width: MediaQuery.of(context).size.width * 0.2,
+                    color: Colors.grey)),
+          ),
+        ]),
+      ),
+    );
   }
 }
 
