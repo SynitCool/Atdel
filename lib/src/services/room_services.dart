@@ -141,6 +141,7 @@ class RoomService {
     SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
 
     user.setJoined = true;
+    user.setPhotoUrl = authUser!.photoURL;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
   }
