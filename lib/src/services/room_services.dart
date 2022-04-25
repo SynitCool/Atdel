@@ -84,8 +84,7 @@ class RoomService {
     await _userRoomService.setHostUserRoom(room, hostAlias);
 
     // update user room reference
-    await _userService
-        .addRoomReference(_db.collection(rootRoomsCollection).doc(room.id));
+    await _userService.addRoomReference(room);
 
     // add to room codes
     await _roomCodesService.addRoomCodes({
@@ -96,59 +95,31 @@ class RoomService {
 
   // join room with code
   Future joinRoomWithCode(String code, String userAlias) async {
-    // room codes doc
-    final CollectionReference<Map<String, dynamic>> roomCodesCollection =
-        _db.collection(rootCodesCollection);
-
-    final DocumentReference<Map<String, dynamic>> codesDoc =
-        roomCodesCollection.doc(roomCodesDoc);
-
-    // users doc
-    final CollectionReference<Map<String, dynamic>> usersCollection =
-        _db.collection(rootUsersCollection);
-
-    final DocumentReference<Map<String, dynamic>> usersDoc =
-        usersCollection.doc(authUser!.uid);
-
     // get reference with code
-    final DocumentSnapshot<Map<String, dynamic>> getRoomCodesDoc =
-        await codesDoc.get();
+    final status = await _roomCodesService.getRoomByCode(code);
 
-    final Map<String, dynamic> roomCodesMap = getRoomCodesDoc.data()!;
+    if (status == "code_not_valid") return status;
 
-    // check valid code
-    if (!roomCodesMap.containsKey(code)) return "code_not_valid";
-
-    // room doc
-    final roomDoc = await roomCodesMap[code].get();
-    final room = Room.fromFirestore(roomDoc);
+    final room = status;
 
     // check if room is private
     if (room.privateRoom) {
-      joinRoomPrivateRoom(room, roomCodesMap[code], usersDoc);
+      await joinRoomPrivateRoom(room);
     }
     if (room.privateRoom) return;
 
     // update the user references
-    _userService.addRoomPreferences(
-        roomCodesMap[code], model.User.fromFirestore(await usersDoc.get()));
+    _userService.addRoomReference(room);
 
-    // update room users
-    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
-    userRoom.setUserReference = usersDoc;
-    userRoom.setAlias = userAlias;
-
-    _userRoomService.addUserRoomByReference(roomCodesMap[code], userRoom);
+    // update user room
+    await _userRoomService.addUserRoomPublicRoom(room, userAlias);
 
     // update room info
     updateMembersCount(room, true);
   }
 
   // join room private room
-  Future joinRoomPrivateRoom(
-      Room room,
-      DocumentReference<Map<String, dynamic>> roomReference,
-      DocumentReference<Map<String, dynamic>> usersDoc) async {
+  Future joinRoomPrivateRoom(Room room) async {
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, model.User.fromFirebaseAuth(authUser!));
@@ -156,15 +127,10 @@ class RoomService {
     if (user == null) return "user_not_include";
 
     // update the user room references
-    _userService.addRoomPreferences(
-        roomReference, model.User.fromFirestore(await usersDoc.get()));
+    await _userService.addRoomReference(room);
 
-    // update room users
-    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
-    userRoom.setUserReference = usersDoc;
-    userRoom.setAlias = user.alias;
-
-    _userRoomService.addUserRoomByReference(roomReference, userRoom);
+    // add user room
+    await _userRoomService.addUserRoomPrivateRoom(room, user);
 
     // update room info
     updateMembersCount(room, true);

@@ -1,4 +1,5 @@
 // firebase
+import 'package:atdel/src/model/selected_users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
@@ -41,23 +42,48 @@ class UserRoomService {
     Map<String, dynamic> hostUserMap = hostUser.toMap();
 
     await roomUsersDoc.set(hostUserMap);
-
-    return hostUser;
   }
 
-  // add user room with reference
-  Future addUserRoomByReference(
-      DocumentReference<Map<String, dynamic>> roomReference,
-      UserRoom userRoom) async {
+  // add user room private room
+  Future addUserRoomPrivateRoom(Room room, SelectedUsers user) async {
     // collection
     final CollectionReference<Map<String, dynamic>> roomUsersCollection =
-        _db.collection("${roomReference.path}/users");
+        _db.collection("$rootRoomsCollection/${room.id}/users");
 
     final DocumentReference<Map<String, dynamic>> roomUsersDoc =
-        roomUsersCollection.doc(userRoom.uid);
+        roomUsersCollection.doc(authUser!.uid);
+
+    // set user room
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
+    userRoom.setUserReference =
+        _db.collection(rootUsersCollection).doc(authUser!.uid);
+    userRoom.setAlias = user.alias;
 
     // set to user room
     await roomUsersDoc.set(userRoom.toMap());
+
+    return userRoom;
+  }
+
+  // add user room public room
+  Future addUserRoomPublicRoom(Room room, String userAlias) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/users");
+
+    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
+        roomUsersCollection.doc(authUser!.uid);
+
+    // set user room
+    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
+    userRoom.setUserReference =
+        _db.collection(rootUsersCollection).doc(authUser!.uid);
+    userRoom.setAlias = userAlias;
+
+    // set to user room
+    await roomUsersDoc.set(userRoom.toMap());
+
+    return userRoom;
   }
 
   // get members room

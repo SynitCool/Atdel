@@ -11,10 +11,10 @@ class UserService {
   final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
   final String rootUsersCollection = "users";
+  final String rootRoomsCollection = "rooms";
 
   // add room reference
-  Future addRoomReference(
-      DocumentReference<Map<String, dynamic>> roomReference) async {
+  Future addRoomReference(Room room) async {
     // users collections
     final CollectionReference<Map<String, dynamic>> usersCollection =
         _db.collection(rootUsersCollection);
@@ -26,7 +26,7 @@ class UserService {
     model.User oldUser = model.User.fromFirestore(await usersDoc.get());
     model.User newUser = model.User.copy(oldUser);
 
-    newUser.roomReferences.add(roomReference);
+    newUser.roomReferences.add(_db.collection(rootRoomsCollection).doc(room.id));
 
     await updateUser(oldUser, newUser);
 
