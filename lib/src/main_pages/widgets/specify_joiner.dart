@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 // services
 import 'package:atdel/src/services/room_services.dart';
 
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+
 class SpecifyJoiner extends StatefulWidget {
   const SpecifyJoiner({Key? key, required this.roomCodeText}) : super(key: key);
 
@@ -86,20 +89,50 @@ class JoinRoomButton extends StatelessWidget {
   final String roomCode;
   final String userAlias;
 
+  // show user metric warning
+  Future showDialogError(BuildContext context, String desc) => showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text(
+            "ERROR",
+            style: TextStyle(color: Colors.red),
+          ),
+          content: Text(desc),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final RoomService roomService = RoomService();
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (roomCode.isEmpty || roomCode.length != 6) return;
               if (userAlias.isEmpty || userAlias.length > 12) return;
 
-              roomService.joinRoomWithCode(roomCode, userAlias);
+              final String? status =
+                  await roomService.joinRoomWithCode(roomCode, userAlias);
 
-              Navigator.pop(context);
-              Navigator.pop(context);
+              if (status == "code_not_valid") {
+                showDialogError(context, "code_not_valid");
+              }
+              if (status == "code_not_valid") return;
+              
+
+              if (status == "user_not_include") {
+                showDialogError(context, "user_not_include");
+              }
+              if (status == "user_not_include") return;
+
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const HomePage()));
             },
             child: const Text("Join")));
   }

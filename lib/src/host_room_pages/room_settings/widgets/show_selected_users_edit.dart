@@ -36,7 +36,7 @@ class ColumnTile extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold))),
             VerticalDivider(),
             Expanded(
-                child: Text("Joined",
+                child: Text("Remove",
                     style: TextStyle(fontWeight: FontWeight.bold))),
           ]),
     );
@@ -121,19 +121,27 @@ class SelectedUsersView extends StatelessWidget {
         itemBuilder: (context, index) {
           final currentData = selectedUsers[index];
 
+          if (currentData.joined) return const SizedBox();
+
           return SelectedUsersInfoTile(user: currentData);
         });
   }
 }
 
 // selected users info
-class SelectedUsersInfoTile extends StatelessWidget {
+class SelectedUsersInfoTile extends ConsumerWidget {
   const SelectedUsersInfoTile({Key? key, required this.user}) : super(key: key);
 
   final SelectedUsers user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // services
+    final SelectedUsersServices selectedUsersServices = SelectedUsersServices();
+
+    // provider
+    final selectedRoomProvider = ref.watch(selectedRoom);
+
     return Column(
       children: [
         ListTile(
@@ -146,17 +154,17 @@ class SelectedUsersInfoTile extends StatelessWidget {
                 const VerticalDivider(),
                 Expanded(child: Text(user.email)),
                 const VerticalDivider(),
-                user.joined
-                    ? const Expanded(
-                        child: Icon(
-                        Icons.done,
-                        color: Colors.green,
-                      ))
-                    : const Expanded(
-                        child: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                      )),
+                Expanded(
+                    child: IconButton(
+                  onPressed: () async {
+                    await selectedUsersServices.removeSelectedUsers(
+                        selectedRoomProvider.room!, user);
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ),
+                )),
               ]),
         ),
         const Divider(color: Colors.black)

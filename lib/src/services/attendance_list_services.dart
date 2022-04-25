@@ -32,6 +32,30 @@ class AttendanceListService {
     return attendanceListUsers;
   }
 
+  // delete all attendance list
+  Future deleteAttendancesList(Room room) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> attendanceListCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/attendance_list");
+
+    // delete all attendance list
+    attendanceListCollection.get().then((snapshot) {
+      for (final snap in snapshot.docs) {
+        final referencePath = snap.reference.path;
+
+        final collectionUsersReference = _db.collection("$referencePath/users");
+
+        collectionUsersReference.get().then((usersSnapshot) {
+          for (final userSnap in usersSnapshot.docs) {
+            userSnap.reference.delete();
+          }
+        });
+
+        snap.reference.delete();
+      }
+    });
+  }
+
   // stream attendance list
   Stream<List<Attendance>> streamAttendanceList(Room room) {
     final String collectionPath =
