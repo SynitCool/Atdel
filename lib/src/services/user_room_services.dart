@@ -19,6 +19,17 @@ class UserRoomService {
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
 
+  // delete current user room
+  Future deleteCurrentUserRoom(Room room) async {
+    // room users collection
+    final roomUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/users");
+    final roomUserDoc = roomUsersCollection.doc(authUser!.uid);
+
+    // delete current user room in room
+    await roomUserDoc.delete();
+  }
+
   // delete all users room
   Future deleteUsersRooms(Room room) async {
     // collection

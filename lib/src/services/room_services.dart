@@ -146,25 +146,22 @@ class RoomService {
   }
 
   // leave room private room
-  Future leaveRoomPrivateRoom(
-      Room room, DocumentReference<Map<String, dynamic>> usersDoc) async {
+  Future leaveRoomPrivateRoom(Room room) async {
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, model.User.fromFirebaseAuth(authUser!));
 
+    if (user == null) return "user_not_available";
+
     // remove the user room references
-    _userService.removeRoomReference(
-        model.User.fromFirestore(await usersDoc.get()).uid, room);
+    await _userService.removeRoomReference(authUser!.uid, room);
 
-    // update room users
-    final UserRoom userRoom = UserRoom.fromFirebaseAuth(authUser!);
-    userRoom.setUserReference = usersDoc;
-    userRoom.setAlias = user!.alias;
-
-    _userRoomService.removeUserRoom(room, userRoom);
+    // remove room users
+    await _userRoomService.removeUserRoom(
+        room, UserRoom.fromFirebaseAuth(authUser!));
 
     // delete user photo metric by current user
-    _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+    await _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
 
     // update selected users
     SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
@@ -231,43 +228,20 @@ class RoomService {
 
   // leave room
   Future leaveRoom(Room room) async {
-    // room collection
-    final roomCollection = _db.collection(rootRoomsCollection);
-    final roomDoc = roomCollection.doc(room.id);
-
-    // room users collection
-    final roomUsersCollection =
-        _db.collection("$rootRoomsCollection/${room.id}/users");
-    final roomUserDoc = roomUsersCollection.doc(authUser!.uid);
-
-    // users collection
-    final usersCollection = _db.collection(rootUsersCollection);
-    final userDoc = usersCollection.doc(authUser!.uid);
-
     // if room private
-    if (room.privateRoom) leaveRoomPrivateRoom(room, userDoc);
-    if (room.privateRoom) return;
+    if (room.privateRoom) return await leaveRoomPrivateRoom(room);
 
-    // remove room reference
-    final getUserDoc = await userDoc.get();
-    final oldUser = model.User.fromMap(getUserDoc.data()!);
-
-    final newUser = model.User.copy(oldUser);
-
-    newUser.roomReferences.remove(roomDoc);
-
-    final userMap = newUser.toMap();
-
-    await userDoc.update(userMap);
+    // remove the user room references
+    await _userService.removeRoomReference(authUser!.uid, room);
 
     // delete user in room users
-    await roomUserDoc.delete();
+    await _userRoomService.deleteCurrentUserRoom(room);
 
     // delete user photo metric by current user
-    _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+    await _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
 
     // decrease member counts
-    updateMembersCount(room, false);
+    await updateMembersCount(room, false);
   }
 
   // update room info
