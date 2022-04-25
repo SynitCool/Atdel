@@ -37,19 +37,20 @@ class RoomService {
 
   // get user info from database
   Future<Room> getRoomInfo(Room room) async {
+    // collection
     final CollectionReference<Map<String, dynamic>> collection =
         _db.collection(rootRoomsCollection);
 
     final DocumentReference<Map<String, dynamic>> doc = collection.doc(room.id);
 
+    // get room info
     final DocumentSnapshot<Map<String, dynamic>> getDoc = await doc.get();
 
     return Room.fromFirestore(getDoc);
   }
 
-  // add room to database
-  Future addRoomToDatabase(
-      Map<String, dynamic> roomInfo, String hostAlias) async {
+  // set room and add to database
+  Future setAddRoomToDatabase(Map<String, dynamic> info) async {
     // room collections
     final CollectionReference<Map<String, dynamic>> roomCollection =
         _db.collection(rootRoomsCollection);
@@ -57,62 +58,40 @@ class RoomService {
     final DocumentReference<Map<String, dynamic>> roomDoc =
         roomCollection.doc();
 
-    // users collections
-    final CollectionReference<Map<String, dynamic>> usersCollection =
-        _db.collection(rootUsersCollection);
-
-    final DocumentReference<Map<String, dynamic>> usersDoc =
-        usersCollection.doc(authUser!.uid);
-
-    // room users collections
-    final String roomUsersPath = "$rootRoomsCollection/${roomDoc.id}/users";
-
-    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
-        _db.collection(roomUsersPath);
-
-    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
-        roomUsersCollection.doc(authUser!.uid);
-
-    // settings room object and add to room Doc
+    // set room
     Room room = Room.fromFirebaseAuth(authUser!);
 
     room.setRoomDesc = "<h1>Welcome</h1>";
-    room.setRoomName = roomInfo["room_name"];
+    room.setRoomName = info["room_name"];
     room.setId = roomDoc.id;
     room.setRoomCode = makeRandomCode();
-    room.setPrivateRoom = roomInfo["private_room"];
-    room.setAttendanceWithMl = roomInfo["attendance_with_ml"];
+    room.setPrivateRoom = info["private_room"];
+    room.setAttendanceWithMl = info["attendance_with_ml"];
 
-    final Map<String, dynamic> roomMap = room.toMap();
+    // add room to database
+    await roomDoc.set(room.toMap());
 
-    await roomDoc.set(roomMap);
+    return room;
+  }
+
+  // add room to database
+  Future addRoomToDatabase(
+      Map<String, dynamic> roomInfo, String hostAlias) async {
+    // settings room object and add to room Doc
+    final Room room = await setAddRoomToDatabase(roomInfo);
 
     // settings room users
-    UserRoom hostUser = UserRoom(
-        alias: hostAlias,
-        displayName: authUser!.displayName!,
-        email: authUser!.email!,
-        photoUrl: authUser!.photoURL!,
-        uid: authUser!.uid,
-        userReference: usersDoc);
-
-    Map<String, dynamic> hostUserMap = hostUser.toMap();
-
-    await roomUsersDoc.set(hostUserMap);
+    await _userRoomService.setHostUserRoom(room, hostAlias);
 
     // update user room reference
-    final DocumentSnapshot<Map<String, dynamic>> getDoc = await usersDoc.get();
-
-    model.User oldUser = model.User.fromFirestore(getDoc);
-    model.User newUser = model.User.copy(oldUser);
-
-    newUser.roomReferences.add(roomDoc);
-
-    await _userService.updateUser(oldUser, newUser);
+    await _userService
+        .addRoomReference(_db.collection(rootRoomsCollection).doc(room.id));
 
     // add to room codes
-    await _roomCodesService
-        .addRoomCodes({"room_code": room.roomCode, "room_reference": roomDoc});
+    await _roomCodesService.addRoomCodes({
+      "room_code": room.roomCode,
+      "room_reference": _db.collection(rootRoomsCollection).doc(room.id)
+    });
   }
 
   // join room with code
@@ -199,8 +178,8 @@ class RoomService {
   }
 
   // leave room private room
-  Future leaveRoomPrivateRoom(Room room,
-    DocumentReference<Map<String, dynamic>> usersDoc) async {
+  Future leaveRoomPrivateRoom(
+      Room room, DocumentReference<Map<String, dynamic>> usersDoc) async {
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, model.User.fromFirebaseAuth(authUser!));

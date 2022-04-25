@@ -16,6 +16,34 @@ class UserRoomService {
   final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
   final String rootRoomsCollection = "rooms";
+  final String rootUsersCollection = "users";
+
+  // set host user as user room
+  Future setHostUserRoom(Room room, String hostAlias) async {
+    // room users collections
+    final String roomUsersPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> roomUsersCollection =
+        _db.collection(roomUsersPath);
+
+    final DocumentReference<Map<String, dynamic>> roomUsersDoc =
+        roomUsersCollection.doc(authUser!.uid);
+
+    // settings room users
+    UserRoom hostUser = UserRoom(
+        alias: hostAlias,
+        displayName: authUser!.displayName!,
+        email: authUser!.email!,
+        photoUrl: authUser!.photoURL!,
+        uid: authUser!.uid,
+        userReference: _db.collection(rootUsersCollection).doc(authUser!.uid));
+
+    Map<String, dynamic> hostUserMap = hostUser.toMap();
+
+    await roomUsersDoc.set(hostUserMap);
+
+    return hostUser;
+  }
 
   // add user room with reference
   Future addUserRoomByReference(

@@ -8,9 +8,30 @@ import 'package:atdel/src/model/room.dart';
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final auth.User? authUser = auth.FirebaseAuth.instance.currentUser; 
+  final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
   final String rootUsersCollection = "users";
+
+  // add room reference
+  Future addRoomReference(
+      DocumentReference<Map<String, dynamic>> roomReference) async {
+    // users collections
+    final CollectionReference<Map<String, dynamic>> usersCollection =
+        _db.collection(rootUsersCollection);
+
+    final DocumentReference<Map<String, dynamic>> usersDoc =
+        usersCollection.doc(authUser!.uid);
+
+    // update user room reference
+    model.User oldUser = model.User.fromFirestore(await usersDoc.get());
+    model.User newUser = model.User.copy(oldUser);
+
+    newUser.roomReferences.add(roomReference);
+
+    await updateUser(oldUser, newUser);
+
+    return newUser;
+  }
 
   // get user info from database
   Future<model.User> getUserInfo(String userUid) async {
@@ -70,7 +91,8 @@ class UserService {
 
   // update room preferences
   Future addRoomPreferences(
-      DocumentReference<Map<String, dynamic>> roomReference, model.User oldUser) async {
+      DocumentReference<Map<String, dynamic>> roomReference,
+      model.User oldUser) async {
     model.User newUser = model.User.copy(oldUser);
 
     newUser.roomReferences.add(roomReference);
