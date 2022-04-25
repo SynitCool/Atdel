@@ -108,9 +108,9 @@ class JoinRoomNextButton extends StatelessWidget {
   }
 }
 
-// room name text field
-class RoomNameTextField extends StatefulWidget {
-  const RoomNameTextField(
+// room code text field
+class RoomCodeTextField extends StatefulWidget {
+  const RoomCodeTextField(
       {Key? key, required this.callback, required this.controller})
       : super(key: key);
 
@@ -118,10 +118,10 @@ class RoomNameTextField extends StatefulWidget {
   final TextEditingController controller;
 
   @override
-  State<RoomNameTextField> createState() => _RoomNameTextFieldState();
+  State<RoomCodeTextField> createState() => _RoomCodeTextFieldState();
 }
 
-class _RoomNameTextFieldState extends State<RoomNameTextField> {
+class _RoomCodeTextFieldState extends State<RoomCodeTextField> {
   // name text controller
   final TextEditingController nameTextFieldController = TextEditingController();
   String nameText = '';
@@ -134,19 +134,17 @@ class _RoomNameTextFieldState extends State<RoomNameTextField> {
     widget.callback(nameText);
   }
 
-  // error text field
+  // erroe text
   String? get errorText {
-    final String text = widget.controller.value.text;
+    final String codeRoomText = widget.controller.value.text;
 
-    if (text.isEmpty) {
+    if (codeRoomText.isEmpty) {
       return 'Can\'t be empty';
-    } else if (text.length < 4) {
-      return 'Too short';
-    } else if (text.length > 12) {
-      return 'Too long';
     }
 
-    return null;
+    if (codeRoomText.length == 6) return null;
+
+    return 'The room id must be 6 characters';
   }
 
   @override
@@ -154,7 +152,7 @@ class _RoomNameTextFieldState extends State<RoomNameTextField> {
     return TextField(
       controller: widget.controller,
       decoration: InputDecoration(
-          label: const Text("Room name"),
+          label: const Text("Room Code"),
           border: const OutlineInputBorder(),
           errorText: errorText),
       onChanged: (text) => setState(() {
@@ -222,9 +220,10 @@ class _UserAliasTextFieldState extends State<UserAliasTextField> {
   }
 }
 
-// create room button
-class CreateRoomButton extends StatelessWidget {
-  const CreateRoomButton({
+
+// join room button
+class JoinRoomButton extends StatelessWidget {
+  const JoinRoomButton({
     Key? key,
     required this.roomInfo,
     required this.hostAlias,

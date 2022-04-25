@@ -59,7 +59,7 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
 
   // room name page
   Widget roomCodePage() => Center(
-        child: RoomNameTextField(
+        child: RoomCodeTextField(
           callback: (value) {
             roomCode = value;
           },
@@ -100,8 +100,7 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                       padding: const EdgeInsets.all(40.0),
                       child: Column(
                         children: [
-                          JoinRoomTitle(
-                              title: contents[i].title, width: width),
+                          JoinRoomTitle(title: contents[i].title, width: width),
                           const SizedBox(
                             height: 15,
                           ),
@@ -143,7 +142,7 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                                   FocusScope.of(context).unfocus();
                                 },
                                 width: width),
-                            CreateRoomButton(
+                            JoinRoomButton(
                                 hostAlias: userAlias,
                                 roomInfo: {},
                                 width: width),
@@ -170,7 +169,7 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                                     duration: const Duration(milliseconds: 200),
                                     curve: Curves.easeIn,
                                   );
-                                  
+
                                   FocusScope.of(context).unfocus();
                                 },
                                 width: width)
