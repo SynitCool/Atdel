@@ -50,11 +50,15 @@ class ContentPage extends ConsumerWidget {
 
   // scenes
   final Widget errorScene = const Center(child: Text("ERROR"));
-  final Widget loadingScene = const Center(child: CircularProgressIndicator());
   final Widget noRoomsScene = const Center(child: Text("No Rooms"));
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final Widget loadingScene = Column(children: const [
+      SizedBox(height: 100),
+      Center(child: CircularProgressIndicator())
+    ]);
+
     final provider = ref.watch(currentUser);
     final _userService = UserService();
     return ListView(
