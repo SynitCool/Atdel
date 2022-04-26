@@ -183,26 +183,6 @@ class SelectedUsersButton extends StatelessWidget {
   }
 }
 
-// selected users pictures for ml button
-class SelectedUsersPicturesMlButton extends StatelessWidget {
-  const SelectedUsersPicturesMlButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      shape: const OutlineInputBorder(),
-      leading: const Icon(Icons.picture_in_picture_sharp),
-      title: const Text("Set Selected Users Pictures ML"),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const PrivatePicturesRoom()));
-      },
-    );
-  }
-}
-
 // general sections
 class GeneralSections extends StatelessWidget {
   const GeneralSections({Key? key}) : super(key: key);
@@ -269,10 +249,6 @@ class PrivateRoomControlSections extends StatelessWidget {
           height: 10,
         ),
         SelectedUsersButton(),
-        SizedBox(
-          height: 15,
-        ),
-        SelectedUsersPicturesMlButton(),
         SizedBox(
           height: 15,
         )
