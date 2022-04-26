@@ -38,6 +38,7 @@ class _PrivateContentRoomState extends State<PrivateContentRoom> {
       child: ListView(
         children: const [
           ShowSelectedUsersButton(),
+          SizedBox(height: 20),
           AddSelectedUsersButton(),
         ],
       ),

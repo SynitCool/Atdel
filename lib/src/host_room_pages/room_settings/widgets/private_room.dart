@@ -23,6 +23,7 @@ class ShowSelectedUsersButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      shape: const OutlineInputBorder(),
       leading: const Icon(Icons.people_alt_outlined),
       onTap: () {
         Navigator.push(
@@ -42,6 +43,7 @@ class AddSelectedUsersButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      shape: const OutlineInputBorder(),
       leading: const Icon(Icons.add_box),
       subtitle: const Text("Add selected users with GUI."),
       onTap: () {
