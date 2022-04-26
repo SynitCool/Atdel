@@ -32,7 +32,7 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
     const JoinRoomAttendanceList(),
     const RoomInfo()
   ];
-  final List<IconData> iconsPage = [Icons.home, Icons.people, Icons.info];
+  final List<IconData> iconsPage = [Icons.home, Icons.class_, Icons.info];
 
   int bottomNavIndex = 0;
 

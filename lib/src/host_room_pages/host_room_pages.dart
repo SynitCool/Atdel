@@ -31,7 +31,7 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   ];
   final List<IconData> iconsPage = [
     Icons.home,
-    Icons.people,
+    Icons.class_,
     Icons.info
   ];
 
