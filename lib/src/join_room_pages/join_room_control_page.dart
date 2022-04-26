@@ -10,6 +10,7 @@ import 'package:atdel/src/join_room_pages/room_desc/join_room_home_preview.dart'
 import 'package:atdel/src/join_room_pages/widgets/join_room_drawer.dart';
 import 'package:atdel/src/join_room_pages/attendance/join_room_attendance_list_page.dart';
 import 'package:atdel/src/join_room_pages/room_info/join_room_info.dart';
+import 'package:atdel/src/join_room_pages/members_page/members_page.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,9 +31,10 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
   final List<Widget> featurePage = [
     const JoinRoomPreviewPage(),
     const JoinRoomAttendanceList(),
+    const MembersPage(),
     const RoomInfo()
   ];
-  final List<IconData> iconsPage = [Icons.home, Icons.class_, Icons.info];
+  final List<IconData> iconsPage = [Icons.home, Icons.class_, Icons.people, Icons.info];
 
   int bottomNavIndex = 0;
 
