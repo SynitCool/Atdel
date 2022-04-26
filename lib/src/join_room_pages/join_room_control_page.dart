@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 
 // custom widget
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 // join room feature
 import 'package:atdel/src/join_room_pages/room_desc/join_room_home_preview.dart';
-import 'package:atdel/src/join_room_pages/widgets/join_room_drawer.dart';
 import 'package:atdel/src/join_room_pages/attendance/join_room_attendance_list_page.dart';
 import 'package:atdel/src/join_room_pages/room_info/join_room_info.dart';
 import 'package:atdel/src/join_room_pages/members_page/members_page.dart';
@@ -38,29 +36,6 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
 
   int bottomNavIndex = 0;
 
-  // controller
-  final AdvancedDrawerController _advancedDrawerController =
-      AdvancedDrawerController();
-
-  // leading appbar
-  Widget leadingAppBar() => IconButton(
-        onPressed: () {
-          _advancedDrawerController.showDrawer();
-        },
-        icon: ValueListenableBuilder<AdvancedDrawerValue>(
-          valueListenable: _advancedDrawerController,
-          builder: (_, value, __) {
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: Icon(
-                value.visible ? Icons.clear : Icons.menu,
-                key: ValueKey<bool>(value.visible),
-              ),
-            );
-          },
-        ),
-      );
-
   // bottom navigator bar
   Widget bottomNavigationBar() => AnimatedBottomNavigationBar.builder(
         leftCornerRadius: 32,
@@ -87,7 +62,6 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
   // the appbar
   PreferredSizeWidget scaffoldAppBar() => AppBar(
         title: const Text("Join Room Control"),
-        leading: leadingAppBar(),
         actions: const [SettingsButton()],
       );
 
@@ -114,15 +88,6 @@ class _JoinRoomControlState extends ConsumerState<JoinRoomControl> {
 
   @override
   Widget build(BuildContext context) {
-    return AdvancedDrawer(
-        controller: _advancedDrawerController,
-        backdropColor: Colors.blueGrey,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        childDecoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-        ),
-        child: mainContentWidget(),
-        drawer: const DrawerWidget());
+    return mainContentWidget();
   }
 }
