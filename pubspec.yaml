@@ -61,7 +61,6 @@ dependencies:
 
   # custom widgets
   fab_circular_menu: ^1.0.2
-  flutter_advanced_drawer: ^1.3.1
   animated_bottom_navigation_bar: ^0.3.2
   floating_action_bubble: ^1.1.4
   html_editor_enhanced: ^2.4.0+1

@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 
 // custom widget
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 // host room feature
 import 'package:atdel/src/host_room_pages/room_desc/home_preview_feature.dart';
-import 'package:atdel/src/host_room_pages/widgets/host_drawer.dart';
 import 'package:atdel/src/host_room_pages/attendance/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_pages/room_info/host_room_info.dart';
 import 'package:atdel/src/host_room_pages/members_page/members_page.dart';
@@ -40,33 +38,9 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   int bottomNavIndex = 0;
 
-  // controller
-  final AdvancedDrawerController _advancedDrawerController =
-      AdvancedDrawerController();
-
-  // leading animation
-  Widget leadingAppBar() => IconButton(
-        onPressed: () {
-          _advancedDrawerController.showDrawer();
-        },
-        icon: ValueListenableBuilder<AdvancedDrawerValue>(
-          valueListenable: _advancedDrawerController,
-          builder: (_, value, __) {
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: Icon(
-                value.visible ? Icons.clear : Icons.menu,
-                key: ValueKey<bool>(value.visible),
-              ),
-            );
-          },
-        ),
-      );
-
   // the appbar
   PreferredSizeWidget appBar() => AppBar(
         title: const Text("Host Room Control"),
-        leading: leadingAppBar(),
         actions: const [SettingsButton()],
       );
 
@@ -102,15 +76,6 @@ class _HostRoomPagesState extends State<HostRoomPages> {
 
   @override
   Widget build(BuildContext context) {
-    return AdvancedDrawer(
-        controller: _advancedDrawerController,
-        backdropColor: Colors.blueGrey,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        childDecoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-        ),
-        child: mainContentWidget(),
-        drawer: const DrawerWidget());
+    return mainContentWidget();
   }
 }
