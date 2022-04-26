@@ -74,30 +74,29 @@ class AttendancePagePrivateRoom extends ConsumerWidget {
     final selectedRoomProvider = ref.watch(selectedRoom);
 
     return FutureBuilder<bool>(
-          future: selectedUsersServices
-              .checkSelectedUsersExist(selectedRoomProvider.room!),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        future: selectedUsersServices
+            .checkSelectedUsersExist(selectedRoomProvider.room!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (snapshot.hasError) return const Center(child: Text("ERROR"));
+          if (snapshot.hasError) return const Center(child: Text("ERROR"));
 
-            final exist = snapshot.data;
+          final exist = snapshot.data;
 
-            if (exist == null) {
-              return const Center(child: CircularProgressIndicator());
-            }
+          if (exist == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (exist) return const AttendancePagePublicRoom();
+          if (exist) return const AttendancePagePublicRoom();
 
-            return const Center(
-              child: Text("Set the private room first to use attendance list."),
-            );
-          });
+          return const Center(
+            child: Text("Set the private room first to use attendance list."),
+          );
+        });
   }
 }
-
 
 // attendance page for public room
 class AttendancePagePublicRoom extends ConsumerStatefulWidget {
@@ -121,6 +120,51 @@ class _AttendancePagePublicRoomState
 
   // services
   final AttendanceListService _attendanceListService = AttendanceListService();
+
+  // attendances
+  List<Attendance> attendances = [];
+  List<Attendance> viewedAttendances = [];
+
+  // filter active attendance
+  void filterActiveAttendances() {
+    List<Attendance> activeAttendances = [];
+    List<Attendance> notActiveAttendances = [];
+
+    for (var element in attendances) {
+      if (element.attendanceActive) activeAttendances.add(element);
+      if (!element.attendanceActive) notActiveAttendances.add(element);
+    }
+
+    setState(() {
+      viewedAttendances = activeAttendances;
+      // attendances.addAll(notActiveAttendances);
+    });
+  }
+
+  // filter active attendance
+  void filterNotActiveAttendances() {
+    List<Attendance> activeAttendances = [];
+    List<Attendance> notActiveAttendances = [];
+
+    for (var element in attendances) {
+      if (element.attendanceActive) activeAttendances.add(element);
+      if (!element.attendanceActive) notActiveAttendances.add(element);
+    }
+
+    setState(() {
+      viewedAttendances = notActiveAttendances;
+      // attendances.addAll(notActiveAttendances);
+    });
+  }
+
+  // filter active attendance
+  void filterDefaultAttendances() {
+    setState(() {
+      viewedAttendances = attendances;
+      // attendances.addAll(notActiveAttendances);
+    });
+  }
+
 
   @override
   void initState() {
@@ -179,35 +223,81 @@ class _AttendancePagePublicRoomState
       animation: _animation,
       iconData: Icons.menu);
 
+  // stream builder
+  Widget streamBuildAttendancesView() {
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+
+    return StreamBuilder<List<Attendance>>(
+      stream: _attendanceListService
+          .streamAttendanceList(_selectedRoomProvider.room!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loadingScene;
+        }
+
+        if (snapshot.hasError) return errorScene;
+
+        final data = snapshot.data;
+
+        if (data == null) return loadingScene;
+
+        attendances = data;
+        viewedAttendances = data;
+
+        if (data.isEmpty) {
+          return const Center(child: Text("No attendance"));
+        }
+
+        return attendancesView();
+      },
+    );
+  }
+
+  // attendances views
+  Widget attendancesView() => ListView.builder(
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
+      itemCount: viewedAttendances.length,
+      itemBuilder: (context, index) {
+        final currentData = viewedAttendances[index];
+
+        return AttendanceButtonWidget(attendance: currentData);
+      });
+
+  // filterWidget
+  Widget filterWidget() => FilteredSections(
+        filterButtons: [
+          PopupMenuItem(
+            child: const Text("Default"),
+            onTap: filterDefaultAttendances,
+          ),
+          PopupMenuItem(
+            child: const Text("Active"),
+            onTap: filterActiveAttendances,
+          ),
+          PopupMenuItem(
+            child: const Text("Not Active"),
+            onTap: filterNotActiveAttendances,
+          ),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
-    final _selectedRoomProvider = ref.watch(selectedRoom);
     return Scaffold(
         floatingActionButton: floatingActionButtonWidget(),
-        body: StreamBuilder<List<Attendance>>(
-          stream: _attendanceListService
-              .streamAttendanceList(_selectedRoomProvider.room!),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return loadingScene;
-            }
-
-            if (snapshot.hasError) return errorScene;
-
-            final data = snapshot.data;
-
-            if (data!.isEmpty) {
-              return const Center(child: Text("No attendance"));
-            }
-
-            return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  final currentData = data[index];
-
-                  return AttendanceButtonWidget(attendance: currentData);
-                });
-          },
-        ));
+        body: attendances.isEmpty
+            ? Column(
+                children: [
+                  filterWidget(),
+                  streamBuildAttendancesView(),
+                ],
+              )
+            : Column(
+                children: [
+                  filterWidget(),
+                  attendancesView(),
+                ],
+              ));
   }
 }

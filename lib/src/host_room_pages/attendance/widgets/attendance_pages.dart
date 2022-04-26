@@ -14,6 +14,9 @@ import 'package:atdel/src/model/attendance.dart';
 // pages
 import 'package:atdel/src/host_room_pages/attendance/members_attendance_list_pages.dart';
 
+// date
+import 'package:intl/intl.dart';
+
 // attendance page loading screen
 class AttendancePageLoadingScreen extends StatelessWidget {
   const AttendancePageLoadingScreen({Key? key}) : super(key: key);
@@ -47,9 +50,11 @@ class AttendanceButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final _selectedRoomProvider = ref.watch(selectedRoom);
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
+        shape: const OutlineInputBorder(),
         onTap: () {
           _selectedAttendanceProvider.setAttendance = attendance;
 
@@ -60,12 +65,46 @@ class AttendanceButtonWidget extends ConsumerWidget {
                       room: _selectedRoomProvider.room!,
                       attendance: attendance)));
         },
-        leading: const Icon(Icons.date_range),
-        title: Column(children: [
-          Text("Start: " + attendance.dateStart.toString()),
-          Text("End: " + attendance.dateEnd.toString())
-        ]),
+        leading: const Icon(Icons.date_range, color: Colors.white),
+        tileColor: attendance.attendanceActive ? Colors.green : Colors.red,
+        title: FittedBox(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text("Start: " +
+                DateFormat('EEEE, d MMM, yyyy h:mm a')
+                    .format(attendance.dateStart), style: const TextStyle(color: Colors.white)),
+            Text("End: " +
+                DateFormat('EEEE, d MMM, yyyy h:mm a')
+                    .format(attendance.dateEnd), style: const TextStyle(color: Colors.white))
+          ]),
+        ),
       ),
+    );
+  }
+}
+
+// filtered sections
+class FilteredSections extends StatelessWidget {
+  const FilteredSections({
+    Key? key,
+    required this.filterButtons
+  }) : super(key: key);
+
+  final List<PopupMenuEntry<dynamic>> filterButtons;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        const Text("Filter by"),
+        PopupMenuButton(
+          icon: const Icon(Icons.filter_list),
+          itemBuilder: (context) {
+            return filterButtons;
+          },
+        )
+      ],
     );
   }
 }
