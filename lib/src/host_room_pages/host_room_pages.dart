@@ -10,6 +10,7 @@ import 'package:atdel/src/host_room_pages/room_desc/home_preview_feature.dart';
 import 'package:atdel/src/host_room_pages/widgets/host_drawer.dart';
 import 'package:atdel/src/host_room_pages/attendance/attendance_list_pages.dart';
 import 'package:atdel/src/host_room_pages/room_info/host_room_info.dart';
+import 'package:atdel/src/host_room_pages/members_page/members_page.dart';
 
 // widgets
 import 'package:atdel/src/host_room_pages/widgets/host_room_pages.dart';
@@ -27,11 +28,13 @@ class _HostRoomPagesState extends State<HostRoomPages> {
   final List<Widget> featurePage = [
     const HomePreviewPage(),
     const AttendanceListPage(),
+    const MembersPage(),
     const RoomInfo()
   ];
   final List<IconData> iconsPage = [
     Icons.home,
     Icons.class_,
+    Icons.people_alt_outlined,
     Icons.info
   ];
 
