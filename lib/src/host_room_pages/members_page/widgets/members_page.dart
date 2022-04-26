@@ -29,8 +29,11 @@ class MemberButton extends ConsumerWidget {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const UserRoomPage()));
       },
-      leading: CircleAvatar(
-          radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      leading: Padding(
+        padding: const EdgeInsets.all(3.0),
+        child: CircleAvatar(
+            radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      ),
       title: Text(
         user.alias,
         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -55,8 +58,11 @@ class HostButton extends ConsumerWidget {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const HostUserRoomPage()));
       },
-      leading: CircleAvatar(
-          radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      leading: Padding(
+        padding: const EdgeInsets.all(3.0),
+        child: CircleAvatar(
+            radius: 30, backgroundImage: NetworkImage(user.photoUrl)),
+      ),
       title: Text(
         user.alias,
         style: const TextStyle(fontWeight: FontWeight.bold),
