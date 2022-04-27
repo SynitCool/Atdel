@@ -19,7 +19,6 @@ class CreateRoomPage extends StatefulWidget {
 class _CreateRoomPageState extends State<CreateRoomPage> {
   // form
   String roomName = '';
-  bool privateRoom = false;
   bool attendanceWithMl = false;
   String hostAlias = '';
 
@@ -73,21 +72,10 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
   // options page
   Widget optionsPage() => Column(
         children: [
-          privateRoomCheckbox(),
-          const SizedBox(height: 15),
           attendanceWithMlCheckbox()
         ],
       );
 
-  // private room checkbox
-  Widget privateRoomCheckbox() => PrivateRoomCheckbox(
-        callback: (value) {
-          setState(() {
-            privateRoom = value;
-          });
-        },
-        callbackPrivateRoom: () => privateRoom,
-      );
 
   // attendance with ml checbox
   Widget attendanceWithMlCheckbox() => AttendanceWithMlCheckbox(
@@ -178,7 +166,6 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                                 hostAlias: hostAlias,
                                 roomInfo: {
                                   "room_name": roomName,
-                                  "private_room": privateRoom,
                                   "attendance_with_ml": attendanceWithMl
                                 },
                                 width: width),
