@@ -159,9 +159,6 @@ class RoomService {
     user.setJoined = false;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
-
-    // delete existing photo
-    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // change room desc
