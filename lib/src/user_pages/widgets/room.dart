@@ -104,10 +104,8 @@ class MakeHostRoomButton extends ConsumerWidget {
 
     return ElevatedButton.icon(
         onPressed: () async {
-          if (selectedRoomProvider.room!.privateRoom) {
-            await removeHostSelectedUser(
+          await removeHostSelectedUser(
                 selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
-          }
 
           final Room oldRoom = Room.copy(selectedRoomProvider.room!);
 
@@ -121,7 +119,6 @@ class MakeHostRoomButton extends ConsumerWidget {
               roomName: selectedRoomProvider.room!.roomName,
               id: selectedRoomProvider.room!.id,
               roomCode: selectedRoomProvider.room!.roomCode,
-              privateRoom: selectedRoomProvider.room!.privateRoom,
               attendanceWithMl: selectedRoomProvider.room!.attendanceWithMl);
 
           roomService.updateRoomInfo(oldRoom, newRoom);
