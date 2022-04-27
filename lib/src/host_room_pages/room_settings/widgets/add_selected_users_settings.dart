@@ -24,7 +24,7 @@ class AddSelectedUsersButton extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
-          onPressed: () {
+          onPressed: () async {
             selectedUsersServices.addSelectedUsers(
                 selectedRoomProvider.room!, selectedUsers);
 
@@ -47,6 +47,12 @@ class ColumnTile extends StatelessWidget {
       title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: const <Widget>[
+            Expanded(
+                child: Text(
+              "Photo",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
+            VerticalDivider(),
             Expanded(
                 child: Text(
               "Alias",

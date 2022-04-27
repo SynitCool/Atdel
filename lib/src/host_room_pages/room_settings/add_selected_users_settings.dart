@@ -1,5 +1,11 @@
+// dart
+import 'dart:io';
+
 // flutter
 import 'package:flutter/material.dart';
+
+// pick file
+import 'package:image_picker/image_picker.dart';
 
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/add_selected_users_settings.dart';
@@ -52,7 +58,13 @@ class _ContentPageState extends State<ContentPage> {
   String userAliasText = '';
   String userEmailText = '';
 
+  // file
+  XFile? userPhoto;
+
   List<Map<String, dynamic>> addedSelectedUsers = [];
+
+  // name text widget
+  String nameFile = "Upload Photo User";
 
   @override
   void dispose() {
@@ -117,7 +129,7 @@ class _ContentPageState extends State<ContentPage> {
   Widget addedSelectedUsersButton() => ElevatedButton.icon(
       icon: const Icon(Icons.add),
       label: const Text("Add"),
-      onPressed: () {
+      onPressed: () async {
         if (userAliasText.isEmpty) return;
         if (userEmailText.isEmpty) return;
 
@@ -130,18 +142,41 @@ class _ContentPageState extends State<ContentPage> {
           "alias": userAliasText,
           "email": userEmailText,
           "joined": false,
-          "photo_url": null
+          "photo_url": null,
+          "photo_file": userPhoto
         };
 
         setState(() {
           addedSelectedUsers.add(selectedUser);
+          userPhoto = null;
         });
 
         widget.callback(addedSelectedUsers);
 
         userAliasController.clear();
         userEmailController.clear();
+
+        nameFile = "Upload Photo User";
+
+        userPhoto = null;
       });
+
+  // upload photo user
+  Widget uploadPhotoUserButton() => ElevatedButton.icon(
+      onPressed: () async {
+        final ImagePicker _picker = ImagePicker();
+
+        final pickImage = await _picker.pickImage(source: ImageSource.gallery);
+
+        if (pickImage == null) return;
+
+        setState(() {
+          userPhoto = pickImage;
+          nameFile = userPhoto!.name;
+        });
+      },
+      icon: const Icon(Icons.add),
+      label: Text(nameFile));
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +214,16 @@ class _ContentPageState extends State<ContentPage> {
                     title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
+                          Expanded(
+                            child: currentData["photo_file"] == null
+                                ? const CircleAvatar(
+                                    backgroundColor: Colors.blue, radius: 30)
+                                : CircleAvatar(
+                                    backgroundImage: FileImage(
+                                        File(currentData["photo_file"].path)),
+                                    radius: 30),
+                          ),
+                          const VerticalDivider(),
                           Expanded(child: Text(currentData["alias"])),
                           const VerticalDivider(),
                           Expanded(child: Text(currentData["email"])),
@@ -192,8 +237,10 @@ class _ContentPageState extends State<ContentPage> {
               userAliasFieldWidget(),
               const SizedBox(height: 15),
               userEmailFieldWidget(),
+              const SizedBox(height: 15),
+              uploadPhotoUserButton(),
               const SizedBox(height: 10),
-              addedSelectedUsersButton()
+              addedSelectedUsersButton(),
             ],
           )
         ],

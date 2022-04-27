@@ -15,90 +15,6 @@ class SelectedUsersTitle extends StatelessWidget {
   }
 }
 
-// title
-class SelectedUsersMlTitle extends StatelessWidget {
-  const SelectedUsersMlTitle({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text("Selected Users ML",
-        style: TextStyle(color: Colors.grey));
-  }
-}
-
-// show ml picutres
-class ShowSelectedUsersPicturesMlButton extends StatelessWidget {
-  const ShowSelectedUsersPicturesMlButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.people_alt_outlined),
-      onTap: () {},
-      title: const Text("Show Selected Users Pictures ML"),
-    );
-  }
-}
-
-// add pictures selected users
-class AddSelectedUsersPicturesMlButton extends StatelessWidget {
-  const AddSelectedUsersPicturesMlButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.add_box),
-      subtitle: const Text("Add selected users pictures with GUI."),
-      onTap: () {},
-      title: const Text("Add Selected Users Picture ML"),
-    );
-  }
-}
-
-// upload pictures in folder selected users button
-class SelectedUsersPicturesMlFileButton extends StatelessWidget {
-  const SelectedUsersPicturesMlFileButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.upload_file),
-      subtitle:
-          const Text("Add selected users pictures with pictures in folder."),
-      onTap: () {},
-      title: Row(children: [
-        const Text("Find Folders"),
-        IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.help),
-            tooltip: "help",
-            iconSize: 20)
-      ]),
-    );
-  }
-}
-
-// upload selected users files button
-class SelectedUsersFileButton extends StatelessWidget {
-  const SelectedUsersFileButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.upload_file),
-      subtitle: const Text("Add selected users with uploading excel file."),
-      onTap: () {},
-      title: Row(children: [
-        const Text("Upload file"),
-        IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.help),
-            tooltip: "help",
-            iconSize: 20)
-      ]),
-    );
-  }
-}
 
 // show selected users button
 class ShowSelectedUsersButton extends StatelessWidget {
@@ -107,6 +23,7 @@ class ShowSelectedUsersButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      shape: const OutlineInputBorder(),
       leading: const Icon(Icons.people_alt_outlined),
       onTap: () {
         Navigator.push(
@@ -126,6 +43,7 @@ class AddSelectedUsersButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      shape: const OutlineInputBorder(),
       leading: const Icon(Icons.add_box),
       subtitle: const Text("Add selected users with GUI."),
       onTap: () {

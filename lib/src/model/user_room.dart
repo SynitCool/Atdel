@@ -5,11 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 class UserRoom {
   final String displayName;
   final String email;
-  final String photoUrl;
   final String uid;
 
   String alias;
   dynamic userReference;
+  String photoUrl;
 
   UserRoom({
     required this.alias,
@@ -73,5 +73,10 @@ class UserRoom {
   // set user reference
   set setUserReference(dynamic newUserReference) {
     userReference = newUserReference;
+  }
+
+  //set photo url
+  set setPhotoUrl(String newPhotoUrl) {
+    photoUrl = newPhotoUrl;
   }
 }

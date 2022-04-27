@@ -106,6 +106,8 @@ class UserRoomService {
         _db.collection(rootUsersCollection).doc(authUser!.uid);
     userRoom.setAlias = user.alias;
 
+    if (user.photoUrl != null) userRoom.setPhotoUrl = user.photoUrl!;
+
     // set to user room
     await roomUsersDoc.set(userRoom.toMap());
 

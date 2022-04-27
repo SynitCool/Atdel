@@ -38,53 +38,8 @@ class _PrivateContentRoomState extends State<PrivateContentRoom> {
       child: ListView(
         children: const [
           ShowSelectedUsersButton(),
+          SizedBox(height: 20),
           AddSelectedUsersButton(),
-          SelectedUsersFileButton(),
-        ],
-      ),
-    );
-  }
-}
-
-// private pictures room
-class PrivatePicturesRoom extends StatefulWidget {
-  const PrivatePicturesRoom({Key? key}) : super(key: key);
-
-  @override
-  State<PrivatePicturesRoom> createState() => _PrivatePicturesRoomState();
-}
-
-class _PrivatePicturesRoomState extends State<PrivatePicturesRoom> {
-  PreferredSizeWidget scaffoldAppBar() =>
-      AppBar(title: const Text("Set Selected Users Pictures ML"));
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: scaffoldAppBar(), body: const PrivatePicturesContentRoom());
-  }
-}
-
-// private pictures content room
-class PrivatePicturesContentRoom extends StatefulWidget {
-  const PrivatePicturesContentRoom({Key? key}) : super(key: key);
-
-  @override
-  State<PrivatePicturesContentRoom> createState() =>
-      _PrivatePicturesContentRoomState();
-}
-
-class _PrivatePicturesContentRoomState
-    extends State<PrivatePicturesContentRoom> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: const [
-          ShowSelectedUsersPicturesMlButton(),
-          AddSelectedUsersPicturesMlButton(),
-          SelectedUsersPicturesMlFileButton(),
         ],
       ),
     );
