@@ -67,6 +67,10 @@ class StorageService {
 
   Future deleteSelectedUsersPhoto(
       Room room, SelectedUsers selectedUsers) async {
+    // checking
+    if (selectedUsers.photoUrl == null) return;
+    if (!selectedUsers.photoUrl!.contains("firebasestorage")) return;
+
     // file info
     final String fileFormat = selectedUsers.photoUrl!
         .split("/")

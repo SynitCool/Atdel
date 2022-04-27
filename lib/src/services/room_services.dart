@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 // model
 import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/user.dart' as model;
 import 'package:atdel/src/model/user_room.dart';
 
 // services
@@ -15,6 +14,7 @@ import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:atdel/src/services/attendance_list_services.dart';
+import 'package:atdel/src/services/storage_services.dart';
 
 // other
 import 'package:random_string_generator/random_string_generator.dart';
@@ -30,6 +30,7 @@ class RoomService {
   final UserPhotoMetricService _userPhotoMetricService =
       UserPhotoMetricService();
   final AttendanceListService _attendanceListService = AttendanceListService();
+  final StorageService _storageService = StorageService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -124,7 +125,7 @@ class RoomService {
   Future joinRoomPrivateRoom(Room room) async {
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
-        room, model.User.fromFirebaseAuth(authUser!));
+        room, authUser!.email!);
 
     if (user == null) return "user_not_include";
 
@@ -149,7 +150,7 @@ class RoomService {
   Future leaveRoomPrivateRoom(Room room) async {
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
-        room, model.User.fromFirebaseAuth(authUser!));
+        room, authUser!.email!);
 
     if (user == null) return "user_not_available";
 
@@ -169,6 +170,9 @@ class RoomService {
     user.setJoined = false;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+
+    // delete existing photo
+    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // change room desc
@@ -242,6 +246,50 @@ class RoomService {
 
     // decrease member counts
     await updateMembersCount(room, false);
+  }
+
+  // kick room
+  Future kickUserFromRoomPrivateRoom(Room room, UserRoom userRoom) async {
+    // get selected users by email
+    final user = await _selectedUsersServices.getSelectedUsersByEmail(
+        room, userRoom.email);
+
+    if (user == null) return "user_not_available";
+
+    // services
+    final userService = UserService();
+    final roomService = RoomService();
+
+    // collection
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final DocumentReference<Map<String, dynamic>> doc =
+        collection.doc(userRoom.uid);
+
+    // remove user room
+    await doc.delete();
+
+    // remove room reference
+    await userService.removeRoomReference(userRoom.uid, room);
+
+    // decrease member counts
+    await roomService.updateMembersCount(room, false);
+
+    // delete user photo metric by current user
+    await _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
+
+    // update selected users
+    SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
+
+    user.setJoined = false;
+
+    _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+
+    // delete existing photo
+    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // update room info

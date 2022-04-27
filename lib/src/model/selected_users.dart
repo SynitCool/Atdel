@@ -2,9 +2,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SelectedUsers {
-  final String alias;
   final String email;
 
+  String alias;
   bool joined;
   String? photoUrl;
 
@@ -46,5 +46,9 @@ class SelectedUsers {
 
   set setPhotoUrl(String? newPhotoUrl) {
     photoUrl = newPhotoUrl;
+  }
+
+  set setAlias(String newAlias) {
+    alias = newAlias;
   }
 }

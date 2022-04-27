@@ -1,5 +1,4 @@
 // flutter
-import 'package:atdel/src/model/user_room.dart';
 import 'package:flutter/material.dart';
 
 // state management
@@ -11,10 +10,12 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // model
 import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/user_room.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
 import 'package:atdel/src/services/room_services.dart';
+import 'package:atdel/src/services/selected_users_services.dart';
 
 // user room page top
 class BuildTop extends ConsumerWidget {
@@ -57,7 +58,7 @@ class KickUserRoomButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // services
-    final UserRoomService userRoomService = UserRoomService();
+    final RoomService roomService = RoomService();
 
     // providers
     final selectedUserRoomProvider = ref.watch(selectedUserRoom);
@@ -65,7 +66,7 @@ class KickUserRoomButton extends ConsumerWidget {
 
     return ElevatedButton.icon(
         onPressed: () {
-          userRoomService.removeUserRoom(
+          roomService.kickUserFromRoomPrivateRoom(
               selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
 
           Navigator.pop(context);
@@ -80,6 +81,18 @@ class KickUserRoomButton extends ConsumerWidget {
 class MakeHostRoomButton extends ConsumerWidget {
   const MakeHostRoomButton({Key? key}) : super(key: key);
 
+  // remove host selected user
+  Future removeHostSelectedUser(Room room, UserRoom userRoom) async {
+    final SelectedUsersServices selectedUsersServices = SelectedUsersServices();
+
+    final selectedUser = await selectedUsersServices.getSelectedUsersByEmail(
+        room, userRoom.email);
+
+    if (selectedUser == null) return;
+
+    await selectedUsersServices.removeSelectedUsers(room, selectedUser);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // services
@@ -90,7 +103,12 @@ class MakeHostRoomButton extends ConsumerWidget {
     final selectedRoomProvider = ref.watch(selectedRoom);
 
     return ElevatedButton.icon(
-        onPressed: () {
+        onPressed: () async {
+          if (selectedRoomProvider.room!.privateRoom) {
+            await removeHostSelectedUser(
+                selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
+          }
+
           final Room oldRoom = Room.copy(selectedRoomProvider.room!);
 
           final Room newRoom = Room(
