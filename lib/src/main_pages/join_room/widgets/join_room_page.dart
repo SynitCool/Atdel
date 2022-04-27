@@ -225,13 +225,53 @@ class JoinRoomButton extends StatelessWidget {
   const JoinRoomButton({
     Key? key,
     required this.roomCode,
-    required this.userAlias,
     required this.width,
   }) : super(key: key);
 
   final String roomCode;
-  final String userAlias;
   final double width;
+
+  // show not valid code
+  Future showNotValidCode(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content:
+            const Text("The code is not valid. Get the code from the host!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // show user is not include
+  Future showUserNotInclude(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text(
+            "You're not include in this room. Ask the host to add you!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,12 +279,16 @@ class JoinRoomButton extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
-          onPressed: () {
-            if (roomCode.isEmpty ||
-                roomCode.length != 6) return;
-            if (userAlias.isEmpty || userAlias.length < 4 || userAlias.length > 12) return;
+          onPressed: () async {
+            if (roomCode.isEmpty || roomCode.length != 6) return;
 
-            roomService.joinRoomWithCode(roomCode, userAlias);
+            final status = await roomService.joinRoomWithCode(roomCode);
+
+            if (status == "code_not_valid") showNotValidCode(context);
+            if (status == "user_not_include") showUserNotInclude(context);
+            if (status == "code_not_valid" || status == "user_not_include") {
+              return;
+            }
 
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));

@@ -19,7 +19,6 @@ class JoinRoomPage extends StatefulWidget {
 class _JoinRoomPageState extends State<JoinRoomPage> {
   // form
   String roomCode = '';
-  String userAlias = '';
 
   // page view
   final _controller = PageController();
@@ -47,14 +46,12 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
 
   // controller
   final TextEditingController roomCodeController = TextEditingController();
-  final TextEditingController userAliasController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
     widgets.add(roomCodePage());
-    widgets.add(userAliasPage());
   }
 
   // room name page
@@ -66,16 +63,6 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
           controller: roomCodeController,
         ),
       );
-
-  // user alias page
-  Widget userAliasPage() => Center(
-      child: UserAliasTextField(
-          callback: (value) {
-            setState(() {
-              userAlias = value;
-            });
-          },
-          controller: userAliasController));
 
   @override
   Widget build(BuildContext context) {
@@ -130,21 +117,10 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                     ? Padding(
                         padding: const EdgeInsets.all(30),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            JoinRoomBackButton(
-                                onPressed: () {
-                                  _controller.previousPage(
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Curves.easeIn,
-                                  );
-
-                                  FocusScope.of(context).unfocus();
-                                },
-                                width: width),
                             JoinRoomButton(
                                 roomCode: roomCode,
-                                userAlias: userAlias,
                                 width: width),
                           ],
                         ),

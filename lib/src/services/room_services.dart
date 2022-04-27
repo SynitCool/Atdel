@@ -96,7 +96,7 @@ class RoomService {
   }
 
   // join room with code
-  Future joinRoomWithCode(String code, String userAlias) async {
+  Future joinRoomWithCode(String code) async {
     // get reference with code
     final status = await _roomCodesService.getRoomByCode(code);
 
@@ -105,7 +105,7 @@ class RoomService {
     final Room room = status;
 
     // check if room is private
-    await joinRoomPrivateRoom(room);
+    return await joinRoomPrivateRoom(room);
   }
 
   // join room private room
@@ -131,6 +131,8 @@ class RoomService {
     user.setJoined = true;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+
+    return "success";
   }
 
   // leave room private room

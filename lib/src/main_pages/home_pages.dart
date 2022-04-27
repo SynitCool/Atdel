@@ -28,13 +28,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // appbar widget
-  PreferredSizeWidget appBarWidget() => AppBar(
-        // title: const Text("Atdel Demo"),
-        elevation: 0,
-        actions: const [SettingsButton()],
-      );
-
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
