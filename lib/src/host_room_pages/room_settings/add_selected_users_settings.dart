@@ -1,3 +1,6 @@
+// dart
+import 'dart:io';
+
 // flutter
 import 'package:flutter/material.dart';
 
@@ -212,6 +215,16 @@ class _ContentPageState extends State<ContentPage> {
                     title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
+                          Expanded(
+                            child: currentData["photo_file"] == null
+                                ? const CircleAvatar(
+                                    backgroundColor: Colors.blue, radius: 30)
+                                : CircleAvatar(
+                                    backgroundImage: FileImage(
+                                        File(currentData["photo_file"].path)),
+                                    radius: 30),
+                          ),
+                          const VerticalDivider(),
                           Expanded(child: Text(currentData["alias"])),
                           const VerticalDivider(),
                           Expanded(child: Text(currentData["email"])),

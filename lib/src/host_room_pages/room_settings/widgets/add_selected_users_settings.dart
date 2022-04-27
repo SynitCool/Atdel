@@ -49,6 +49,12 @@ class ColumnTile extends StatelessWidget {
           children: const <Widget>[
             Expanded(
                 child: Text(
+              "Photo",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
+            VerticalDivider(),
+            Expanded(
+                child: Text(
               "Alias",
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
