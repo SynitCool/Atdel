@@ -68,7 +68,6 @@ class RoomService {
     room.setRoomName = info["room_name"];
     room.setId = roomDoc.id;
     room.setRoomCode = makeRandomCode();
-    room.setPrivateRoom = info["private_room"];
     room.setAttendanceWithMl = info["attendance_with_ml"];
 
     // add room to database
@@ -103,22 +102,10 @@ class RoomService {
 
     if (status == "code_not_valid") return status;
 
-    final room = status;
+    final Room room = status;
 
     // check if room is private
-    if (room.privateRoom) {
-      await joinRoomPrivateRoom(room);
-    }
-    if (room.privateRoom) return;
-
-    // update the user references
-    _userService.addRoomReference(room);
-
-    // update user room
-    await _userRoomService.addUserRoomPublicRoom(room, userAlias);
-
-    // update room info
-    updateMembersCount(room, true);
+    await joinRoomPrivateRoom(room);
   }
 
   // join room private room
@@ -233,19 +220,7 @@ class RoomService {
   // leave room
   Future leaveRoom(Room room) async {
     // if room private
-    if (room.privateRoom) return await leaveRoomPrivateRoom(room);
-
-    // remove the user room references
-    await _userService.removeRoomReference(authUser!.uid, room);
-
-    // delete user in room users
-    await _userRoomService.deleteCurrentUserRoom(room);
-
-    // delete user photo metric by current user
-    await _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
-
-    // decrease member counts
-    await updateMembersCount(room, false);
+    await leaveRoomPrivateRoom(room);
   }
 
   // kick room
@@ -315,17 +290,6 @@ class RoomService {
 
     // update
     await updateRoomInfo(oldRoom, roomInfo);
-  }
-
-  // stream global rooms
-  Stream<List<Room>> streamGlobalRooms() {
-    final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootRoomsCollection);
-
-    final Stream<List<Room>> snapshot = collection.snapshots().map(
-        (snap) => snap.docs.map((data) => Room.fromMap(data.data())).toList());
-
-    return snapshot;
   }
 
   // stream local rooms

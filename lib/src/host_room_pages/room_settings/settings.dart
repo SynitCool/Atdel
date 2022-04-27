@@ -45,14 +45,6 @@ class _SetRoomPagesState extends ConsumerState<SetRoomPages> {
                 });
               }),
               const SizedBox(height: 30),
-              PrivateRoomSettings(
-                callback: (newPrivateRoom) {
-                  setState(() {
-                    newRoomInfo["private_room"] = newPrivateRoom;
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
               AttendanceWithMlSettings(callback: (newAttendanceWithMl) {
                 setState(() {
                   newRoomInfo["attendance_with_ml"] = newAttendanceWithMl;

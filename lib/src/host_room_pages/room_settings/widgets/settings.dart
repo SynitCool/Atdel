@@ -15,7 +15,6 @@ import 'package:atdel/src/services/room_services.dart';
 
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/attendance_with_ml_settings.dart';
-import 'package:atdel/src/host_room_pages/room_settings/widgets/private_room_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/widgets/room_name_settings.dart';
 
 // pages
@@ -80,8 +79,6 @@ class UpdateRoomButton extends ConsumerWidget {
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 
           selectedRoomProvider.room!.setRoomName = newRoomInfo["room_name"];
-          selectedRoomProvider.room!.setPrivateRoom =
-              newRoomInfo["private_room"];
           selectedRoomProvider.room!.setAttendanceWithMl =
               newRoomInfo["attendance_with_ml"];
 
@@ -146,40 +143,6 @@ class _RoomNameSettingsState extends State<RoomNameSettings> {
             widget.callback(newRoomNameText);
           }),
         ),
-      ],
-    );
-  }
-}
-
-// private room settings
-class PrivateRoomSettings extends StatefulWidget {
-  const PrivateRoomSettings({Key? key, required this.callback})
-      : super(key: key);
-
-  final Function callback;
-
-  @override
-  State<PrivateRoomSettings> createState() => _PrivateRoomSettingsState();
-}
-
-class _PrivateRoomSettingsState extends State<PrivateRoomSettings> {
-  bool privateRoomValue = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const OldPrivateRoomSetting(),
-        const SizedBox(height: 5),
-        CheckboxListTile(
-            shape: const OutlineInputBorder(),
-            value: privateRoomValue,
-            title: const Text("New Private Room Settings"),
-            subtitle: const Text("The host can specify who can enter the room"),
-            onChanged: (value) => setState(() {
-                  privateRoomValue = value!;
-                  widget.callback(privateRoomValue);
-                }))
       ],
     );
   }

@@ -7,9 +7,6 @@ import 'package:atdel/src/host_room_pages/room_settings/widgets/host_settings_pa
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// providers
-import 'package:atdel/src/providers/selected_room_providers.dart';
-
 // settings page
 class HostSettingsPage extends StatefulWidget {
   const HostSettingsPage({Key? key}) : super(key: key);
@@ -35,15 +32,14 @@ class ContentSettings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedRoomProvider = ref.watch(selectedRoom);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
-        children: [
-          const GeneralSections(),
-          const OptionsSections(),
-          selectedRoomProvider.room!.privateRoom ?  const PrivateRoomControlSections() : Column(),
-          const DangerZoneSections(),
+        children: const [
+          GeneralSections(),
+          OptionsSections(),
+          PrivateRoomControlSections(),
+          DangerZoneSections(),
         ],
       ),
     );

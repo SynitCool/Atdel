@@ -54,8 +54,6 @@ class AttendanceListPage extends ConsumerWidget {
 
           if (data == null) return const AttendancePageLoadingScreen();
 
-          if (data.privateRoom) return const AttendancePagePrivateRoom();
-
           return const AttendancePagePublicRoom();
         });
   }

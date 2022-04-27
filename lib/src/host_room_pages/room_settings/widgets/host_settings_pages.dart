@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // features
 import 'package:atdel/src/host_room_pages/room_settings/settings.dart';
-import 'package:atdel/src/host_room_pages/room_settings/private_room_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/attendance_with_ml_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/room_name_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/private_room.dart';
@@ -54,26 +53,6 @@ class SettingsRoomButton extends StatelessWidget {
       onTap: () {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const SetRoomPages()));
-      },
-    );
-  }
-}
-
-// private room option button
-class PrivateRoomOptionButton extends StatelessWidget {
-  const PrivateRoomOptionButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      shape: const OutlineInputBorder(),
-      leading: const Icon(Icons.privacy_tip),
-      title: const Text("Private Room"),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const PrivateRoomSettingsPage()));
       },
     );
   }
@@ -220,12 +199,7 @@ class OptionsSections extends StatelessWidget {
         ),
         RoomNameOptionButton(),
         SizedBox(
-          height: 10,
-        ),
-        PrivateRoomOptionButton(),
-        SizedBox(
-          height: 10,
-        ),
+          height: 10),
         AttendanceWithMlOptionButton(),
         SizedBox(
           height: 15,
