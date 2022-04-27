@@ -85,6 +85,11 @@ class SelectedUsersServices {
 
     final doc = collection.doc(selectedUsers.email);
 
+    // delete selected users photo if exist
+    if (selectedUsers.photoUrl != null) {
+      await _storageService.deleteSelectedUsersPhoto(room, selectedUsers);
+    }
+
     // remove selected user
     await doc.delete();
   }
