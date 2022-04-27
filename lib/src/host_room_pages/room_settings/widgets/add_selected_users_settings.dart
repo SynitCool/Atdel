@@ -24,7 +24,7 @@ class AddSelectedUsersButton extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
-          onPressed: () {
+          onPressed: () async {
             selectedUsersServices.addSelectedUsers(
                 selectedRoomProvider.room!, selectedUsers);
 

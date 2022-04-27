@@ -129,7 +129,7 @@ class _ContentPageState extends State<ContentPage> {
   Widget addedSelectedUsersButton() => ElevatedButton.icon(
       icon: const Icon(Icons.add),
       label: const Text("Add"),
-      onPressed: () {
+      onPressed: () async {
         if (userAliasText.isEmpty) return;
         if (userEmailText.isEmpty) return;
 
@@ -146,8 +146,6 @@ class _ContentPageState extends State<ContentPage> {
           "photo_file": userPhoto
         };
 
-        print(selectedUser);
-
         setState(() {
           addedSelectedUsers.add(selectedUser);
           userPhoto = null;
@@ -159,6 +157,7 @@ class _ContentPageState extends State<ContentPage> {
         userEmailController.clear();
 
         nameFile = "Upload Photo User";
+
         userPhoto = null;
       });
 

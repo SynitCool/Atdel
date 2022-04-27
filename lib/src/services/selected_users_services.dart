@@ -1,3 +1,6 @@
+// dart
+import 'dart:io';
+
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -6,10 +9,16 @@ import 'package:atdel/src/model/selected_users.dart';
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user.dart';
 
+// services
+import 'package:atdel/src/services/storage_services.dart';
+
 class SelectedUsersServices {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final String rootRoomsCollection = "rooms";
+
+  // services
+  final StorageService _storageService = StorageService();
 
   // deleate all selected users
   Future deleteSelectedUsers(Room room) async {
@@ -51,6 +60,16 @@ class SelectedUsersServices {
 
     // make doc and set
     for (final selectedUser in selectedUsers) {
+      if (selectedUser["photo_file"] != null) {
+        // upload photo user
+        final photoUrl = await _storageService.uploadSelectedUsersPhoto(
+            room, File(selectedUser["photo_file"].path), selectedUser["alias"]);
+
+        selectedUser["photo_url"] = photoUrl;
+      }
+
+      selectedUser.remove("photo_file");
+
       final doc = collection.doc(selectedUser["email"]);
 
       await doc.set(selectedUser);
