@@ -36,12 +36,12 @@ class _ContentPageState extends State<ContentPage> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: const [
-          GeneralTitle(),
-          SetJoinUserRoomButton(),
-          SizedBox(height: 20),
-          MachineLearningRelatedTitle(),
-          SetImageButton(),
-          SizedBox(height: 50),
+          // GeneralTitle(),
+          // SetJoinUserRoomButton(),
+          // SizedBox(height: 20),
+          // MachineLearningRelatedTitle(),
+          // SetImageButton(),
+          // SizedBox(height: 50),
           DangerZoneTitle(),
           LeaveRoomButton()
         ],

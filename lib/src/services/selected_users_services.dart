@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // model
 import 'package:atdel/src/model/selected_users.dart';
 import 'package:atdel/src/model/room.dart';
-import 'package:atdel/src/model/user.dart';
 
 // services
 import 'package:atdel/src/services/storage_services.dart';
@@ -35,12 +34,12 @@ class SelectedUsersServices {
   }
 
   // check selected users
-  Future<SelectedUsers?> getSelectedUsersByEmail(Room room, User user) async {
+  Future<SelectedUsers?> getSelectedUsersByEmail(Room room, String email) async {
     // collection
     final collection =
         _db.collection("$rootRoomsCollection/${room.id}/selected_users");
 
-    final doc = collection.doc(user.email);
+    final doc = collection.doc(email);
 
     // check doc
     final getDoc = await doc.get();
