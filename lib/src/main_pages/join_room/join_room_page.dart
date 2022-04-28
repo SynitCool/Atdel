@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 // widgets
 import 'package:atdel/src/main_pages/join_room/widgets/join_room_page.dart';
 
+// services
+import 'package:atdel/src/services/room_services.dart';
+
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+
 // util
 import 'package:atdel/src/main_pages/join_room/size_config.dart';
 import 'package:atdel/src/main_pages/join_room/join_room_contents.dart';
@@ -47,6 +53,12 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
   // controller
   final TextEditingController roomCodeController = TextEditingController();
 
+  // services
+  final RoomService _roomService = RoomService();
+
+  // size
+  double width = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +75,37 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
           controller: roomCodeController,
         ),
       );
+
+  Widget joinRoomButton() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: ElevatedButton(
+        onPressed: () async {
+          if (roomCode.isEmpty || roomCode.length != 6) return;
+
+          final status = await _roomService.joinRoomWithCode(roomCode);
+
+          if (status == "code_not_valid") showNotValidCode(context);
+          if (status == "user_not_include") showUserNotInclude(context);
+          if (status == "code_not_valid" || status == "user_not_include") {
+            return;
+          }
+
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        },
+        child: const Text("Join"),
+        style: ElevatedButton.styleFrom(
+          primary: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          elevation: 0,
+          padding: (width <= 550)
+              ? const EdgeInsets.symmetric(horizontal: 30, vertical: 20)
+              : const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+          textStyle: TextStyle(fontSize: (width <= 550) ? 13 : 17),
+        ),
+      ));
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +162,7 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            JoinRoomButton(
-                                roomCode: roomCode,
-                                width: width),
+                            joinRoomButton(),
                           ],
                         ),
                       )

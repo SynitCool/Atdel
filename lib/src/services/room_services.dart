@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 // model
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_room.dart';
+import 'package:atdel/src/model/user.dart' as model;
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
@@ -261,9 +262,6 @@ class RoomService {
     user.setJoined = false;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
-
-    // delete existing photo
-    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // update room info
@@ -289,6 +287,50 @@ class RoomService {
 
     // update
     await updateRoomInfo(oldRoom, roomInfo);
+  }
+
+  // change host room
+  Future changeHostRoom(Room room, UserRoom newHost) async {
+    // get new host user
+    final newHostUser = await _userService.getUserInfo(newHost.uid);
+    final oldHost =
+        await _userRoomService.getUserFromUsersRoomByUid(room, authUser!.uid);
+
+    // selected users new host
+    final newHostSelectedUsers = await _selectedUsersServices
+        .getSelectedUsersByEmail(room, newHost.email);
+
+    // change room info
+    final Room oldRoom = Room.copy(room);
+
+    final Room newRoom = Room(
+        hostEmail: newHostUser.email,
+        hostPhotoUrl: newHostUser.photoUrl,
+        hostName: newHostUser.displayName,
+        hostUid: newHostUser.uid,
+        memberCounts: room.memberCounts,
+        roomDesc: room.roomDesc,
+        roomName: room.roomName,
+        id: room.id,
+        roomCode: room.roomCode,
+        attendanceWithMl: room.attendanceWithMl);
+
+    await updateRoomInfo(oldRoom, newRoom);
+
+    // update new host room user room
+    final newUserRoom = UserRoom.copy(newHost);
+
+    newUserRoom.setPhotoUrl = newHostUser.photoUrl;
+    newUserRoom.setAlias = newHostUser.displayName;
+
+    await _userRoomService.updateUserRoom(room, newHost, newUserRoom);
+
+    // remove selected user new host
+    await _selectedUsersServices.removeSelectedUsers(
+        room, newHostSelectedUsers!);
+
+    // remove old host
+    await _userRoomService.removeUserRoom(room, oldHost);
   }
 
   // stream local rooms

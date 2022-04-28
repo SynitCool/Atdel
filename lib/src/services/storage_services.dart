@@ -18,6 +18,7 @@ import 'package:atdel/src/model/selected_users.dart';
 class StorageService {
   // final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  // download file
   Future downloadFile(Reference ref) async {
     // check permission
     const permission = Permission.storage;
@@ -43,6 +44,7 @@ class StorageService {
     // });
   }
 
+  // upload selected users photo
   Future<String> uploadSelectedUsersPhoto(
       Room room, File photoFile, String photoName) async {
     // file info
@@ -65,12 +67,9 @@ class StorageService {
     return await ref.getDownloadURL();
   }
 
+  // delete selected users photo
   Future deleteSelectedUsersPhoto(
       Room room, SelectedUsers selectedUsers) async {
-    // checking
-    if (selectedUsers.photoUrl == null) return;
-    if (!selectedUsers.photoUrl!.contains("firebasestorage")) return;
-
     // file info
     final String fileFormat = selectedUsers.photoUrl!
         .split("/")
@@ -88,4 +87,6 @@ class StorageService {
     // delete file
     await ref.delete();
   }
+
+
 }

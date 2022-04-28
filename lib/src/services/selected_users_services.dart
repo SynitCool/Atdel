@@ -91,6 +91,7 @@ class SelectedUsersServices {
     await doc.delete();
   }
 
+
   // update selected user
   Future updateSelectedUser(Room room, SelectedUsers oldSelectedUsers,
       SelectedUsers newSelectedUsers) async {

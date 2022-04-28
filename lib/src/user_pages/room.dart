@@ -54,10 +54,6 @@ class BuildContent extends ConsumerWidget {
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
             children: const [
-              SettingsTitle(),
-              SizedBox(height: 10),
-              ChangeUserAliasTextField(),
-              SizedBox(height: 20),
               OptionsTitle(),
               MakeHostRoomButton(),
               KickUserRoomButton(),
