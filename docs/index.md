@@ -16,6 +16,10 @@ Changes and improvements are more than welcome! Feel free to fork and open a pul
 
 Atdel is licensed under the [MIT license](https://github.com/SynitCool/Atdel/blob/master/LICENSE).
 
+# Privacy Policies
+
+Atdel is an open source attendaces list with machine learning app. [Privacy Policies](./privacy_polices.md).
+
 # Credits
 
 Made with Flutter by Google.
