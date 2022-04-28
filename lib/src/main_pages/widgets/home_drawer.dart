@@ -59,31 +59,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   Navigator.pop(context);
                 },
               ),
-              CustomListTile(
-                  isCollapsed: _isCollapsed,
-                  icon: Icons.calendar_today,
-                  title: "Attendace / Coming Soon",
-                  infoCount: 0,
-                  onTap: () {}),
               const Divider(color: Colors.grey),
               const Spacer(),
-              CustomListTile(
-                  isCollapsed: _isCollapsed,
-                  icon: Icons.notifications,
-                  title: "Notifications / Coming Soon",
-                  infoCount: 2,
-                  onTap: () {}),
-              CustomListTile(
-                  isCollapsed: _isCollapsed,
-                  icon: Icons.settings,
-                  title: "Settings",
-                  infoCount: 0,
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SettingsPages()));
-                  }),
               const SizedBox(height: 10),
               BottomUserInfo(isCollapsed: _isCollapsed),
               Align(
@@ -132,7 +109,9 @@ class CustomDrawerHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const FlutterLogo(size: 30),
+          const CircleAvatar(
+            backgroundImage: AssetImage("assets/images/logo-atdel-aiti-solution.png"),
+            ),
           if (isColapsed) const SizedBox(width: 10),
           if (isColapsed)
             const Expanded(

@@ -9,20 +9,20 @@ class OnboardingContents {
 
 List<OnboardingContents> contents = [
   OnboardingContents(
-    title: "Track Your work and get the result",
+    title: "Take The Attendance Easily",
     image: "assets/images/image1.png",
-    desc: "Remember to keep track of your professional accomplishments.",
+    desc: "Atdel will help you to take attendance easily and organize.",
   ),
   OnboardingContents(
-    title: "Stay organized with team",
+    title: "Organizing Attendances With Atdel is Easy",
     image: "assets/images/image2.png",
     desc:
-        "But understanding the contributions our colleagues make to our teams and companies.",
+        "Organizing your attendances with atdel is easy.",
   ),
   OnboardingContents(
-    title: "Get notified when work happens",
+    title: "Managing Attendances With Atdel To Other Platform",
     image: "assets/images/image3.png",
     desc:
-        "Take control of notifications, collaborate live or on your own time.",
+        "Atdel can be great to deal with other platform to managing attendances.",
   ),
 ];
