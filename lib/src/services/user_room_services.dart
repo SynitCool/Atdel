@@ -166,6 +166,22 @@ class UserRoomService {
     return UserRoom.fromFirestore(getDoc);
   }
 
+  // get user from users room by uid
+  Future<UserRoom> getUserFromUsersRoomByUid(Room room, String userUid) async {
+    // collection
+    final String collectionPath = "$rootRoomsCollection/${room.id}/users";
+
+    final CollectionReference<Map<String, dynamic>> collection =
+        _db.collection(collectionPath);
+
+    final doc = collection.doc(userUid);
+
+    // get user
+    final getDoc = await doc.get();
+
+    return UserRoom.fromFirestore(getDoc);
+  }
+
   // get users room
   Future<List<UserRoom>> getUsersRoom(Room room) async {
     final String collectionPath = "$rootRoomsCollection/${room.id}/users";

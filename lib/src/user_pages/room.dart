@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // providers
 import 'package:atdel/src/providers/selected_user_room_providers.dart';
-import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // widgets
 import 'package:atdel/src/user_pages/widgets/room.dart';
@@ -37,7 +36,6 @@ class BuildContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedUserRoomProvider = ref.watch(selectedUserRoom);
-    final selectedRoomProvider = ref.watch(selectedRoom);
     return Column(children: [
       const SizedBox(height: 8),
       Text(selectedUserRoomProvider.userRoom!.alias,
@@ -55,14 +53,10 @@ class BuildContent extends ConsumerWidget {
         child: ListView(
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
-            children: [
-              selectedRoomProvider.room!.privateRoom ? Container() : const SettingsTitle(),
-              selectedRoomProvider.room!.privateRoom ? Container() : const SizedBox(height: 10),
-              selectedRoomProvider.room!.privateRoom ? Container() : const ChangeUserAliasTextField(),
-              selectedRoomProvider.room!.privateRoom ? Container() : const SizedBox(height: 20),
-              const OptionsTitle(),
-              const MakeHostRoomButton(),
-              const KickUserRoomButton(),
+            children: const [
+              OptionsTitle(),
+              MakeHostRoomButton(),
+              KickUserRoomButton(),
             ]),
       )
     ]);

@@ -1,12 +1,6 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// services
-import 'package:atdel/src/services/room_services.dart';
-
-// pages
-import 'package:atdel/src/main_pages/home_pages.dart';
-
 // join room title
 class JoinRoomTitle extends StatelessWidget {
   const JoinRoomTitle({Key? key, required this.title, required this.width})
@@ -220,47 +214,44 @@ class _UserAliasTextFieldState extends State<UserAliasTextField> {
   }
 }
 
-// join room button
-class JoinRoomButton extends StatelessWidget {
-  const JoinRoomButton({
-    Key? key,
-    required this.roomCode,
-    required this.userAlias,
-    required this.width,
-  }) : super(key: key);
 
-  final String roomCode;
-  final String userAlias;
-  final double width;
+// show not valid code
+Future showNotValidCode(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text(
+        "ERROR",
+        style: TextStyle(color: Colors.red),
+      ),
+      content: const Text("The code is not valid. Get the code from the host!"),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'OK'),
+          child: const Text('OK'),
+        ),
+      ],
+    ),
+  );
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final RoomService roomService = RoomService();
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: ElevatedButton(
-          onPressed: () {
-            if (roomCode.isEmpty ||
-                roomCode.length != 6) return;
-            if (userAlias.isEmpty || userAlias.length < 4 || userAlias.length > 12) return;
-
-            roomService.joinRoomWithCode(roomCode, userAlias);
-
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const HomePage()));
-          },
-          child: const Text("Join"),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            elevation: 0,
-            padding: (width <= 550)
-                ? const EdgeInsets.symmetric(horizontal: 30, vertical: 20)
-                : const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
-            textStyle: TextStyle(fontSize: (width <= 550) ? 13 : 17),
-          ),
-        ));
-  }
+// show user is not include
+Future showUserNotInclude(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text(
+        "ERROR",
+        style: TextStyle(color: Colors.red),
+      ),
+      content: const Text(
+          "You're not include in this room. Ask the host to add you!"),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'OK'),
+          child: const Text('OK'),
+        ),
+      ],
+    ),
+  );
 }

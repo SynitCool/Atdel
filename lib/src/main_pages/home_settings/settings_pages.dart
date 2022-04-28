@@ -34,7 +34,7 @@ class ContentSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Column(children: const [PermissionButton(), DevButton()]),
+      child: Column(children: const [DevButton()]),
     );
   }
 }

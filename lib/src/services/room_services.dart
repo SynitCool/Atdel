@@ -14,8 +14,6 @@ import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:atdel/src/services/attendance_list_services.dart';
-import 'package:atdel/src/services/storage_services.dart';
-
 // other
 import 'package:random_string_generator/random_string_generator.dart';
 
@@ -30,7 +28,6 @@ class RoomService {
   final UserPhotoMetricService _userPhotoMetricService =
       UserPhotoMetricService();
   final AttendanceListService _attendanceListService = AttendanceListService();
-  final StorageService _storageService = StorageService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
@@ -68,7 +65,6 @@ class RoomService {
     room.setRoomName = info["room_name"];
     room.setId = roomDoc.id;
     room.setRoomCode = makeRandomCode();
-    room.setPrivateRoom = info["private_room"];
     room.setAttendanceWithMl = info["attendance_with_ml"];
 
     // add room to database
@@ -97,28 +93,16 @@ class RoomService {
   }
 
   // join room with code
-  Future joinRoomWithCode(String code, String userAlias) async {
+  Future joinRoomWithCode(String code) async {
     // get reference with code
     final status = await _roomCodesService.getRoomByCode(code);
 
     if (status == "code_not_valid") return status;
 
-    final room = status;
+    final Room room = status;
 
     // check if room is private
-    if (room.privateRoom) {
-      await joinRoomPrivateRoom(room);
-    }
-    if (room.privateRoom) return;
-
-    // update the user references
-    _userService.addRoomReference(room);
-
-    // update user room
-    await _userRoomService.addUserRoomPublicRoom(room, userAlias);
-
-    // update room info
-    updateMembersCount(room, true);
+    return await joinRoomPrivateRoom(room);
   }
 
   // join room private room
@@ -144,6 +128,8 @@ class RoomService {
     user.setJoined = true;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
+
+    return "success";
   }
 
   // leave room private room
@@ -170,9 +156,6 @@ class RoomService {
     user.setJoined = false;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
-
-    // delete existing photo
-    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // change room desc
@@ -233,19 +216,7 @@ class RoomService {
   // leave room
   Future leaveRoom(Room room) async {
     // if room private
-    if (room.privateRoom) return await leaveRoomPrivateRoom(room);
-
-    // remove the user room references
-    await _userService.removeRoomReference(authUser!.uid, room);
-
-    // delete user in room users
-    await _userRoomService.deleteCurrentUserRoom(room);
-
-    // delete user photo metric by current user
-    await _userPhotoMetricService.deleteUserPhotoMetricCurrentUser(room);
-
-    // decrease member counts
-    await updateMembersCount(room, false);
+    await leaveRoomPrivateRoom(room);
   }
 
   // kick room
@@ -287,9 +258,6 @@ class RoomService {
     user.setJoined = false;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
-
-    // delete existing photo
-    await _storageService.deleteSelectedUsersPhoto(room, user);
   }
 
   // update room info
@@ -317,15 +285,48 @@ class RoomService {
     await updateRoomInfo(oldRoom, roomInfo);
   }
 
-  // stream global rooms
-  Stream<List<Room>> streamGlobalRooms() {
-    final CollectionReference<Map<String, dynamic>> collection =
-        _db.collection(rootRoomsCollection);
+  // change host room
+  Future changeHostRoom(Room room, UserRoom newHost) async {
+    // get new host user
+    final newHostUser = await _userService.getUserInfo(newHost.uid);
+    final oldHost =
+        await _userRoomService.getUserFromUsersRoomByUid(room, authUser!.uid);
 
-    final Stream<List<Room>> snapshot = collection.snapshots().map(
-        (snap) => snap.docs.map((data) => Room.fromMap(data.data())).toList());
+    // selected users new host
+    final newHostSelectedUsers = await _selectedUsersServices
+        .getSelectedUsersByEmail(room, newHost.email);
 
-    return snapshot;
+    // change room info
+    final Room oldRoom = Room.copy(room);
+
+    final Room newRoom = Room(
+        hostEmail: newHostUser.email,
+        hostPhotoUrl: newHostUser.photoUrl,
+        hostName: newHostUser.displayName,
+        hostUid: newHostUser.uid,
+        memberCounts: room.memberCounts,
+        roomDesc: room.roomDesc,
+        roomName: room.roomName,
+        id: room.id,
+        roomCode: room.roomCode,
+        attendanceWithMl: room.attendanceWithMl);
+
+    await updateRoomInfo(oldRoom, newRoom);
+
+    // update new host room user room
+    final newUserRoom = UserRoom.copy(newHost);
+
+    newUserRoom.setPhotoUrl = newHostUser.photoUrl;
+    newUserRoom.setAlias = newHostUser.displayName;
+
+    await _userRoomService.updateUserRoom(room, newHost, newUserRoom);
+
+    // remove selected user new host
+    await _selectedUsersServices.removeSelectedUsers(
+        room, newHostSelectedUsers!);
+
+    // remove old host
+    await _userRoomService.removeUserRoom(room, oldHost);
   }
 
   // stream local rooms

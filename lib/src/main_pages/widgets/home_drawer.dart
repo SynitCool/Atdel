@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // pages
 import 'package:atdel/src/main_pages/home_settings/settings_pages.dart';
+import 'package:atdel/src/initialize_pages/initialize_pages.dart';
 
 // authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
@@ -361,7 +362,11 @@ class BottomUserInfo extends ConsumerWidget {
 
                           provider.googleLogout();
 
-                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const InitializePages()));
                         },
                         icon: const Icon(
                           Icons.logout,
@@ -400,7 +405,10 @@ class BottomUserInfo extends ConsumerWidget {
 
                       provider.googleLogout();
 
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const InitializePages()));
                     },
                     icon: const Icon(
                       Icons.logout,

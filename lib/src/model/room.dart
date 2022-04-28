@@ -13,7 +13,6 @@ class Room {
   String roomName;
   String id;
   String roomCode;
-  bool privateRoom;
   bool attendanceWithMl;
 
   Room(
@@ -26,7 +25,6 @@ class Room {
       required this.roomName,
       required this.id,
       required this.roomCode,
-      required this.privateRoom,
       required this.attendanceWithMl});
 
   factory Room.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -42,7 +40,6 @@ class Room {
         roomName: data["room_name"],
         id: data["id"],
         roomCode: data["room_code"],
-        privateRoom: data["private_room"],
         attendanceWithMl: data["attendance_with_ml"]);
   }
 
@@ -56,7 +53,6 @@ class Room {
       roomName: "",
       id: "",
       roomCode: "",
-      privateRoom: false,
       attendanceWithMl: false);
 
   factory Room.fromMap(Map<String, dynamic> map) => Room(
@@ -69,7 +65,6 @@ class Room {
       roomName: map["room_name"],
       id: map["id"],
       roomCode: map["room_code"],
-      privateRoom: map["private_room"],
       attendanceWithMl: map["attendance_with_ml"]);
 
   factory Room.copy(Room room) => Room(
@@ -82,7 +77,6 @@ class Room {
       hostName: room.hostName,
       hostUid: room.hostUid,
       memberCounts: room.memberCounts,
-      privateRoom: room.privateRoom,
       attendanceWithMl: room.attendanceWithMl);
 
   Map<String, dynamic> toMap() => {
@@ -95,7 +89,6 @@ class Room {
         "room_name": roomName,
         "id": id,
         "room_code": roomCode,
-        "private_room": privateRoom,
         "attendance_with_ml": attendanceWithMl
       };
 
@@ -113,10 +106,6 @@ class Room {
 
   set setRoomCode(String newCode) {
     roomCode = newCode;
-  }
-
-  set setPrivateRoom(bool newPrivateRoom) {
-    privateRoom = newPrivateRoom;
   }
 
   set setAttendanceWithMl(bool newAttendanceWithMl) {

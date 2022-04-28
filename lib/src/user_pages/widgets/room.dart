@@ -9,13 +9,14 @@ import 'package:atdel/src/providers/selected_user_room_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // model
-import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_room.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
 import 'package:atdel/src/services/room_services.dart';
-import 'package:atdel/src/services/selected_users_services.dart';
+
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
 
 // user room page top
 class BuildTop extends ConsumerWidget {
@@ -81,18 +82,6 @@ class KickUserRoomButton extends ConsumerWidget {
 class MakeHostRoomButton extends ConsumerWidget {
   const MakeHostRoomButton({Key? key}) : super(key: key);
 
-  // remove host selected user
-  Future removeHostSelectedUser(Room room, UserRoom userRoom) async {
-    final SelectedUsersServices selectedUsersServices = SelectedUsersServices();
-
-    final selectedUser = await selectedUsersServices.getSelectedUsersByEmail(
-        room, userRoom.email);
-
-    if (selectedUser == null) return;
-
-    await selectedUsersServices.removeSelectedUsers(room, selectedUser);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // services
@@ -104,30 +93,11 @@ class MakeHostRoomButton extends ConsumerWidget {
 
     return ElevatedButton.icon(
         onPressed: () async {
-          if (selectedRoomProvider.room!.privateRoom) {
-            await removeHostSelectedUser(
-                selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
-          }
+          roomService.changeHostRoom(
+              selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
 
-          final Room oldRoom = Room.copy(selectedRoomProvider.room!);
-
-          final Room newRoom = Room(
-              hostEmail: selectedUserRoomProvider.userRoom!.email,
-              hostPhotoUrl: selectedUserRoomProvider.userRoom!.photoUrl,
-              hostName: selectedUserRoomProvider.userRoom!.displayName,
-              hostUid: selectedUserRoomProvider.userRoom!.uid,
-              memberCounts: selectedRoomProvider.room!.memberCounts,
-              roomDesc: selectedRoomProvider.room!.roomDesc,
-              roomName: selectedRoomProvider.room!.roomName,
-              id: selectedRoomProvider.room!.id,
-              roomCode: selectedRoomProvider.room!.roomCode,
-              privateRoom: selectedRoomProvider.room!.privateRoom,
-              attendanceWithMl: selectedRoomProvider.room!.attendanceWithMl);
-
-          roomService.updateRoomInfo(oldRoom, newRoom);
-
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.person_add_alt),
         style: ElevatedButton.styleFrom(primary: Colors.grey),

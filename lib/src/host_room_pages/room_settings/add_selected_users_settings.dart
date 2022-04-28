@@ -138,6 +138,8 @@ class _ContentPageState extends State<ContentPage> {
 
         if (userAliasText.length > 12) return;
 
+        if (userPhoto == null) return;
+
         Map<String, dynamic> selectedUser = {
           "alias": userAliasText,
           "email": userEmailText,
@@ -163,6 +165,8 @@ class _ContentPageState extends State<ContentPage> {
 
   // upload photo user
   Widget uploadPhotoUserButton() => ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+          primary: userPhoto == null ? Colors.red : Colors.blue),
       onPressed: () async {
         final ImagePicker _picker = ImagePicker();
 
@@ -176,7 +180,7 @@ class _ContentPageState extends State<ContentPage> {
         });
       },
       icon: const Icon(Icons.add),
-      label: Text(nameFile));
+      label: userPhoto == null ? Text("Required $nameFile") : Text(nameFile));
 
   @override
   Widget build(BuildContext context) {

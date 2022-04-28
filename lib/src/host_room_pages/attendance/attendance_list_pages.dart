@@ -1,5 +1,4 @@
 // flutter
-import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:flutter/material.dart';
 
 // custom widgets
@@ -54,61 +53,22 @@ class AttendanceListPage extends ConsumerWidget {
 
           if (data == null) return const AttendancePageLoadingScreen();
 
-          if (data.privateRoom) return const AttendancePagePrivateRoom();
-
-          return const AttendancePagePublicRoom();
-        });
-  }
-}
-
-// attendance page for private room
-class AttendancePagePrivateRoom extends ConsumerWidget {
-  const AttendancePagePrivateRoom({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // services
-    final selectedUsersServices = SelectedUsersServices();
-
-    // providers
-    final selectedRoomProvider = ref.watch(selectedRoom);
-
-    return FutureBuilder<bool>(
-        future: selectedUsersServices
-            .checkSelectedUsersExist(selectedRoomProvider.room!),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) return const Center(child: Text("ERROR"));
-
-          final exist = snapshot.data;
-
-          if (exist == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (exist) return const AttendancePagePublicRoom();
-
-          return const Center(
-            child: Text("Set the private room first to use attendance list."),
-          );
+          return const ContentPage();
         });
   }
 }
 
 // attendance page for public room
-class AttendancePagePublicRoom extends ConsumerStatefulWidget {
-  const AttendancePagePublicRoom({Key? key}) : super(key: key);
+class ContentPage extends ConsumerStatefulWidget {
+  const ContentPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<AttendancePagePublicRoom> createState() =>
-      _AttendancePagePublicRoomState();
+  ConsumerState<ContentPage> createState() =>
+      _ContentPageState();
 }
 
-class _AttendancePagePublicRoomState
-    extends ConsumerState<AttendancePagePublicRoom>
+class _ContentPageState
+    extends ConsumerState<ContentPage>
     with SingleTickerProviderStateMixin {
   // floating action button animation
   late Animation<double> _animation;
