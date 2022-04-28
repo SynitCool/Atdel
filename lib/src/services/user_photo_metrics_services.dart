@@ -78,6 +78,8 @@ class UserPhotoMetricService {
       smallestUserUid = key;
     });
 
+    if (smallestSimilarity! > 0.7) return null;
+
     return smallestUserUid;
   }
 

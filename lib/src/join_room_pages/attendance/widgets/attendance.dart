@@ -23,8 +23,6 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
-
-
 // attend with ml
 class AttendWithML extends StatelessWidget {
   const AttendWithML({Key? key}) : super(key: key);
@@ -68,8 +66,50 @@ class AttendByGalleryButton extends ConsumerWidget {
           "ERROR",
           style: TextStyle(color: Colors.red),
         ),
-        content:
-            const Text("Image for room must be set before take attendance!"),
+        content: const Text(
+            "Cannot classfied well or wrong image, please ask the host to update your photo for taking the attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // show no face detected warning
+  Future showNoFaceDetectedAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text(
+            "Cannot get the face, ask the host to update your photo to take attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // show no face detected warning
+  Future showMoreThanOneFaceAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text(
+            "The photo has more than one face, ask the host to update your photo to take attendance!"),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'OK'),
@@ -105,7 +145,19 @@ class AttendByGalleryButton extends ConsumerWidget {
 
           final detectFace = await _mlService.runDetector(File(file.path));
 
+          if (detectFace == "no_face_detected") {
+            showNoFaceDetectedAlert(context);
+            return;
+          }
+          if (detectFace == "more_than_one_face") {
+            showMoreThanOneFaceAlert(context);
+            return;
+          }
+
           final runModelMetric = await _mlService.runModel(detectFace);
+
+          await _userPhotoMetricService.updateUserPhotoMetric(
+              _selectedRoomProvider.room!, runModelMetric);
 
           final detectedUid =
               await _userPhotoMetricService.calcSmallestUserSimilarity(

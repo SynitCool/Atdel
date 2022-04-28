@@ -16,7 +16,6 @@ class MLService {
   late FaceDetector _detector;
   late Interpreter _interpreter;
 
-
   MLService() {
     _loadDetector();
     _loadModel();
@@ -33,6 +32,7 @@ class MLService {
   Future _loadModel() async {
     _interpreter = await Interpreter.fromAsset("mobile_face_net.tflite");
   }
+
   // run the detector
   Future runDetector(File imageFile) async {
     InputImage input = InputImage.fromFile(imageFile);
@@ -40,7 +40,8 @@ class MLService {
     List<Face> faces = await _detector.processImage(input);
     int facesLength = faces.length;
 
-    if (facesLength > 1 || facesLength == 0) return;
+    if (facesLength > 1) return "more_than_one_face";
+    if (facesLength == 0) return "no_face_detected";
 
     img.Image croppedImage = cropFace(imageFile, faces[0]);
     // List<int> encodedPng = img.encodePng(croppedImage);
