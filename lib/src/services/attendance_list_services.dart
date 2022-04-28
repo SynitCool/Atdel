@@ -15,20 +15,19 @@ class AttendanceListService {
   final String rootRoomsCollection = "rooms";
 
   // get attendance list
-  Future<Map<Attendance, List<UserAttendance>>> getAttendanceListUsers(Room room) async {
+  Future<Map<Attendance, List<UserAttendance>>> getAttendanceListUsers(
+      Room room, List<Attendance> attendances) async {
     final UserAttendanceService userAttendanceService = UserAttendanceService();
 
     Map<Attendance, List<UserAttendance>> attendanceListUsers = {};
 
-    final attendancesList = await getAttendanceList(room);
-
-    for (final attendance in attendancesList) {
+    for (final attendance in attendances) {
       final usersAttendance =
           await userAttendanceService.getUsersAttendance(room, attendance);
 
       attendanceListUsers[attendance] = usersAttendance;
     }
-    
+
     return attendanceListUsers;
   }
 

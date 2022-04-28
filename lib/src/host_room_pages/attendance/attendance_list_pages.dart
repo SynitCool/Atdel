@@ -63,12 +63,10 @@ class ContentPage extends ConsumerStatefulWidget {
   const ContentPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ContentPage> createState() =>
-      _ContentPageState();
+  ConsumerState<ContentPage> createState() => _ContentPageState();
 }
 
-class _ContentPageState
-    extends ConsumerState<ContentPage>
+class _ContentPageState extends ConsumerState<ContentPage>
     with SingleTickerProviderStateMixin {
   // floating action button animation
   late Animation<double> _animation;
@@ -125,7 +123,6 @@ class _ContentPageState
     });
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -167,8 +164,13 @@ class _ContentPageState
           final ConvertToExcelService convertToExcelService =
               ConvertToExcelService();
 
-          convertToExcelService
-              .convertByAttendanceList(_selectedRoomProvider.room!);
+          convertToExcelService.convertByAttendanceList(
+              _selectedRoomProvider.room!, viewedAttendances);
+
+          const snackBar = SnackBar(
+            content: Text("Converting Attendances List To Excel"),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         });
   }
 

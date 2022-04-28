@@ -27,13 +27,13 @@ class ConvertToExcelService {
   final String mainSheet = "main_sheet";
 
   // convert with attendance list
-  Future convertByAttendanceList(Room room) async {
+  Future convertByAttendanceList(Room room, List<Attendance> attendances) async {
     // get users attendance and users room
     final AttendanceListService attendanceListService = AttendanceListService();
     final UserRoomService userRoomService = UserRoomService();
 
     final Map<Attendance, List<UserAttendance>> attendanceUsers =
-        await attendanceListService.getAttendanceListUsers(room);
+        await attendanceListService.getAttendanceListUsers(room, attendances);
 
     final usersRoom = await userRoomService.getUsersRoomNoHost(room);
 
@@ -45,7 +45,7 @@ class ConvertToExcelService {
     await addDateAbsent(attendanceUsers, mainSheet, uidRowNum);
 
     // encode to excel
-    saveToDownloadDirectory(excel.encode()!, "test_excel_2.xlsx");
+    saveToDownloadDirectory(excel.encode()!, "atdel_attendances_list.xlsx");
   }
 
   // add list number to excel
