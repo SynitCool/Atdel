@@ -110,6 +110,7 @@ class AttendanceListButtonWidget extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
+              shape: const OutlineInputBorder(),
               tileColor: listTileColor(data!),
               onTap: () {
                 if (!data.absent) attendanceNotAbsentError(context);
