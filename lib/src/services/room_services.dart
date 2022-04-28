@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 // model
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_room.dart';
-import 'package:atdel/src/model/user.dart' as model;
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
@@ -15,8 +14,6 @@ import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:atdel/src/services/attendance_list_services.dart';
-import 'package:atdel/src/services/storage_services.dart';
-
 // other
 import 'package:random_string_generator/random_string_generator.dart';
 
@@ -31,7 +28,6 @@ class RoomService {
   final UserPhotoMetricService _userPhotoMetricService =
       UserPhotoMetricService();
   final AttendanceListService _attendanceListService = AttendanceListService();
-  final StorageService _storageService = StorageService();
 
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";

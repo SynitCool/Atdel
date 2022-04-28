@@ -1,12 +1,6 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// services
-import 'package:atdel/src/services/room_services.dart';
-
-// pages
-import 'package:atdel/src/main_pages/home_pages.dart';
-
 // join room title
 class JoinRoomTitle extends StatelessWidget {
   const JoinRoomTitle({Key? key, required this.title, required this.width})
