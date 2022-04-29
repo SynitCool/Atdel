@@ -109,7 +109,8 @@ class CustomDrawerHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircleAvatar(
-            backgroundImage: AssetImage("assets/images/logo-atdel-aiti-solution.png"),
+            backgroundImage: AssetImage("assets/images/atdel-aiti-solution-transparent_2.png"),
+            
             ),
           if (isColapsed) const SizedBox(width: 10),
           if (isColapsed)
