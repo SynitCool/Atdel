@@ -10,14 +10,12 @@ import 'package:atdel/src/model/room.dart';
 
 // services
 import 'package:atdel/src/services/storage_services.dart';
+import 'package:atdel/src/services/user_photo_metrics_services.dart';
 
 class SelectedUsersServices {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final String rootRoomsCollection = "rooms";
-
-  // services
-  final StorageService _storageService = StorageService();
 
   // deleate all selected users
   Future deleteSelectedUsers(Room room) async {
@@ -34,7 +32,8 @@ class SelectedUsersServices {
   }
 
   // check selected users
-  Future<SelectedUsers?> getSelectedUsersByEmail(Room room, String email) async {
+  Future<SelectedUsers?> getSelectedUsersByEmail(
+      Room room, String email) async {
     // collection
     final collection =
         _db.collection("$rootRoomsCollection/${room.id}/selected_users");
@@ -52,6 +51,8 @@ class SelectedUsersServices {
   // add selected users to database
   Future addSelectedUsers(
       Room room, List<Map<String, dynamic>> selectedUsers) async {
+    final StorageService _storageService = StorageService();
+
     // collection
     final collectionPath = "$rootRoomsCollection/${room.id}/selected_users";
 
@@ -69,14 +70,20 @@ class SelectedUsersServices {
 
       selectedUser.remove("photo_file");
 
-      final doc = collection.doc(selectedUser["email"]);
+      final selected = SelectedUsers.fromMap(selectedUser);
 
-      await doc.set(selectedUser);
+      final doc = collection.doc(selected.email);
+
+      await doc.set(selected.toMap());
     }
   }
 
   // remove selected users
   Future removeSelectedUsers(Room room, SelectedUsers selectedUsers) async {
+    final StorageService _storageService = StorageService();
+    final UserPhotoMetricService _userPhotoMetricService =
+      UserPhotoMetricService();
+
     // collection
     final collectionPath = "$rootRoomsCollection/${room.id}/selected_users";
 
@@ -87,10 +94,12 @@ class SelectedUsersServices {
     // delete selected users photo if exist
     await _storageService.deleteSelectedUsersPhoto(room, selectedUsers);
 
+    // delete user photo metric
+    await _userPhotoMetricService.deleteUserPhotoMetric(room, selectedUsers);
+
     // remove selected user
     await doc.delete();
   }
-
 
   // update selected user
   Future updateSelectedUser(Room room, SelectedUsers oldSelectedUsers,

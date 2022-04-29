@@ -2,8 +2,17 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
+// path
+import 'package:path_provider/path_provider.dart';
+
 // model
 import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/selected_users.dart';
+
+// services
+import 'package:atdel/src/services/ml_services.dart';
+import 'package:atdel/src/services/selected_users_services.dart';
+import 'package:atdel/src/services/storage_services.dart';
 
 // linalg
 import 'package:ml_linalg/vector.dart';
@@ -40,6 +49,74 @@ class UserPhotoMetricService {
 
     // update users photo metric
     await referenceChild.update({_authUser!.uid: metric});
+  }
+
+  // check user photo metric exist
+  Future<bool> userPhotoMetricExist(Room room) async {
+    // database reference
+    final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
+
+    final DatabaseReference reference = _db.ref(photoRoomMetricPath);
+    final DatabaseReference referenceChild =
+        reference.child(usersPhotoMetricReference);
+
+    // check if user metric exist
+    final DataSnapshot getReferenceUserMetric =
+        await referenceChild.child(_authUser!.uid).get();
+
+    if (getReferenceUserMetric.exists) return true;
+
+    return false;
+  }
+
+  // update photo metric with selected users photo
+  Future updateWithSelectedUsersPhoto(Room room) async {
+    final MLService _mlService = MLService();
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final StorageService _storageService = StorageService();
+
+    // check user photo metric exist
+    if (await userPhotoMetricExist(room)) return;
+
+    // get selected users photo
+    final selectedUsers = await _selectedUsersServices.getSelectedUsersByEmail(
+        room, _authUser!.email!);
+
+    // temp dir
+    final tempDir = await getTemporaryDirectory();
+
+    // download image
+    final downloadFile = await _storageService.downloadSelectedUsersPhoto(
+        room, tempDir, selectedUsers!);
+
+    // set photo metric
+    final detectFace = await _mlService.runDetector(downloadFile);
+
+    if (detectFace == "no_face_detected") return "no_face_detected";
+    if (detectFace == "more_than_one_face") return "more_than_one_face";
+
+    final runModelMetric = await _mlService.runModel(detectFace);
+
+    await updateUserPhotoMetric(room, runModelMetric);
+  }
+
+  // delete user photo metric
+  Future deleteUserPhotoMetric(Room room, SelectedUsers selectedUsers) async {
+    // database reference
+    final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
+
+    final DatabaseReference reference = _db.ref(photoRoomMetricPath);
+    final DatabaseReference referenceChild =
+        reference.child(usersPhotoMetricReference);
+
+    final selectedUserMetric = referenceChild.child(_authUser!.uid);
+
+    // check if user metric exist
+    final DataSnapshot getReferenceUserMetric = await selectedUserMetric.get();
+
+    if (!getReferenceUserMetric.exists) return;
+
+    await selectedUserMetric.remove();
   }
 
   // calculate similarity

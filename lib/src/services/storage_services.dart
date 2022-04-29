@@ -16,7 +16,49 @@ import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/selected_users.dart';
 
 class StorageService {
-  // final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  final String rootRoomsStorage = "rooms";
+
+  // download selected users photo
+  Future downloadSelectedUsersPhoto(
+      Room room, Directory dir, SelectedUsers selectedUsers) async {
+    // check permission
+    const permission = Permission.storage;
+
+    if (await permission.isDenied) {
+      final permissionStatus = await permission.request();
+
+      if (permissionStatus.isDenied) return;
+    }
+
+    // file info
+    final String fileFormat = selectedUsers.photoUrl!
+        .split("/")
+        .last
+        .split("?")
+        .first
+        .split(".")
+        .last;
+
+    final ref = _storage
+        .ref("$rootRoomsStorage/${room.id}")
+        .child("/selected_users")
+        .child("/${selectedUsers.alias}.$fileFormat");
+
+    // temp path
+    final dirFile = File(join(dir.path, "${selectedUsers.alias}.$fileFormat"));
+
+    final downloadTask = ref.writeToFile(dirFile);
+
+    // final snapshot = downloadTask.snapshot;
+
+    downloadTask.asStream().forEach((element) {
+      print(element.bytesTransferred / element.totalBytes);
+    });
+
+    return dirFile;
+  }
 
   // download file
   Future downloadFile(Reference ref) async {
@@ -87,6 +129,4 @@ class StorageService {
     // delete file
     await ref.delete();
   }
-
-
 }
