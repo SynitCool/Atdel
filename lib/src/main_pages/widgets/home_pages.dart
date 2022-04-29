@@ -306,21 +306,7 @@ class CustomAppBar extends StatelessWidget {
                     text: "Atdel",
                     fontSize: 24,
                     color: Colors.white,
-                    fontWeight: FontWeight.w600),
-                SettingsButton()
-                // IconButton(
-                //     onPressed: () {
-                //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                //           content: Text(
-                //               'You currently don\'t have any notifications')));
-                //     },
-                //     icon: const CircleAvatar(
-                //         backgroundColor: Colors.white,
-                //         radius: 30,
-                //         child: Icon(
-                //           Icons.add_alert,
-                //           size: 20,
-                //         ))),
+                    fontWeight: FontWeight.w600)
               ],
             ),
             Row(

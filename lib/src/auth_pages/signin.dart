@@ -134,11 +134,7 @@ class SignInPage extends StatelessWidget {
                     children: <TextSpan>[
                       TextSpan(text: 'By tapping Sign up, you agree to our '),
                       TextSpan(
-                          text: 'Terms of use ',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: 'and '),
-                      TextSpan(
-                          text: 'Privacy',
+                          text: 'Privacy Policies',
                           style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
