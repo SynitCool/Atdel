@@ -109,7 +109,7 @@ class UserPhotoMetricService {
     final DatabaseReference referenceChild =
         reference.child(usersPhotoMetricReference);
 
-    final selectedUserMetric = referenceChild.child(_authUser!.uid);
+    final selectedUserMetric = referenceChild.child(selectedUsers.uid!);
 
     // check if user metric exist
     final DataSnapshot getReferenceUserMetric = await selectedUserMetric.get();
