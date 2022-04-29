@@ -51,11 +51,7 @@ class StorageService {
 
     final downloadTask = ref.writeToFile(dirFile);
 
-    // final snapshot = downloadTask.snapshot;
-
-    downloadTask.asStream().forEach((element) {
-      print(element.bytesTransferred / element.totalBytes);
-    });
+    downloadTask.snapshot;
 
     return dirFile;
   }

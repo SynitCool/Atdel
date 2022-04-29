@@ -71,12 +71,11 @@ class UserPhotoMetricService {
 
   // update photo metric with selected users photo
   Future updateWithSelectedUsersPhoto(Room room) async {
-    final MLService _mlService = MLService();
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
-    final StorageService _storageService = StorageService();
-
     // check user photo metric exist
     if (await userPhotoMetricExist(room)) return;
+
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final StorageService _storageService = StorageService();
 
     // get selected users photo
     final selectedUsers = await _selectedUsersServices.getSelectedUsersByEmail(
@@ -88,6 +87,8 @@ class UserPhotoMetricService {
     // download image
     final downloadFile = await _storageService.downloadSelectedUsersPhoto(
         room, tempDir, selectedUsers!);
+
+    final MLService _mlService = MLService();
 
     // set photo metric
     final detectFace = await _mlService.runDetector(downloadFile);

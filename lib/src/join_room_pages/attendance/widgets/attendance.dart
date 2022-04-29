@@ -31,10 +31,10 @@ class AttendWithML extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: const [
-        AttendByGalleryButton(),
-        SizedBox(
-          height: 10,
-        ),
+        // AttendByGalleryButton(),
+        // SizedBox(
+        //   height: 10,
+        // ),
         AttendByCameraButton()
       ],
     );
@@ -122,11 +122,6 @@ class AttendByGalleryButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // services
-    final _mlService = MLService();
-    final _imagePicker = ImagePicker();
-    final _userPhotoMetricService = UserPhotoMetricService();
-    final _userAttendanceService = UserAttendanceService();
 
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
@@ -138,10 +133,18 @@ class AttendByGalleryButton extends ConsumerWidget {
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
         onTap: () async {
+          final _imagePicker = ImagePicker();
+          final _userPhotoMetricService = UserPhotoMetricService();
+          final _userAttendanceService = UserAttendanceService();
+
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.gallery);
 
           if (file == null) return;
+
+          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          final _mlService = MLService();
 
           final detectFace = await _mlService.runDetector(File(file.path));
 
@@ -155,9 +158,6 @@ class AttendByGalleryButton extends ConsumerWidget {
           }
 
           final runModelMetric = await _mlService.runModel(detectFace);
-
-          await _userPhotoMetricService.updateUserPhotoMetric(
-              _selectedRoomProvider.room!, runModelMetric);
 
           final detectedUid =
               await _userPhotoMetricService.calcSmallestUserSimilarity(
@@ -207,14 +207,50 @@ class AttendByCameraButton extends ConsumerWidget {
     );
   }
 
+    // show no face detected warning
+  Future showNoFaceDetectedAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text(
+            "Cannot get the face, ask the host to update your photo to take attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // show no face detected warning
+  Future showMoreThanOneFaceAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text(
+          "ERROR",
+          style: TextStyle(color: Colors.red),
+        ),
+        content: const Text(
+            "The photo has more than one face, ask the host to update your photo to take attendance!"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // services
-    final _mlService = MLService();
-    final _imagePicker = ImagePicker();
-    final _userPhotoMetricService = UserPhotoMetricService();
-    final _userAttendanceService = UserAttendanceService();
-
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
@@ -233,12 +269,29 @@ class AttendByCameraButton extends ConsumerWidget {
             if (permissionStatus.isDenied) return;
           }
 
+          final _imagePicker = ImagePicker();
+          final _userPhotoMetricService = UserPhotoMetricService();
+          final _userAttendanceService = UserAttendanceService();
+
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.camera);
 
           if (file == null) return;
 
+          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          final _mlService = MLService();
+
           final detectFace = await _mlService.runDetector(File(file.path));
+
+          if (detectFace == "no_face_detected") {
+            showNoFaceDetectedAlert(context);
+            return;
+          }
+          if (detectFace == "more_than_one_face") {
+            showMoreThanOneFaceAlert(context);
+            return;
+          }
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
