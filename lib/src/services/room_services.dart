@@ -21,14 +21,6 @@ class RoomService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final auth.User? authUser = auth.FirebaseAuth.instance.currentUser;
 
-  final RoomCodesService _roomCodesService = RoomCodesService();
-  final UserService _userService = UserService();
-  final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
-  final UserRoomService _userRoomService = UserRoomService();
-  final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
-  final AttendanceListService _attendanceListService = AttendanceListService();
-
   final String rootRoomsCollection = "rooms";
   final String rootUsersCollection = "users";
   final String rootCodesCollection = "codes";
@@ -76,6 +68,11 @@ class RoomService {
   // add room to database
   Future addRoomToDatabase(
       Map<String, dynamic> roomInfo, String hostAlias) async {
+    
+    final RoomCodesService _roomCodesService = RoomCodesService();
+    final UserService _userService = UserService();
+    final UserRoomService _userRoomService = UserRoomService();
+
     // settings room object and add to room Doc
     final Room room = await setAddRoomToDatabase(roomInfo);
 
@@ -94,6 +91,8 @@ class RoomService {
 
   // join room with code
   Future joinRoomWithCode(String code) async {
+    final RoomCodesService _roomCodesService = RoomCodesService();
+
     // get reference with code
     final status = await _roomCodesService.getRoomByCode(code);
 
@@ -107,6 +106,10 @@ class RoomService {
 
   // join room private room
   Future joinRoomPrivateRoom(Room room) async {
+    final UserService _userService = UserService();
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final UserRoomService _userRoomService = UserRoomService();
+
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, authUser!.email!);
@@ -126,6 +129,7 @@ class RoomService {
     SelectedUsers oldSelectedUser = SelectedUsers.copy(user);
 
     user.setJoined = true;
+    user.setUid = authUser!.uid;
 
     _selectedUsersServices.updateSelectedUser(room, oldSelectedUser, user);
 
@@ -134,6 +138,12 @@ class RoomService {
 
   // leave room private room
   Future leaveRoomPrivateRoom(Room room) async {
+    final UserService _userService = UserService();
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final UserRoomService _userRoomService = UserRoomService();
+    final UserPhotoMetricService _userPhotoMetricService =
+      UserPhotoMetricService();
+
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, authUser!.email!);
@@ -191,6 +201,13 @@ class RoomService {
 
   // delete room
   Future deleteRoomFromDatabase(Room room) async {
+    final RoomCodesService _roomCodesService = RoomCodesService();
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final UserRoomService _userRoomService = UserRoomService();
+    final UserPhotoMetricService _userPhotoMetricService =
+      UserPhotoMetricService();
+    final AttendanceListService _attendanceListService = AttendanceListService();
+
     // delete room code
     await _roomCodesService.deleteRoomCode(room);
 
@@ -221,6 +238,10 @@ class RoomService {
 
   // kick room
   Future kickUserFromRoomPrivateRoom(Room room, UserRoom userRoom) async {
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final UserPhotoMetricService _userPhotoMetricService =
+      UserPhotoMetricService();
+
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
         room, userRoom.email);
@@ -287,6 +308,10 @@ class RoomService {
 
   // change host room
   Future changeHostRoom(Room room, UserRoom newHost) async {
+    final UserService _userService = UserService();
+    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final UserRoomService _userRoomService = UserRoomService();
+
     // get new host user
     final newHostUser = await _userService.getUserInfo(newHost.uid);
     final oldHost =

@@ -145,7 +145,8 @@ class _ContentPageState extends State<ContentPage> {
           "email": userEmailText,
           "joined": false,
           "photo_url": null,
-          "photo_file": userPhoto
+          "photo_file": userPhoto,
+          "uid": null
         };
 
         setState(() {
