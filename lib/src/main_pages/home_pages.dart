@@ -19,6 +19,9 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 // widgets
 import 'package:atdel/src/main_pages/widgets/home_pages.dart';
 
+// connection
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 // home page
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -28,12 +31,64 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  dynamic connectionSubscription;
+
+  // check connection
+  bool connection = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    connectionSubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (result.name == "none") {
+        setState(() {
+          connection = false;
+        });
+
+        return;
+      }
+
+      setState(() {
+        connection = true;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    connectionSubscription.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-        drawer: CustomDrawer(),
-        body: ContentPage(),
-        floatingActionButton: OptionRoomButton());
+    return Scaffold(
+        appBar: PreferredSize(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: connection
+                  ? Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.blue,
+                    )
+                  : Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.red,
+                      alignment: Alignment.center,
+                      child: const Text('Please check your internet connection',
+                          style: TextStyle(color: Colors.white, fontSize: 14)),
+                    ),
+            ),
+            preferredSize: const Size.fromHeight(0)),
+        drawer: const CustomDrawer(),
+        body: const ContentPage(),
+        floatingActionButton: const OptionRoomButton());
   }
 }
 
@@ -55,6 +110,8 @@ class ContentPage extends ConsumerWidget {
     final provider = ref.watch(currentUser);
     final _userService = UserService();
     return ListView(
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
       children: [
         CustomAppBar(height: MediaQuery.of(context).size.height),
         StreamBuilder<src_user.User>(

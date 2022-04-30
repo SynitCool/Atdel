@@ -99,22 +99,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
-  connection_status_bar:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: main
-      resolved-ref: bd8722fe47f5996cfef5e0ce46b11f99422558bb
-      url: "https://github.com/thisisamir98/connection_status_bar.git"
-    source: git
-    version: "1.1.6"
   connectivity_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: connectivity_plus
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "2.3.0"
   connectivity_plus_linux:
     dependency: transitive
     description:

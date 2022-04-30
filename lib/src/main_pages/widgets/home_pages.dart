@@ -287,41 +287,41 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height * 0.28,
-      width: double.infinity,
-      decoration: const BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(40),
-              bottomLeft: Radius.circular(40))),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(top: 50, left: 23, right: 23, bottom: 23),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                TextWidget(
-                    text: "Atdel",
-                    fontSize: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600)
-              ],
-            ),
-            Row(
-              children: const [
-                TextWidget(
-                    text: "An amazing app to take attendance.",
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400),
-              ],
-            )
-          ],
-        ),
+    height: height * 0.28,
+    width: double.infinity,
+    decoration: const BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(40),
+            bottomLeft: Radius.circular(40))),
+    child: Padding(
+      padding:
+          const EdgeInsets.only(top: 50, left: 23, right: 23, bottom: 23),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              TextWidget(
+                  text: "Atdel",
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600)
+            ],
+          ),
+          Row(
+            children: const [
+              TextWidget(
+                  text: "An amazing app to take attendance.",
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400),
+            ],
+          )
+        ],
       ),
-    );
+    ),
+      );
   }
 }
 
