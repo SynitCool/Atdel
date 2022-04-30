@@ -138,3 +138,30 @@ class AttendanceListButtonWidget extends ConsumerWidget {
         });
   }
 }
+
+
+// filtered sections
+class FilteredSections extends StatelessWidget {
+  const FilteredSections({
+    Key? key,
+    required this.filterButtons
+  }) : super(key: key);
+
+  final List<PopupMenuEntry<dynamic>> filterButtons;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        const Text("Filter by"),
+        PopupMenuButton(
+          icon: const Icon(Icons.filter_list),
+          itemBuilder: (context) {
+            return filterButtons;
+          },
+        )
+      ],
+    );
+  }
+}
