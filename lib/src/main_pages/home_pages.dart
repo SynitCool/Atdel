@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   dynamic connectionSubscription;
 
   // check connection
-  bool connection = false;
+  bool connection = true;
 
   @override
   void initState() {
