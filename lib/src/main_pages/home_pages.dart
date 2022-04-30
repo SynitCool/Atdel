@@ -19,9 +19,6 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 // widgets
 import 'package:atdel/src/main_pages/widgets/home_pages.dart';
 
-// connection widget
-import 'package:connection_status_bar/connection_status_bar.dart';
-
 // connection
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -34,7 +31,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var connectionSubscription;
+  dynamic connectionSubscription;
 
   // check connection
   bool connection = false;
@@ -46,8 +43,6 @@ class _HomePageState extends State<HomePage> {
     connectionSubscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
-      print(result.name);
-
       if (result.name == "none") {
         setState(() {
           connection = false;
