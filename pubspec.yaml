@@ -65,6 +65,10 @@ dependencies:
   floating_action_bubble: ^1.1.4
   html_editor_enhanced: ^2.4.0+1
   flutter_html: ^2.2.1
+  connection_status_bar:
+    git:
+      url: https://github.com/thisisamir98/connection_status_bar.git
+      ref: main
 
   # file system
   image_picker: ^0.8.4+11
