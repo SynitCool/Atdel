@@ -84,11 +84,15 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
 
     if (signAddButton == "error") return;
 
+    SmartDialog.showLoading();
+
     final AttendanceService attendanceService = AttendanceService();
     final _selectedRoomProvider = ref.watch(selectedRoom);
 
     attendanceService.addAttendanceToDatabase(
         _selectedRoomProvider.room!, startDate!, endDate!);
+
+    SmartDialog.dismiss();
 
     Navigator.pop(context);
   }
