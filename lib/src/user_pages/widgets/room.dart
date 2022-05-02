@@ -18,6 +18,10 @@ import 'package:atdel/src/services/room_services.dart';
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // user room page top
 class BuildTop extends ConsumerWidget {
   const BuildTop({Key? key}) : super(key: key);
@@ -67,8 +71,12 @@ class KickUserRoomButton extends ConsumerWidget {
 
     return ElevatedButton.icon(
         onPressed: () {
+          SmartDialog.showLoading();
+
           roomService.kickUserFromRoomPrivateRoom(
               selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
+
+          SmartDialog.dismiss();
 
           Navigator.pop(context);
         },
@@ -93,8 +101,12 @@ class MakeHostRoomButton extends ConsumerWidget {
 
     return ElevatedButton.icon(
         onPressed: () async {
+          SmartDialog.showLoading();
+
           roomService.changeHostRoom(
               selectedRoomProvider.room!, selectedUserRoomProvider.userRoom!);
+
+          SmartDialog.dismiss();
 
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
@@ -167,6 +179,26 @@ class _ChangeUserAliasTextFieldState
     super.dispose();
   }
 
+  // check name text is valid
+  bool nameTextValid() {
+    if (nameText.isEmpty) {
+      toastWidget("New User Name Supposed Not To Be Empty!");
+      return false;
+    }
+    if (nameText.length < 4) {
+      toastWidget(
+          "New User Name Length Supposed Not To Be Less Than 4 Characters");
+      return false;
+    }
+    if (nameText.length > 12) {
+      toastWidget(
+          "New User Name Length Supposed Not To Be Greater Than 12 Characters");
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     // providers
@@ -184,9 +216,9 @@ class _ChangeUserAliasTextFieldState
           errorText: errorText,
           suffixIcon: IconButton(
             onPressed: () async {
-              if (nameText.isEmpty) return;
-              if (nameText.length < 4) return;
-              if (nameText.length > 12) return;
+              if (!nameTextValid()) return;
+
+              SmartDialog.showLoading();
 
               final UserRoom oldUserRoom =
                   UserRoom.copy(selectedUserRoomProvider.userRoom!);
@@ -197,6 +229,8 @@ class _ChangeUserAliasTextFieldState
                   oldUserRoom, selectedUserRoomProvider.userRoom!);
 
               nameTextFieldController.clear();
+              SmartDialog.dismiss();
+
               Navigator.pop(context);
             },
             icon: const Icon(Icons.navigate_next_outlined),
