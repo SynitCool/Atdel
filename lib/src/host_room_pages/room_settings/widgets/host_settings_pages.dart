@@ -33,10 +33,10 @@ class DisperseButton extends ConsumerWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
-      onTap: () {
+      onTap: () async {
         SmartDialog.showLoading();
 
-        _roomService.deleteRoomFromDatabase(_selectedRoomProvider.room!);
+        await _roomService.deleteRoomFromDatabase(_selectedRoomProvider.room!);
 
         SmartDialog.dismiss();
 
