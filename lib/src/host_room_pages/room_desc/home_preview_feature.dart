@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 // pages
 import 'package:atdel/src/host_room_pages/room_desc/home_feature.dart';
@@ -70,4 +71,3 @@ class _HomePreviewPageState extends ConsumerState<HomePreviewPage>
         body: const ViewHtml());
   }
 }
-

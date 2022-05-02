@@ -8,6 +8,7 @@ import 'package:html_editor_enhanced/html_editor.dart';
 
 // custom widget
 import 'package:floating_action_bubble/floating_action_bubble.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,9 +54,17 @@ class _EditHomeState extends ConsumerState<EditHome>
       bubbleColor: Colors.blue,
       onPress: () {
         if (kIsWeb) {
+          SmartDialog.showLoading();
+
           controller.reloadWeb();
+
+          SmartDialog.dismiss();
         } else {
+          SmartDialog.showLoading();
+
           controller.editorController!.reload();
+
+          SmartDialog.dismiss();
         }
       });
 
@@ -67,11 +76,17 @@ class _EditHomeState extends ConsumerState<EditHome>
       titleStyle: const TextStyle(color: Colors.white),
       bubbleColor: Colors.blue,
       onPress: () async {
+        SmartDialog.showLoading();
+
         final _selectedRoomProvider = ref.watch(selectedRoom);
 
         final text = await controller.getText();
 
         _roomService.changeRoomDesc(_selectedRoomProvider.room!.id, text);
+
+        SmartDialog.dismiss();
+
+        FocusScope.of(context).unfocus();
 
         Navigator.pop(context);
       });
