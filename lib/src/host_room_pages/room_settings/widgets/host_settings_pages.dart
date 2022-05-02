@@ -12,6 +12,12 @@ import 'package:atdel/src/host_room_pages/room_settings/attendance_with_ml_setti
 import 'package:atdel/src/host_room_pages/room_settings/room_name_settings.dart';
 import 'package:atdel/src/host_room_pages/room_settings/private_room.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
+// pages
+import 'package:atdel/src/main_pages/home_pages.dart';
+
 // disperse button
 class DisperseButton extends ConsumerWidget {
   const DisperseButton({Key? key}) : super(key: key);
@@ -28,11 +34,14 @@ class DisperseButton extends ConsumerWidget {
         borderRadius: BorderRadius.circular(15.0),
       ),
       onTap: () {
-        Navigator.pop(context);
+        SmartDialog.showLoading();
 
         _roomService.deleteRoomFromDatabase(_selectedRoomProvider.room!);
 
-        Navigator.pop(context);
+        SmartDialog.dismiss();
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
       },
       title: const Text("Disperse Room"),
       leading: const Icon(Icons.close),
@@ -198,8 +207,7 @@ class OptionsSections extends StatelessWidget {
           height: 5,
         ),
         RoomNameOptionButton(),
-        SizedBox(
-          height: 10),
+        SizedBox(height: 10),
         AttendanceWithMlOptionButton(),
         SizedBox(
           height: 15,
