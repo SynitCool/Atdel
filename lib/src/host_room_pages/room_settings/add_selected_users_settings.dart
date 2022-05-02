@@ -3,6 +3,7 @@ import 'dart:io';
 
 // flutter
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // pick file
 import 'package:image_picker/image_picker.dart';
@@ -107,7 +108,8 @@ class _ContentPageState extends State<ContentPage> {
         decoration: InputDecoration(
             label: const Text("User Alias"),
             border: const OutlineInputBorder(),
-            errorText: userAliasErrorText),
+            errorText: userAliasErrorText,
+            prefixIcon: const Icon(Icons.person)),
         onChanged: (text) => setState(() {
           userAliasText = text;
         }),
@@ -119,7 +121,8 @@ class _ContentPageState extends State<ContentPage> {
         decoration: InputDecoration(
             label: const Text("User Email"),
             border: const OutlineInputBorder(),
-            errorText: userEmailErrorText),
+            errorText: userEmailErrorText,
+            prefixIcon: const Icon(Icons.email)),
         onChanged: (text) => setState(() {
           userEmailText = text;
         }),
