@@ -13,6 +13,9 @@ import 'package:atdel/src/services/selected_users_services.dart';
 // model
 import 'package:atdel/src/model/selected_users.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // column tile
 class ColumnTile extends StatelessWidget {
   const ColumnTile({Key? key}) : super(key: key);
@@ -145,9 +148,13 @@ class SelectedUsersInfoTile extends ConsumerWidget {
     return Column(
       children: [
         ListTile(
-          leading: user.photoUrl == null ? const CircleAvatar(
-              backgroundColor: Colors.transparent, radius: 30) : CircleAvatar(
-              backgroundImage: NetworkImage(user.photoUrl!), radius: 30,),
+          leading: user.photoUrl == null
+              ? const CircleAvatar(
+                  backgroundColor: Colors.transparent, radius: 30)
+              : CircleAvatar(
+                  backgroundImage: NetworkImage(user.photoUrl!),
+                  radius: 30,
+                ),
           title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -158,8 +165,12 @@ class SelectedUsersInfoTile extends ConsumerWidget {
                 Expanded(
                     child: IconButton(
                   onPressed: () async {
+                    SmartDialog.showLoading();
+
                     await selectedUsersServices.removeSelectedUsers(
                         selectedRoomProvider.room!, user);
+                        
+                    SmartDialog.dismiss();
                   },
                   icon: const Icon(
                     Icons.close,
