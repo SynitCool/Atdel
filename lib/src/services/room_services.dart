@@ -1,11 +1,11 @@
 // firebase
-import 'package:atdel/src/model/selected_users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 // model
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/user_room.dart';
+import 'package:atdel/src/model/selected_users.dart';
 
 // services
 import 'package:atdel/src/services/user_room_services.dart';
@@ -14,6 +14,8 @@ import 'package:atdel/src/services/room_codes_services.dart';
 import 'package:atdel/src/services/user_services.dart';
 import 'package:atdel/src/services/selected_users_services.dart';
 import 'package:atdel/src/services/attendance_list_services.dart';
+import 'package:atdel/src/services/storage_services.dart';
+
 // other
 import 'package:random_string_generator/random_string_generator.dart';
 
@@ -68,7 +70,6 @@ class RoomService {
   // add room to database
   Future addRoomToDatabase(
       Map<String, dynamic> roomInfo, String hostAlias) async {
-    
     final RoomCodesService _roomCodesService = RoomCodesService();
     final UserService _userService = UserService();
     final UserRoomService _userRoomService = UserRoomService();
@@ -107,7 +108,8 @@ class RoomService {
   // join room private room
   Future joinRoomPrivateRoom(Room room) async {
     final UserService _userService = UserService();
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final UserRoomService _userRoomService = UserRoomService();
 
     // get selected users by email
@@ -139,10 +141,11 @@ class RoomService {
   // leave room private room
   Future leaveRoomPrivateRoom(Room room) async {
     final UserService _userService = UserService();
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final UserRoomService _userRoomService = UserRoomService();
     final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
+        UserPhotoMetricService();
 
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
@@ -202,11 +205,14 @@ class RoomService {
   // delete room
   Future deleteRoomFromDatabase(Room room) async {
     final RoomCodesService _roomCodesService = RoomCodesService();
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final UserRoomService _userRoomService = UserRoomService();
     final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
-    final AttendanceListService _attendanceListService = AttendanceListService();
+        UserPhotoMetricService();
+    final AttendanceListService _attendanceListService =
+        AttendanceListService();
+    final StorageService _storageService = StorageService();
 
     // delete room code
     await _roomCodesService.deleteRoomCode(room);
@@ -227,7 +233,10 @@ class RoomService {
     await _selectedUsersServices.deleteSelectedUsers(room);
 
     // delete room user photo metric
-    _userPhotoMetricService.deleteRoomUserPhotoMetric(room);
+    await _userPhotoMetricService.deleteRoomUserPhotoMetric(room);
+
+    // delete room selected users photo
+    await _storageService.deleteRoomSelectedUsersPhoto(room);
   }
 
   // leave room
@@ -238,9 +247,10 @@ class RoomService {
 
   // kick room
   Future kickUserFromRoomPrivateRoom(Room room, UserRoom userRoom) async {
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
+        UserPhotoMetricService();
 
     // get selected users by email
     final user = await _selectedUsersServices.getSelectedUsersByEmail(
@@ -309,7 +319,8 @@ class RoomService {
   // change host room
   Future changeHostRoom(Room room, UserRoom newHost) async {
     final UserService _userService = UserService();
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final UserRoomService _userRoomService = UserRoomService();
 
     // get new host user

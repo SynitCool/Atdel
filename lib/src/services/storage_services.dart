@@ -125,4 +125,19 @@ class StorageService {
     // delete file
     await ref.delete();
   }
+
+  // delete room selected users photo
+  Future deleteRoomSelectedUsersPhoto(Room room) async {
+    Reference ref = FirebaseStorage.instance.ref("rooms/${room.id}");
+
+    final refChild = ref.child("selected_users");
+
+    refChild.listAll().then((value) async {
+      for (var element in value.items) {
+        final elementRef = _storage.ref(element.fullPath);
+
+        await elementRef.delete();
+      }
+    });
+  }
 }
