@@ -45,7 +45,7 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
     if (date == null) {
       return defaultText;
     } else {
-      return DateFormat(dateFormat).format(date);
+      return DateFormat('EEEE, d MMM, yyyy h:mm a').format(date);
     }
   }
 
@@ -157,8 +157,12 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
     String startDateText = "Date Start";
     String endDateText = "Date End";
 
-    if (start != null) startDateText = DateFormat(dateFormat).format(start);
-    if (end != null) endDateText = DateFormat(dateFormat).format(end);
+    if (start != null) {
+      startDateText = DateFormat('EEEE, d MMM, yyyy h:mm a').format(start);
+    }
+    if (end != null) {
+      endDateText = DateFormat('EEEE, d MMM, yyyy h:mm a').format(end);
+    }
 
     if (startDateError.isNotEmpty) startDateText = startDateError;
     if (endDateError.isNotEmpty) endDateText = endDateError;
