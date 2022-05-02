@@ -15,7 +15,6 @@ import 'package:atdel/src/main_pages/join_room/size_config.dart';
 import 'package:atdel/src/main_pages/join_room/join_room_contents.dart';
 
 // custom widgets
-import 'package:atdel/src/widgets/dialog.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 // join room on boarding
