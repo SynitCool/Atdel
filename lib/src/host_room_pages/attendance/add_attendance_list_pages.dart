@@ -13,6 +13,10 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 class AddAttendanceListPage extends ConsumerStatefulWidget {
   const AddAttendanceListPage({Key? key}) : super(key: key);
 
@@ -45,9 +49,39 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
     }
   }
 
+  // date valid
+  bool dateValid() {
+    if (startDate == null) {
+      toastWidget("Start Date Supposed Be Valid!");
+      return false;
+    }
+    if (endDate == null) {
+      toastWidget("End Date Supposed Be Valid!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // date error
+  bool dateError() {
+    if (startDateError.isNotEmpty) {
+      toastWidget(startDateError);
+      return false;
+    }
+    if (endDateError.isNotEmpty) {
+      toastWidget(endDateError);
+      return false;
+    }
+
+    return true;
+  }
+
   // add attendance
   Future addAttendanceToDatabase() async {
-    if (startDate == null || endDate == null) return;
+    if (!dateValid()) return;
+    if (!dateError()) return;
+
     if (signAddButton == "error") return;
 
     final AttendanceService attendanceService = AttendanceService();
