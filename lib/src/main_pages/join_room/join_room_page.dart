@@ -14,6 +14,10 @@ import 'package:atdel/src/main_pages/home_pages.dart';
 import 'package:atdel/src/main_pages/join_room/size_config.dart';
 import 'package:atdel/src/main_pages/join_room/join_room_contents.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // join room on boarding
 class JoinRoomPage extends StatefulWidget {
   const JoinRoomPage({Key? key}) : super(key: key);
@@ -80,15 +84,15 @@ class _JoinRoomPageState extends State<JoinRoomPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: ElevatedButton(
         onPressed: () async {
-          if (roomCode.isEmpty || roomCode.length != 6) return;
+          if (!roomCodeValid(roomCode)) return;
+
+          SmartDialog.showLoading();
 
           final status = await _roomService.joinRoomWithCode(roomCode);
 
-          if (status == "code_not_valid") showNotValidCode(context);
-          if (status == "user_not_include") showUserNotInclude(context);
-          if (status == "code_not_valid" || status == "user_not_include") {
-            return;
-          }
+          SmartDialog.dismiss();
+
+          if (!joinRoomStatusValid(status)) return;
 
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
