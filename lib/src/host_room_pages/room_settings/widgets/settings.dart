@@ -20,6 +20,10 @@ import 'package:atdel/src/host_room_pages/room_settings/widgets/room_name_settin
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // update room button
 class UpdateRoomButton extends ConsumerWidget {
   const UpdateRoomButton({Key? key, required this.newRoomInfo})
@@ -29,16 +33,30 @@ class UpdateRoomButton extends ConsumerWidget {
 
   // check room name valid
   bool newRoomNameValid(String roomName) {
-    if (roomName.isEmpty) return false;
-    if (roomName.length < 4) return false;
-    if (roomName.length > 12) return false;
+    if (roomName.isEmpty) {
+      toastWidget("Room Name Supposed Not To Be Empty!");
+      return false;
+    }
+    if (roomName.length < 4) {
+      toastWidget("Room Name Length Supposed Not To Be Less Than 4 Characters");
+      return false;
+    }
+    if (roomName.length > 12) {
+      toastWidget(
+          "Room Name Length Supposed Not To Be Greater Than 12 Characters");
+      return false;
+    }
 
     return true;
   }
 
   // check if new data is valid
   bool newDataValid() {
-    if (newRoomInfo["room_name"] == null) return false;
+    if (newRoomInfo["room_name"] == null) {
+      toastWidget("New Room Data Supposed To Be Valid");
+
+      return false;
+    }
 
     return true;
   }
@@ -71,10 +89,11 @@ class UpdateRoomButton extends ConsumerWidget {
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
         onPressed: () {
-          if (!newDataValid()) showDataNotValidError(context);
           if (!newDataValid()) return;
 
           if (!newRoomNameValid(newRoomInfo["room_name"])) return;
+
+          SmartDialog.showLoading();
 
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 
@@ -84,7 +103,10 @@ class UpdateRoomButton extends ConsumerWidget {
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
 
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+          SmartDialog.dismiss();
+
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         },
         icon: const Icon(Icons.update),
         tooltip: "Update Room",
