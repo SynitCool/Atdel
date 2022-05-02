@@ -160,17 +160,17 @@ class _ContentPageState extends ConsumerState<ContentPage>
         title: "Convert2Excel",
         titleStyle: const TextStyle(color: Colors.white),
         bubbleColor: Colors.blue,
-        onPress: () {
-          final ConvertToExcelService convertToExcelService =
-              ConvertToExcelService();
-
-          convertToExcelService.convertByAttendanceList(
-              _selectedRoomProvider.room!, viewedAttendances);
-
+        onPress: () async {
           const snackBar = SnackBar(
             content: Text("Converting Attendances List To Excel"),
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          final ConvertToExcelService convertToExcelService =
+              ConvertToExcelService();
+
+          await convertToExcelService.convertByAttendanceList(
+              _selectedRoomProvider.room!, viewedAttendances);
         });
   }
 
