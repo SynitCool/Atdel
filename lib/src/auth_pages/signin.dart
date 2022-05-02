@@ -10,39 +10,11 @@ import 'package:atdel/src/authentication/google_authentication.dart';
 // pages
 import 'package:atdel/src/initialize_pages/initialize_pages.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
-
-  // PreferredSizeWidget appBarWidget() =>
-  //     AppBar(title: const Text("Sign in"), centerTitle: true);
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: appBarWidget(),
-  //     body: Center(
-  //         child: Padding(
-  //             padding: const EdgeInsets.all(32),
-  //             child: Column(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 ElevatedButton.icon(
-  //                   onPressed: () {
-  //                     final provider = GoogleSignInProvider();
-
-  //                     provider.googleLogin();
-  //                   },
-  //                   icon: const FaIcon(FontAwesomeIcons.google),
-  //                   label: const Text("Sign in with google"),
-  //                   style: ElevatedButton.styleFrom(
-  //                       primary: Colors.white,
-  //                       onPrimary: Colors.black,
-  //                       minimumSize: const Size(double.infinity, 50)),
-  //                 )
-  //               ],
-  //             ))),
-  //   );
-  // }
 
   final Color color = const Color(0xffD94928);
   @override
@@ -102,9 +74,13 @@ class SignInPage extends StatelessWidget {
                         ),
                         elevation: MaterialStateProperty.all(8.0)),
                     onPressed: () async {
+                      SmartDialog.showLoading();
+
                       final provider = GoogleSignInProvider();
 
                       final user = await provider.googleLogin();
+
+                      SmartDialog.dismiss();
 
                       if (user == null) return;
 

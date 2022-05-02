@@ -7,6 +7,10 @@ import 'package:atdel/src/services/room_services.dart';
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // create room title
 class CreateRoomTitle extends StatelessWidget {
   const CreateRoomTitle({Key? key, required this.title, required this.width})
@@ -318,18 +322,60 @@ class CreateRoomButton extends StatelessWidget {
   final Map<String, dynamic> roomInfo;
   final double width;
 
+  // checking room name is valid
+  bool roomNameValid() {
+    if (roomInfo["room_name"].isEmpty) {
+      toastWidget("Room Name Supposed Not To Be Empty!");
+      return false;
+    }
+    if (roomInfo["room_name"].length < 4) {
+      toastWidget("Room Name Supposed Not To Be Less Than 4 Characters");
+      return false;
+    }
+    if (roomInfo["room_name"].length > 12) {
+      toastWidget("Room Name Supposed Not To Be Greater Than 12 Characters");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  // checking host alias valid
+  bool hostAliasValid() {
+    if (hostAlias.isEmpty) {
+      toastWidget("Host Alias Supposed Not To Be Empty!");
+      return false;
+    }
+    if (hostAlias.length < 4) {
+      toastWidget("Host Alias Supposed Not To Be Less Than 4 Characters");
+      return false;
+    }
+    if (hostAlias.length > 12) {
+      toastWidget("Host Alias Supposed Not To Be Greater Than 12 Characters");
+
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final RoomService roomService = RoomService();
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
-          onPressed: () {
-            if (roomInfo["room_name"].isEmpty ||
-                roomInfo["room_name"].length < 4) return;
-            if (roomInfo["room_name"].length > 12) return;
+          onPressed: () async {
+            // checking room name
+            if (!roomNameValid()) return;
+            if (!hostAliasValid()) return;
+
+            SmartDialog.showLoading();
 
             roomService.addRoomToDatabase(roomInfo, hostAlias);
+
+            SmartDialog.dismiss();
 
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));

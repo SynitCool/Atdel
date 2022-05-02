@@ -1,6 +1,9 @@
 // flutter
 import 'package:flutter/material.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+
 // join room title
 class JoinRoomTitle extends StatelessWidget {
   const JoinRoomTitle({Key? key, required this.title, required this.width})
@@ -214,7 +217,6 @@ class _UserAliasTextFieldState extends State<UserAliasTextField> {
   }
 }
 
-
 // show not valid code
 Future showNotValidCode(BuildContext context) {
   return showDialog(
@@ -254,4 +256,32 @@ Future showUserNotInclude(BuildContext context) {
       ],
     ),
   );
+}
+
+// check room code is valid
+bool roomCodeValid(String roomCode) {
+  if (roomCode.isEmpty) {
+    toastWidget("Room Code Supposed Not To Be Empty!");
+    return false;
+  }
+  if (roomCode.length != 6) {
+    toastWidget("Room Code Supposed To Be 6 Characters!");
+    return false;
+  }
+
+  return true;
+}
+
+// join room status
+bool joinRoomStatusValid(String status) {
+  if (status == "code_not_valid") {
+    toastWidget("The code is not valid. Get the code from the host!");
+    return false;
+  }
+  if (status == "user_not_include") {
+    toastWidget("You're not include in this room. Ask the host to add you!");
+    return false;
+  }
+
+  return true;
 }

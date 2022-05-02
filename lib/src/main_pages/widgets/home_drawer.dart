@@ -13,6 +13,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/current_user_providers.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // custom drawer
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -109,9 +112,9 @@ class CustomDrawerHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircleAvatar(
-            backgroundImage: AssetImage("assets/images/atdel-aiti-solution-transparent_2.png"),
-            
-            ),
+            backgroundImage: AssetImage(
+                "assets/images/atdel-aiti-solution-transparent_2.png"),
+          ),
           if (isColapsed) const SizedBox(width: 10),
           if (isColapsed)
             const Expanded(
@@ -337,9 +340,13 @@ class BottomUserInfo extends ConsumerWidget {
                       padding: const EdgeInsets.only(right: 10),
                       child: IconButton(
                         onPressed: () {
+                          SmartDialog.showLoading();
+
                           final provider = GoogleSignInProvider();
 
                           provider.googleLogout();
+
+                          SmartDialog.dismiss();
 
                           Navigator.pushReplacement(
                               context,
@@ -380,9 +387,13 @@ class BottomUserInfo extends ConsumerWidget {
                 Expanded(
                   child: IconButton(
                     onPressed: () {
+                      SmartDialog.showLoading();
+
                       final provider = GoogleSignInProvider();
 
                       provider.googleLogout();
+
+                      SmartDialog.dismiss();
 
                       Navigator.pushReplacement(
                           context,

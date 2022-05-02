@@ -16,6 +16,9 @@ import 'package:atdel/src/model/room.dart';
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // old attendance with ml settings
 class OldAttendanceWithMlSetting extends ConsumerWidget {
   const OldAttendanceWithMlSetting({Key? key}) : super(key: key);
@@ -56,11 +59,15 @@ class UpdateAttendanceWithMlButton extends ConsumerWidget {
             return;
           }
 
+          SmartDialog.showLoading();
+
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 
           selectedRoomProvider.room!.setAttendanceWithMl = attendanceWithMl;
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
+          
+          SmartDialog.dismiss();
 
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));

@@ -16,6 +16,10 @@ import 'package:atdel/src/model/room.dart';
 // pages
 import 'package:atdel/src/main_pages/home_pages.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // old room widget
 class OldRoomTextField extends ConsumerWidget {
   const OldRoomTextField({Key? key}) : super(key: key);
@@ -45,9 +49,19 @@ class UpdateRoomNameButton extends ConsumerWidget {
 
   // check room name valid
   bool newRoomNameValid(String roomName) {
-    if (roomName.isEmpty) return false;
-    if (roomName.length < 4) return false;
-    if (roomName.length > 12) return false;
+    if (roomName.isEmpty) {
+      toastWidget("Room Name Supposed Not To Be Empty!");
+      return false;
+    }
+    if (roomName.length < 4) {
+      toastWidget("Room Name Length Supposed Not To Be Less Than 4 Characters");
+      return false;
+    }
+    if (roomName.length > 12) {
+      toastWidget(
+          "Room Name Length Supposed Not To Be Greater Than 12 Characters");
+      return false;
+    }
 
     return true;
   }
@@ -68,11 +82,15 @@ class UpdateRoomNameButton extends ConsumerWidget {
 
           if (selectedRoomProvider.room!.roomName == roomName) return;
 
+          SmartDialog.showLoading();
+
           final oldRoom = Room.copy(selectedRoomProvider.room!);
 
           selectedRoomProvider.room!.setRoomName = roomName;
 
           roomService.updateRoomInfo(oldRoom, selectedRoomProvider.room!);
+
+          SmartDialog.dismiss();
 
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
