@@ -1,5 +1,4 @@
 // flutter
-import 'package:atdel/src/model/user.dart';
 import 'package:flutter/material.dart';
 
 // pages
@@ -22,6 +21,9 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 
 // custom widgets
 import 'package:atdel/src/widgets/dialog.dart';
+
+// date
+import 'package:intl/intl.dart';
 
 // attendance button
 class AttendanceListButtonWidget extends ConsumerWidget {
@@ -147,12 +149,19 @@ class AttendanceListButtonWidget extends ConsumerWidget {
                         builder: (context) => const JoinRoomAttendance()));
               },
               leading: const Icon(Icons.date_range, color: Colors.white),
-              title: Column(children: [
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Text(
-                  "Start: " + attendance.dateStart.toString(),
+                  "Start: " +
+                      DateFormat('EEEE, d MMM, yyyy h:mm a')
+                          .format(attendance.dateStart),
                   style: const TextStyle(color: Colors.white),
                 ),
-                Text("End: " + attendance.dateEnd.toString(),
+                Text(
+                    "End: " +
+                        DateFormat('EEEE, d MMM, yyyy h:mm a')
+                            .format(attendance.dateEnd),
                     style: const TextStyle(color: Colors.white))
               ]),
             ),
