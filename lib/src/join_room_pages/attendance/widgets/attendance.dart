@@ -23,6 +23,9 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // attend with ml
 class AttendWithML extends StatelessWidget {
   const AttendWithML({Key? key}) : super(key: key);
@@ -122,7 +125,6 @@ class AttendByGalleryButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
@@ -142,7 +144,8 @@ class AttendByGalleryButton extends ConsumerWidget {
 
           if (file == null) return;
 
-          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+          await _userPhotoMetricService
+              .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
           final _mlService = MLService();
 
@@ -207,7 +210,7 @@ class AttendByCameraButton extends ConsumerWidget {
     );
   }
 
-    // show no face detected warning
+  // show no face detected warning
   Future showNoFaceDetectedAlert(BuildContext context) {
     return showDialog(
       context: context,
@@ -278,7 +281,8 @@ class AttendByCameraButton extends ConsumerWidget {
 
           if (file == null) return;
 
-          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+          await _userPhotoMetricService
+              .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
           final _mlService = MLService();
 
@@ -337,10 +341,14 @@ class AttendWithNoMlButton extends ConsumerWidget {
       leading: const Icon(Icons.check),
       title: const Text("Attend"),
       onTap: () async {
+        SmartDialog.showLoading();
+
         _userAttendanceService.updateAbsentUser(
             _selectedCurrentUserProvider.user!,
             _selectedRoomProvider.room!,
             _selectedAttendanceProvider.attendance!);
+
+        SmartDialog.dismiss();
 
         Navigator.pop(context);
       },
