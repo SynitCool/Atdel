@@ -25,6 +25,7 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // custom widgets
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:atdel/src/widgets/dialog.dart';
 
 // attend with ml
 class AttendWithML extends StatelessWidget {
@@ -34,10 +35,10 @@ class AttendWithML extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: const [
-        // AttendByGalleryButton(),
-        // SizedBox(
-        //   height: 10,
-        // ),
+        AttendByGalleryButton(),
+        SizedBox(
+          height: 10,
+        ),
         AttendByCameraButton()
       ],
     );
@@ -123,6 +124,38 @@ class AttendByGalleryButton extends ConsumerWidget {
     );
   }
 
+  // face valid
+  bool detectFaceValid(dynamic detectFaceStatus) {
+    if (detectFaceStatus == "no_face_detected") {
+      toastWidget("There's No Face Detected In Selected Picture!");
+      return false;
+    }
+    if (detectFaceStatus == "more_than_one_face") {
+      toastWidget("Detected More Than 1 Face in Selected Picture!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // classified valid
+  bool classifiedValid(String? detectedUid, String realUid) {
+    if (detectedUid == null) {
+      toastWidget(
+          "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      return false;
+    }
+    if (detectedUid != realUid) {
+      toastWidget(
+          "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // states
@@ -135,6 +168,8 @@ class AttendByGalleryButton extends ConsumerWidget {
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
         onTap: () async {
+          SmartDialog.showLoading();
+
           final _imagePicker = ImagePicker();
           final _userPhotoMetricService = UserPhotoMetricService();
           final _userAttendanceService = UserAttendanceService();
@@ -142,7 +177,10 @@ class AttendByGalleryButton extends ConsumerWidget {
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.gallery);
 
-          if (file == null) return;
+          if (file == null) {
+            SmartDialog.dismiss();
+            return;
+          }
 
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
@@ -150,15 +188,8 @@ class AttendByGalleryButton extends ConsumerWidget {
           final _mlService = MLService();
 
           final detectFace = await _mlService.runDetector(File(file.path));
-
-          if (detectFace == "no_face_detected") {
-            showNoFaceDetectedAlert(context);
-            return;
-          }
-          if (detectFace == "more_than_one_face") {
-            showMoreThanOneFaceAlert(context);
-            return;
-          }
+          
+          if (!detectFaceValid(detectFace)) return;
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
@@ -166,19 +197,15 @@ class AttendByGalleryButton extends ConsumerWidget {
               await _userPhotoMetricService.calcSmallestUserSimilarity(
                   _selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            showUserMetricAlert(context);
-          }
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            return;
-          }
+          if (!classifiedValid(
+              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
 
           _userAttendanceService.updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
+
+          SmartDialog.dismiss();
 
           Navigator.pop(context);
         });

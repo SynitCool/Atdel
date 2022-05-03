@@ -49,6 +49,8 @@ class StorageService {
     // temp path
     final dirFile = File(join(dir.path, "${selectedUsers.alias}.$fileFormat"));
 
+    dirFile.createSync(recursive: true);
+
     final downloadTask = ref.writeToFile(dirFile);
 
     downloadTask.snapshot;
