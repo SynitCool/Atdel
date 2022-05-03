@@ -21,13 +21,19 @@ import 'package:atdel/src/model/user_room.dart';
 import 'package:atdel/src/services/attendance_list_services.dart';
 import 'package:atdel/src/services/user_room_services.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 class ConvertToExcelService {
   final Excel excel = Excel.createExcel();
 
   final String mainSheet = "main_sheet";
 
   // convert with attendance list
-  Future convertByAttendanceList(Room room, List<Attendance> attendances) async {
+  Future convertByAttendanceList(
+      Room room, List<Attendance> attendances) async {
+    SmartDialog.showLoading();
+
     // get users attendance and users room
     final AttendanceListService attendanceListService = AttendanceListService();
     final UserRoomService userRoomService = UserRoomService();
@@ -46,6 +52,8 @@ class ConvertToExcelService {
 
     // encode to excel
     saveToDownloadDirectory(excel.encode()!, "atdel_attendances_list.xlsx");
+
+    SmartDialog.dismiss();
   }
 
   // add list number to excel

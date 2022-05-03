@@ -13,6 +13,10 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 // state management
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 class AddAttendanceListPage extends ConsumerStatefulWidget {
   const AddAttendanceListPage({Key? key}) : super(key: key);
 
@@ -41,20 +45,54 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
     if (date == null) {
       return defaultText;
     } else {
-      return DateFormat(dateFormat).format(date);
+      return DateFormat('EEEE, d MMM, yyyy h:mm a').format(date);
     }
+  }
+
+  // date valid
+  bool dateValid() {
+    if (startDate == null) {
+      toastWidget("Start Date Supposed Be Valid!");
+      return false;
+    }
+    if (endDate == null) {
+      toastWidget("End Date Supposed Be Valid!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // date error
+  bool dateError() {
+    if (startDateError.isNotEmpty) {
+      toastWidget(startDateError);
+      return false;
+    }
+    if (endDateError.isNotEmpty) {
+      toastWidget(endDateError);
+      return false;
+    }
+
+    return true;
   }
 
   // add attendance
   Future addAttendanceToDatabase() async {
-    if (startDate == null || endDate == null) return;
+    if (!dateValid()) return;
+    if (!dateError()) return;
+
     if (signAddButton == "error") return;
+
+    SmartDialog.showLoading();
 
     final AttendanceService attendanceService = AttendanceService();
     final _selectedRoomProvider = ref.watch(selectedRoom);
 
     attendanceService.addAttendanceToDatabase(
         _selectedRoomProvider.room!, startDate!, endDate!);
+
+    SmartDialog.dismiss();
 
     Navigator.pop(context);
   }
@@ -123,8 +161,12 @@ class _AddAttendanceListPageState extends ConsumerState<AddAttendanceListPage> {
     String startDateText = "Date Start";
     String endDateText = "Date End";
 
-    if (start != null) startDateText = DateFormat(dateFormat).format(start);
-    if (end != null) endDateText = DateFormat(dateFormat).format(end);
+    if (start != null) {
+      startDateText = DateFormat('EEEE, d MMM, yyyy h:mm a').format(start);
+    }
+    if (end != null) {
+      endDateText = DateFormat('EEEE, d MMM, yyyy h:mm a').format(end);
+    }
 
     if (startDateError.isNotEmpty) startDateText = startDateError;
     if (endDateError.isNotEmpty) endDateText = endDateError;

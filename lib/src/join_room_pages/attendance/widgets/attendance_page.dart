@@ -19,6 +19,11 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/current_user_providers.dart';
 
+// custom widgets
+import 'package:atdel/src/widgets/dialog.dart';
+
+// date
+import 'package:intl/intl.dart';
 
 // attendance button
 class AttendanceListButtonWidget extends ConsumerWidget {
@@ -81,6 +86,27 @@ class AttendanceListButtonWidget extends ConsumerWidget {
     return Colors.red;
   }
 
+  // attendance valid
+  bool attendanceValid() {
+    if (!attendance.attendanceActive) {
+      toastWidget("Attendance Is Not Active!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // user attendance valid
+  bool userAttendanceValid(UserAttendance userAttendance) {
+    if (!userAttendance.absent) {
+      toastWidget("You're Not Absent For This Attendance!");
+
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // providers
@@ -113,10 +139,8 @@ class AttendanceListButtonWidget extends ConsumerWidget {
               shape: const OutlineInputBorder(),
               tileColor: listTileColor(data!),
               onTap: () {
-                if (!data.absent) attendanceNotAbsentError(context);
-                if (!data.absent) return;
-                if (!attendance.attendanceActive) attendanceActiveError(context);
-                if (!attendance.attendanceActive) return;
+                if (!userAttendanceValid(data)) return;
+                if (!attendanceValid()) return;
 
                 _selectedAttendanceProvider.setAttendance = attendance;
                 Navigator.push(
@@ -125,12 +149,19 @@ class AttendanceListButtonWidget extends ConsumerWidget {
                         builder: (context) => const JoinRoomAttendance()));
               },
               leading: const Icon(Icons.date_range, color: Colors.white),
-              title: Column(children: [
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Text(
-                  "Start: " + attendance.dateStart.toString(),
+                  "Start: " +
+                      DateFormat('EEEE, d MMM, yyyy h:mm a')
+                          .format(attendance.dateStart),
                   style: const TextStyle(color: Colors.white),
                 ),
-                Text("End: " + attendance.dateEnd.toString(),
+                Text(
+                    "End: " +
+                        DateFormat('EEEE, d MMM, yyyy h:mm a')
+                            .format(attendance.dateEnd),
                     style: const TextStyle(color: Colors.white))
               ]),
             ),
@@ -139,13 +170,10 @@ class AttendanceListButtonWidget extends ConsumerWidget {
   }
 }
 
-
 // filtered sections
 class FilteredSections extends StatelessWidget {
-  const FilteredSections({
-    Key? key,
-    required this.filterButtons
-  }) : super(key: key);
+  const FilteredSections({Key? key, required this.filterButtons})
+      : super(key: key);
 
   final List<PopupMenuEntry<dynamic>> filterButtons;
 

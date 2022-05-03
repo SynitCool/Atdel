@@ -23,6 +23,10 @@ import 'package:atdel/src/providers/current_user_providers.dart';
 import 'package:atdel/src/providers/selected_attendance_providers.dart';
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:atdel/src/widgets/dialog.dart';
+
 // attend with ml
 class AttendWithML extends StatelessWidget {
   const AttendWithML({Key? key}) : super(key: key);
@@ -31,10 +35,10 @@ class AttendWithML extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: const [
-        // AttendByGalleryButton(),
-        // SizedBox(
-        //   height: 10,
-        // ),
+        AttendByGalleryButton(),
+        SizedBox(
+          height: 10,
+        ),
         AttendByCameraButton()
       ],
     );
@@ -57,72 +61,41 @@ class AttendWithNoMl extends StatelessWidget {
 class AttendByGalleryButton extends ConsumerWidget {
   const AttendByGalleryButton({Key? key}) : super(key: key);
 
-  // show user metric warning
-  Future showUserMetricAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content: const Text(
-            "Cannot classfied well or wrong image, please ask the host to update your photo for taking the attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+
+  // face valid
+  bool detectFaceValid(dynamic detectFaceStatus) {
+    if (detectFaceStatus == "no_face_detected") {
+      toastWidget("There's No Face Detected In Selected Picture!");
+      return false;
+    }
+    if (detectFaceStatus == "more_than_one_face") {
+      toastWidget("Detected More Than 1 Face in Selected Picture!");
+      return false;
+    }
+
+    return true;
   }
 
-  // show no face detected warning
-  Future showNoFaceDetectedAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content: const Text(
-            "Cannot get the face, ask the host to update your photo to take attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+  // classified valid
+  bool classifiedValid(String? detectedUid, String realUid) {
+    if (detectedUid == null) {
+      toastWidget(
+          "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
 
-  // show no face detected warning
-  Future showMoreThanOneFaceAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content: const Text(
-            "The photo has more than one face, ask the host to update your photo to take attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+      return false;
+    }
+    if (detectedUid != realUid) {
+      toastWidget(
+          "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      return false;
+    }
+
+    return true;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     // states
     final _selectedRoomProvider = ref.watch(selectedRoom);
     final _selectedAttendanceProvider = ref.watch(selectedAttendance);
@@ -133,6 +106,8 @@ class AttendByGalleryButton extends ConsumerWidget {
         leading: const Icon(Icons.photo),
         title: const Text("Attend With Image Gallery"),
         onTap: () async {
+          SmartDialog.showLoading();
+
           final _imagePicker = ImagePicker();
           final _userPhotoMetricService = UserPhotoMetricService();
           final _userAttendanceService = UserAttendanceService();
@@ -140,22 +115,19 @@ class AttendByGalleryButton extends ConsumerWidget {
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.gallery);
 
-          if (file == null) return;
+          if (file == null) {
+            SmartDialog.dismiss();
+            return;
+          }
 
-          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+          await _userPhotoMetricService
+              .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
           final _mlService = MLService();
 
           final detectFace = await _mlService.runDetector(File(file.path));
-
-          if (detectFace == "no_face_detected") {
-            showNoFaceDetectedAlert(context);
-            return;
-          }
-          if (detectFace == "more_than_one_face") {
-            showMoreThanOneFaceAlert(context);
-            return;
-          }
+          
+          if (!detectFaceValid(detectFace)) return;
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
@@ -163,19 +135,15 @@ class AttendByGalleryButton extends ConsumerWidget {
               await _userPhotoMetricService.calcSmallestUserSimilarity(
                   _selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            showUserMetricAlert(context);
-          }
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            return;
-          }
+          if (!classifiedValid(
+              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
 
           _userAttendanceService.updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
+
+          SmartDialog.dismiss();
 
           Navigator.pop(context);
         });
@@ -186,67 +154,36 @@ class AttendByGalleryButton extends ConsumerWidget {
 class AttendByCameraButton extends ConsumerWidget {
   const AttendByCameraButton({Key? key}) : super(key: key);
 
-  // show user metric warning
-  Future showUserMetricAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content:
-            const Text("Image for room must be set before take attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  // face valid
+  bool detectFaceValid(dynamic detectFaceStatus) {
+    if (detectFaceStatus == "no_face_detected") {
+      toastWidget("There's No Face Detected In Selected Picture!");
+      return false;
+    }
+    if (detectFaceStatus == "more_than_one_face") {
+      toastWidget("Detected More Than 1 Face in Selected Picture!");
+      return false;
+    }
+
+    return true;
   }
 
-    // show no face detected warning
-  Future showNoFaceDetectedAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content: const Text(
-            "Cannot get the face, ask the host to update your photo to take attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+  // classified valid
+  bool classifiedValid(String? detectedUid, String realUid) {
+    if (detectedUid == null) {
+      toastWidget(
+          "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
 
-  // show no face detected warning
-  Future showMoreThanOneFaceAlert(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(
-          "ERROR",
-          style: TextStyle(color: Colors.red),
-        ),
-        content: const Text(
-            "The photo has more than one face, ask the host to update your photo to take attendance!"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+      return false;
+    }
+    if (detectedUid != realUid) {
+      toastWidget(
+          "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -276,22 +213,19 @@ class AttendByCameraButton extends ConsumerWidget {
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.camera);
 
-          if (file == null) return;
+          if (file == null) {
+            SmartDialog.dismiss();
+            return;
+          }
 
-          await _userPhotoMetricService.updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+          await _userPhotoMetricService
+              .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
           final _mlService = MLService();
 
           final detectFace = await _mlService.runDetector(File(file.path));
-
-          if (detectFace == "no_face_detected") {
-            showNoFaceDetectedAlert(context);
-            return;
-          }
-          if (detectFace == "more_than_one_face") {
-            showMoreThanOneFaceAlert(context);
-            return;
-          }
+          
+          if (!detectFaceValid(detectFace)) return;
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
@@ -299,19 +233,15 @@ class AttendByCameraButton extends ConsumerWidget {
               await _userPhotoMetricService.calcSmallestUserSimilarity(
                   _selectedRoomProvider.room!, runModelMetric);
 
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            showUserMetricAlert(context);
-          }
-          if (detectedUid == null ||
-              detectedUid != _selectedCurrentUserProvider.user!.uid) {
-            return;
-          }
+          if (!classifiedValid(
+              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
 
           _userAttendanceService.updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!);
+
+          SmartDialog.dismiss();
 
           Navigator.pop(context);
         });
@@ -337,10 +267,14 @@ class AttendWithNoMlButton extends ConsumerWidget {
       leading: const Icon(Icons.check),
       title: const Text("Attend"),
       onTap: () async {
+        SmartDialog.showLoading();
+
         _userAttendanceService.updateAbsentUser(
             _selectedCurrentUserProvider.user!,
             _selectedRoomProvider.room!,
             _selectedAttendanceProvider.attendance!);
+
+        SmartDialog.dismiss();
 
         Navigator.pop(context);
       },

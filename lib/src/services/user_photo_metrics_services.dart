@@ -74,7 +74,8 @@ class UserPhotoMetricService {
     // check user photo metric exist
     if (await userPhotoMetricExist(room)) return;
 
-    final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+    final SelectedUsersServices _selectedUsersServices =
+        SelectedUsersServices();
     final StorageService _storageService = StorageService();
 
     // get selected users photo

@@ -10,6 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // providers
 import 'package:atdel/src/providers/selected_room_providers.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 // add selected users to database
 class AddSelectedUsersButton extends ConsumerWidget {
   const AddSelectedUsersButton({Key? key, required this.selectedUsers})
@@ -25,8 +28,12 @@ class AddSelectedUsersButton extends ConsumerWidget {
       padding: const EdgeInsets.all(8.0),
       child: IconButton(
           onPressed: () async {
-            selectedUsersServices.addSelectedUsers(
+            SmartDialog.showLoading();
+
+            await selectedUsersServices.addSelectedUsers(
                 selectedRoomProvider.room!, selectedUsers);
+
+            SmartDialog.dismiss();
 
             Navigator.pop(context);
           },

@@ -10,6 +10,10 @@ import 'package:image_picker/image_picker.dart';
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/add_selected_users_settings.dart';
 
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:atdel/src/widgets/dialog.dart';
+
 // page
 class AddSelectedUsersPage extends StatefulWidget {
   const AddSelectedUsersPage({Key? key}) : super(key: key);
@@ -127,20 +131,60 @@ class _ContentPageState extends State<ContentPage> {
         }),
       );
 
+  // check user alias valid
+  bool userAliasValid() {
+    if (userAliasText.isEmpty) {
+      toastWidget("User Alias Supposed Not To Be Empty!");
+      return false;
+    }
+    if (userAliasText.length < 4) {
+      toastWidget(
+          "User Alias Length Supposed Not To Be Less Than 4 Characters!");
+      return false;
+    }
+    if (userAliasText.length > 12) {
+      toastWidget(
+          "User Alias Length Supposed Not To Be Greater Than 12 Characters!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // check email valid
+  bool emailValid() {
+    if (userEmailText.isEmpty) {
+      toastWidget("User Email Supposed Not To Be Empty!");
+      return false;
+    }
+    if (!userEmailText.contains("@")) {
+      toastWidget("User Email Is Not Valid!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // check user photo valid
+  bool userPhotoValid() {
+    if (userPhoto == null) {
+      toastWidget("User Photo Supposed Not To Be Empty!");
+      return false;
+    }
+
+    return true;
+  }
+
   // add added selected users
   Widget addedSelectedUsersButton() => ElevatedButton.icon(
       icon: const Icon(Icons.add),
       label: const Text("Add"),
       onPressed: () async {
-        if (userAliasText.isEmpty) return;
-        if (userEmailText.isEmpty) return;
+        if (!userAliasValid()) return;
+        if (!emailValid()) return;
+        if (!userPhotoValid()) return;
 
-        if (userAliasText.length < 4) return;
-        if (!userEmailText.contains("@")) return;
-
-        if (userAliasText.length > 12) return;
-
-        if (userPhoto == null) return;
+        SmartDialog.showLoading();
 
         Map<String, dynamic> selectedUser = {
           "alias": userAliasText,
@@ -164,6 +208,8 @@ class _ContentPageState extends State<ContentPage> {
         nameFile = "Upload Photo User";
 
         userPhoto = null;
+
+        SmartDialog.dismiss();
       });
 
   // upload photo user
