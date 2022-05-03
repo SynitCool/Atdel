@@ -20,6 +20,10 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // pages
 import 'package:atdel/src/user_pages/room.dart';
+import 'package:atdel/src/main_pages/home_pages.dart';
+
+// custom widgets
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 // set image button
 class SetImageButton extends ConsumerWidget {
@@ -67,11 +71,14 @@ class LeaveRoomButton extends ConsumerWidget {
       style: ElevatedButton.styleFrom(primary: Colors.red),
       label: const Text("Leave Room"),
       onPressed: () {
-        Navigator.pop(context);
+        SmartDialog.showLoading();
 
         _roomService.leaveRoom(_selectedRoomProvider.room!);
 
-        Navigator.pop(context);
+        SmartDialog.dismiss();
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
       },
     );
   }
