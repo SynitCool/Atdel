@@ -121,6 +121,20 @@ class UserPhotoMetricService {
     await selectedUserMetric.remove();
   }
 
+  // delete user photo metric with uid
+  Future deleteUserPhotoMetricUid(Room room, String uid) async {
+    // database reference
+    final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
+
+    final DatabaseReference reference = _db.ref(photoRoomMetricPath);
+    final DatabaseReference referenceChild =
+        reference.child(usersPhotoMetricReference);
+
+    final selectedUserMetric = referenceChild.child(uid);
+
+    await selectedUserMetric.remove();
+  }
+
   // calculate similarity
   Future<Map<String, dynamic>?> calcSmallestUserSimilarity(
       Room room, List<dynamic> metric) async {

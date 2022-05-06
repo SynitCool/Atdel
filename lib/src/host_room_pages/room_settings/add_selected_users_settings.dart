@@ -2,7 +2,6 @@
 import 'dart:io';
 
 // flutter
-import 'package:atdel/src/app.dart';
 import 'package:flutter/material.dart';
 
 // pick file
@@ -26,7 +25,6 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 
 // model
 import 'package:atdel/src/model/selected_users.dart';
-import 'package:atdel/src/model/room.dart';
 
 // page
 class AddSelectedUsersPage extends StatefulWidget {
@@ -351,6 +349,5 @@ class _ContentPageState extends ConsumerState<ContentPage> {
         ],
       ),
     );
-    ;
   }
 }

@@ -59,11 +59,46 @@ class _AttendWithMLState extends State<AttendWithML> {
                   similarityText = "Similarity: ${value["similarity"]}";
                 })),
         const SizedBox(
+          height: 15,
+        ),
+        const DeleteUserPhotoMetric(),
+        const SizedBox(
           height: 20,
         ),
         Text(similarityText)
       ],
     );
+  }
+}
+
+// delete user photo metric
+class DeleteUserPhotoMetric extends ConsumerWidget {
+  const DeleteUserPhotoMetric({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
+    // states
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedCurrentUserProvider = ref.watch(currentUser);
+
+    return ListTile(
+        shape: const OutlineInputBorder(),
+        leading: const Icon(Icons.refresh),
+        title: const Text("Refresh User Photo Metric"),
+        onTap: () async {
+          SmartDialog.showLoading();
+
+          await userPhotoMetricService.deleteUserPhotoMetricUid(
+              _selectedRoomProvider.room!,
+              _selectedCurrentUserProvider.user!.uid);
+
+          SmartDialog.dismiss();
+
+          // Navigator.pop(context);
+        });
   }
 }
 
@@ -119,16 +154,24 @@ class AttendByGalleryButton extends ConsumerWidget {
   }
 
   // classified valid
-  bool classifiedValid(String? detectedUid, String realUid) {
+  bool classifiedValid(
+      Room room, String uid, String? detectedUid, String realUid) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
     if (detectedUid == null) {
       toastWidget(
           "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
     if (detectedUid != realUid) {
       toastWidget(
           "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
@@ -154,7 +197,8 @@ class AttendByGalleryButton extends ConsumerWidget {
 
     callback(detected);
 
-    if (!classifiedValid(detected!["id"], currentUser.uid)) return;
+    if (!classifiedValid(
+        room, currentUser.uid, detected!["id"], currentUser.uid)) return;
 
     // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
@@ -228,16 +272,24 @@ class AttendByCameraButton extends ConsumerWidget {
   }
 
   // classified valid
-  bool classifiedValid(String? detectedUid, String realUid) {
+  bool classifiedValid(
+      Room room, String uid, String? detectedUid, String realUid) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
     if (detectedUid == null) {
       toastWidget(
           "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
     if (detectedUid != realUid) {
       toastWidget(
           "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
@@ -263,7 +315,7 @@ class AttendByCameraButton extends ConsumerWidget {
 
     callback(detected);
 
-    if (!classifiedValid(detected!["id"], currentUser.uid)) return;
+    if (!classifiedValid(room, currentUser.uid, detected!["id"], currentUser.uid)) return;
 
     // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
