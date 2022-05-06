@@ -27,7 +27,7 @@ class _JoinRoomAttendanceState extends ConsumerState<JoinRoomAttendance> {
       appBar: AppBar(title: const Text("Join Room Attendance")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: attendanceWithMl ? const AttendWithML() : const AttendWithNoMl(),
+        child: attendanceWithMl ? const AttendWithML() : const AttendWithNoMl() 
       ),
     );
   }

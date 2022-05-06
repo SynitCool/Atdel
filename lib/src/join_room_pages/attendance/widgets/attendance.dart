@@ -32,23 +32,55 @@ import 'package:atdel/src/model/user.dart';
 import 'package:atdel/src/model/room.dart';
 import 'package:atdel/src/model/attendance.dart';
 
-// attend with ml
-class AttendWithML extends StatelessWidget {
+// dev attend with ml
+class AttendWithML extends StatefulWidget {
   const AttendWithML({Key? key}) : super(key: key);
+
+  @override
+  State<AttendWithML> createState() => _AttendWithMLState();
+}
+
+class _AttendWithMLState extends State<AttendWithML> {
+  String similarityText = "No Similarity";
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: const [
-        AttendByGalleryButton(),
-        SizedBox(
+      children: [
+        AttendByGalleryButton(
+            callback: (value) => setState(() {
+                  similarityText = "Similarity: ${value["similarity"]}";
+                })),
+        const SizedBox(
           height: 10,
         ),
-        AttendByCameraButton()
+        const AttendByCameraButton(),
+        const SizedBox(
+          height: 20,
+        ),
+        Text(similarityText)
       ],
     );
   }
 }
+
+// attend with ml
+// class AttendWithML extends StatelessWidget {
+//   const AttendWithML({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       children: [
+//         AttendByGalleryButton(callback: callback),
+//         const SizedBox(
+//           height: 10,
+//         ),
+//         const AttendByCameraButton()
+//       ],
+//     );
+//   }
+// }
 
 // attend with no ml
 class AttendWithNoMl extends StatelessWidget {
@@ -64,7 +96,10 @@ class AttendWithNoMl extends StatelessWidget {
 
 // attend with image by gallery
 class AttendByGalleryButton extends ConsumerWidget {
-  const AttendByGalleryButton({Key? key}) : super(key: key);
+  const AttendByGalleryButton({Key? key, required this.callback})
+      : super(key: key);
+
+  final Function callback;
 
   // face valid
   bool detectFaceValid(dynamic detectFaceStatus) {
@@ -111,10 +146,12 @@ class AttendByGalleryButton extends ConsumerWidget {
 
     final runModelMetric = await _mlService.runModel(detectFace);
 
-    final detectedUid = await _userPhotoMetricService
-        .calcSmallestUserSimilarity(room, runModelMetric);
+    final detected = await _userPhotoMetricService.calcSmallestUserSimilarity(
+        room, runModelMetric);
 
-    if (!classifiedValid(detectedUid, currentUser.uid)) return;
+    callback(detected);
+
+    if (!classifiedValid(detected!["id"], currentUser.uid)) return;
 
     // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
@@ -239,12 +276,12 @@ class AttendByCameraButton extends ConsumerWidget {
 
           final runModelMetric = await _mlService.runModel(detectFace);
 
-          final detectedUid =
+          final detected =
               await _userPhotoMetricService.calcSmallestUserSimilarity(
                   _selectedRoomProvider.room!, runModelMetric);
 
           if (!classifiedValid(
-              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
+              detected!["id"], _selectedCurrentUserProvider.user!.uid)) return;
 
           _userAttendanceService.updateAbsentUser(
               _selectedCurrentUserProvider.user!,

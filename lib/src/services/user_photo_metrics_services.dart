@@ -122,7 +122,7 @@ class UserPhotoMetricService {
   }
 
   // calculate similarity
-  Future<String?> calcSmallestUserSimilarity(
+  Future<Map<String, dynamic>?> calcSmallestUserSimilarity(
       Room room, List<dynamic> metric) async {
     // database reference
     final String photoRoomMetricPath = "$rootRoomReference/${room.id}";
@@ -157,11 +157,9 @@ class UserPhotoMetricService {
       smallestUserUid = key;
     });
 
-    print("Smallest Similarity: $smallestSimilarity");
+    // if (smallestSimilarity! > 1) return null;
 
-    if (smallestSimilarity! > 0.7) return null;
-
-    return smallestUserUid;
+    return {"id": smallestUserUid, "similarity": smallestSimilarity};
   }
 
   // delete room user photo metric
