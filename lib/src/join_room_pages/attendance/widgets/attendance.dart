@@ -184,8 +184,14 @@ class AttendByGalleryButton extends ConsumerWidget {
             return;
           }
 
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
+
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
 
           updateAbsentUser(
               _selectedCurrentUserProvider.user!,
@@ -296,8 +302,14 @@ class AttendByCameraButton extends ConsumerWidget {
             return;
           }
 
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
+
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
 
           updateAbsentUser(
               _selectedCurrentUserProvider.user!,
