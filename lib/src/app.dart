@@ -13,15 +13,13 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
         child: MaterialApp(
-          title: "Atdel", 
-          home: const InitializePages(),
-          navigatorObservers: [FlutterSmartDialog.observer],
-          builder: FlutterSmartDialog.init()
-          ));
+            title: "Atdel",
+            home: const InitializePages(),
+            navigatorObservers: [FlutterSmartDialog.observer],
+            builder: FlutterSmartDialog.init()));
   }
 }

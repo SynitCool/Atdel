@@ -27,23 +27,98 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:atdel/src/widgets/dialog.dart';
 
-// attend with ml
-class AttendWithML extends StatelessWidget {
+// model
+import 'package:atdel/src/model/user.dart';
+import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/attendance.dart';
+
+// dev attend with ml
+class AttendWithML extends StatefulWidget {
   const AttendWithML({Key? key}) : super(key: key);
+
+  @override
+  State<AttendWithML> createState() => _AttendWithMLState();
+}
+
+class _AttendWithMLState extends State<AttendWithML> {
+  String similarityText = "No Similarity";
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: const [
-        AttendByGalleryButton(),
-        SizedBox(
+      children: [
+        AttendByGalleryButton(
+            callback: (value) => setState(() {
+                  similarityText = "Similarity: ${value["similarity"]}";
+                })),
+        const SizedBox(
           height: 10,
         ),
-        AttendByCameraButton()
+        AttendByCameraButton(
+            callback: (value) => setState(() {
+                  similarityText = "Similarity: ${value["similarity"]}";
+                })),
+        const SizedBox(
+          height: 15,
+        ),
+        const DeleteUserPhotoMetric(),
+        const SizedBox(
+          height: 20,
+        ),
+        Text(similarityText)
       ],
     );
   }
 }
+
+// delete user photo metric
+class DeleteUserPhotoMetric extends ConsumerWidget {
+  const DeleteUserPhotoMetric({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
+    // states
+    final _selectedRoomProvider = ref.watch(selectedRoom);
+    final _selectedCurrentUserProvider = ref.watch(currentUser);
+
+    return ListTile(
+        shape: const OutlineInputBorder(),
+        leading: const Icon(Icons.refresh),
+        title: const Text("Refresh User Photo Metric"),
+        onTap: () async {
+          SmartDialog.showLoading();
+
+          await userPhotoMetricService.deleteUserPhotoMetricUid(
+              _selectedRoomProvider.room!,
+              _selectedCurrentUserProvider.user!.uid);
+
+          SmartDialog.dismiss();
+
+          // Navigator.pop(context);
+        });
+  }
+}
+
+// attend with ml
+// class AttendWithML extends StatelessWidget {
+//   const AttendWithML({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       children: [
+//         AttendByGalleryButton(callback: callback),
+//         const SizedBox(
+//           height: 10,
+//         ),
+//         const AttendByCameraButton()
+//       ],
+//     );
+//   }
+// }
 
 // attend with no ml
 class AttendWithNoMl extends StatelessWidget {
@@ -59,8 +134,10 @@ class AttendWithNoMl extends StatelessWidget {
 
 // attend with image by gallery
 class AttendByGalleryButton extends ConsumerWidget {
-  const AttendByGalleryButton({Key? key}) : super(key: key);
+  const AttendByGalleryButton({Key? key, required this.callback})
+      : super(key: key);
 
+  final Function callback;
 
   // face valid
   bool detectFaceValid(dynamic detectFaceStatus) {
@@ -77,10 +154,16 @@ class AttendByGalleryButton extends ConsumerWidget {
   }
 
   // classified valid
-  bool classifiedValid(String? detectedUid, String realUid) {
+  bool classifiedValid(
+      Room room, String uid, String? detectedUid, String realUid) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
     if (detectedUid == null) {
       toastWidget(
           "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
@@ -88,10 +171,36 @@ class AttendByGalleryButton extends ConsumerWidget {
       toastWidget(
           "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
 
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
+
       return false;
     }
 
     return true;
+  }
+
+  // update absent user
+  void updateAbsentUser(User currentUser, Room room, Attendance attendance,
+      String filePath) async {
+    final _mlService = MLService();
+    final _userPhotoMetricService = UserPhotoMetricService();
+    // final _userAttendanceService = UserAttendanceService();
+
+    final detectFace = await _mlService.runDetector(File(filePath));
+
+    if (!detectFaceValid(detectFace)) return;
+
+    final runModelMetric = await _mlService.runModel(detectFace);
+
+    final detected = await _userPhotoMetricService.calcSmallestUserSimilarity(
+        room, runModelMetric);
+
+    callback(detected);
+
+    if (!classifiedValid(
+        room, currentUser.uid, detected!["id"], currentUser.uid)) return;
+
+    // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
 
   @override
@@ -110,7 +219,6 @@ class AttendByGalleryButton extends ConsumerWidget {
 
           final _imagePicker = ImagePicker();
           final _userPhotoMetricService = UserPhotoMetricService();
-          final _userAttendanceService = UserAttendanceService();
 
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.gallery);
@@ -120,39 +228,34 @@ class AttendByGalleryButton extends ConsumerWidget {
             return;
           }
 
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
+
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
-          final _mlService = MLService();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
 
-          final detectFace = await _mlService.runDetector(File(file.path));
-          
-          if (!detectFaceValid(detectFace)) return;
-
-          final runModelMetric = await _mlService.runModel(detectFace);
-
-          final detectedUid =
-              await _userPhotoMetricService.calcSmallestUserSimilarity(
-                  _selectedRoomProvider.room!, runModelMetric);
-
-          if (!classifiedValid(
-              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
-
-          _userAttendanceService.updateAbsentUser(
+          updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
-              _selectedAttendanceProvider.attendance!);
+              _selectedAttendanceProvider.attendance!,
+              file.path);
 
           SmartDialog.dismiss();
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
         });
   }
 }
 
 // attend with image by camera
 class AttendByCameraButton extends ConsumerWidget {
-  const AttendByCameraButton({Key? key}) : super(key: key);
+  const AttendByCameraButton({Key? key, required this.callback})
+      : super(key: key);
+
+  final Function callback;
 
   // face valid
   bool detectFaceValid(dynamic detectFaceStatus) {
@@ -169,10 +272,16 @@ class AttendByCameraButton extends ConsumerWidget {
   }
 
   // classified valid
-  bool classifiedValid(String? detectedUid, String realUid) {
+  bool classifiedValid(
+      Room room, String uid, String? detectedUid, String realUid) {
+    final UserPhotoMetricService userPhotoMetricService =
+        UserPhotoMetricService();
+
     if (detectedUid == null) {
       toastWidget(
           "Cannot Be Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
+
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
 
       return false;
     }
@@ -180,10 +289,35 @@ class AttendByCameraButton extends ConsumerWidget {
       toastWidget(
           "Wrong Classified. Change The Selected Picture Or Ask Host To Change Your Picture!");
 
+      userPhotoMetricService.deleteUserPhotoMetricUid(room, uid);
+
       return false;
     }
 
     return true;
+  }
+
+  // update absent user
+  void updateAbsentUser(User currentUser, Room room, Attendance attendance,
+      String filePath) async {
+    final _mlService = MLService();
+    final _userPhotoMetricService = UserPhotoMetricService();
+    // final _userAttendanceService = UserAttendanceService();
+
+    final detectFace = await _mlService.runDetector(File(filePath));
+
+    if (!detectFaceValid(detectFace)) return;
+
+    final runModelMetric = await _mlService.runModel(detectFace);
+
+    final detected = await _userPhotoMetricService.calcSmallestUserSimilarity(
+        room, runModelMetric);
+
+    callback(detected);
+
+    if (!classifiedValid(room, currentUser.uid, detected!["id"], currentUser.uid)) return;
+
+    // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
 
   @override
@@ -206,9 +340,11 @@ class AttendByCameraButton extends ConsumerWidget {
             if (permissionStatus.isDenied) return;
           }
 
+          SmartDialog.showLoading();
+
           final _imagePicker = ImagePicker();
           final _userPhotoMetricService = UserPhotoMetricService();
-          final _userAttendanceService = UserAttendanceService();
+          // final _userAttendanceService = UserAttendanceService();
 
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.camera);
@@ -218,32 +354,24 @@ class AttendByCameraButton extends ConsumerWidget {
             return;
           }
 
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
+
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
-          final _mlService = MLService();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
 
-          final detectFace = await _mlService.runDetector(File(file.path));
-          
-          if (!detectFaceValid(detectFace)) return;
-
-          final runModelMetric = await _mlService.runModel(detectFace);
-
-          final detectedUid =
-              await _userPhotoMetricService.calcSmallestUserSimilarity(
-                  _selectedRoomProvider.room!, runModelMetric);
-
-          if (!classifiedValid(
-              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
-
-          _userAttendanceService.updateAbsentUser(
+          updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
-              _selectedAttendanceProvider.attendance!);
+              _selectedAttendanceProvider.attendance!,
+              file.path);
 
           SmartDialog.dismiss();
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
         });
   }
 }
