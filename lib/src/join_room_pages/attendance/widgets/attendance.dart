@@ -27,6 +27,11 @@ import 'package:atdel/src/providers/selected_room_providers.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:atdel/src/widgets/dialog.dart';
 
+// model
+import 'package:atdel/src/model/user.dart';
+import 'package:atdel/src/model/room.dart';
+import 'package:atdel/src/model/attendance.dart';
+
 // attend with ml
 class AttendWithML extends StatelessWidget {
   const AttendWithML({Key? key}) : super(key: key);
@@ -61,7 +66,6 @@ class AttendWithNoMl extends StatelessWidget {
 class AttendByGalleryButton extends ConsumerWidget {
   const AttendByGalleryButton({Key? key}) : super(key: key);
 
-
   // face valid
   bool detectFaceValid(dynamic detectFaceStatus) {
     if (detectFaceStatus == "no_face_detected") {
@@ -94,6 +98,27 @@ class AttendByGalleryButton extends ConsumerWidget {
     return true;
   }
 
+  // update absent user
+  void updateAbsentUser(User currentUser, Room room, Attendance attendance,
+      String filePath) async {
+    final _mlService = MLService();
+    final _userPhotoMetricService = UserPhotoMetricService();
+    // final _userAttendanceService = UserAttendanceService();
+
+    final detectFace = await _mlService.runDetector(File(filePath));
+
+    if (!detectFaceValid(detectFace)) return;
+
+    final runModelMetric = await _mlService.runModel(detectFace);
+
+    final detectedUid = await _userPhotoMetricService
+        .calcSmallestUserSimilarity(room, runModelMetric);
+
+    if (!classifiedValid(detectedUid, currentUser.uid)) return;
+
+    // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // states
@@ -110,7 +135,6 @@ class AttendByGalleryButton extends ConsumerWidget {
 
           final _imagePicker = ImagePicker();
           final _userPhotoMetricService = UserPhotoMetricService();
-          final _userAttendanceService = UserAttendanceService();
 
           final XFile? file =
               await _imagePicker.pickImage(source: ImageSource.gallery);
@@ -123,29 +147,15 @@ class AttendByGalleryButton extends ConsumerWidget {
           await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
 
-          final _mlService = MLService();
-
-          final detectFace = await _mlService.runDetector(File(file.path));
-          
-          if (!detectFaceValid(detectFace)) return;
-
-          final runModelMetric = await _mlService.runModel(detectFace);
-
-          final detectedUid =
-              await _userPhotoMetricService.calcSmallestUserSimilarity(
-                  _selectedRoomProvider.room!, runModelMetric);
-
-          if (!classifiedValid(
-              detectedUid, _selectedCurrentUserProvider.user!.uid)) return;
-
-          _userAttendanceService.updateAbsentUser(
+          updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
-              _selectedAttendanceProvider.attendance!);
+              _selectedAttendanceProvider.attendance!,
+              file.path);
 
           SmartDialog.dismiss();
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
         });
   }
 }
@@ -224,7 +234,7 @@ class AttendByCameraButton extends ConsumerWidget {
           final _mlService = MLService();
 
           final detectFace = await _mlService.runDetector(File(file.path));
-          
+
           if (!detectFaceValid(detectFace)) return;
 
           final runModelMetric = await _mlService.runModel(detectFace);

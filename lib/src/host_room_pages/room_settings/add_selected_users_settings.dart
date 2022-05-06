@@ -2,6 +2,7 @@
 import 'dart:io';
 
 // flutter
+import 'package:atdel/src/app.dart';
 import 'package:flutter/material.dart';
 
 // pick file
@@ -10,9 +11,22 @@ import 'package:image_picker/image_picker.dart';
 // widgets
 import 'package:atdel/src/host_room_pages/room_settings/widgets/add_selected_users_settings.dart';
 
+// services
+import 'package:atdel/src/services/selected_users_services.dart';
+
 // custom widgets
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:atdel/src/widgets/dialog.dart';
+
+// state management
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// providers
+import 'package:atdel/src/providers/selected_room_providers.dart';
+
+// model
+import 'package:atdel/src/model/selected_users.dart';
+import 'package:atdel/src/model/room.dart';
 
 // page
 class AddSelectedUsersPage extends StatefulWidget {
@@ -44,16 +58,19 @@ class _AddSelectedUsersPageState extends State<AddSelectedUsersPage> {
 }
 
 // content
-class ContentPage extends StatefulWidget {
+class ContentPage extends ConsumerStatefulWidget {
   const ContentPage({Key? key, required this.callback}) : super(key: key);
 
   final Function callback;
 
   @override
-  State<ContentPage> createState() => _ContentPageState();
+  ConsumerState<ContentPage> createState() => _ContentPageState();
 }
 
-class _ContentPageState extends State<ContentPage> {
+class _ContentPageState extends ConsumerState<ContentPage> {
+  // services
+  final SelectedUsersServices _selectedUsersServices = SelectedUsersServices();
+
   // controller
   final TextEditingController userAliasController = TextEditingController();
   final TextEditingController userEmailController = TextEditingController();
@@ -66,6 +83,11 @@ class _ContentPageState extends State<ContentPage> {
   XFile? userPhoto;
 
   List<Map<String, dynamic>> addedSelectedUsers = [];
+  List<String> usersAlias = [];
+  List<String> usersEmail = [];
+
+  // selected users in database
+  List<SelectedUsers> selectedUsersDatabase = [];
 
   // name text widget
   String nameFile = "Upload Photo User";
@@ -175,14 +197,39 @@ class _ContentPageState extends State<ContentPage> {
     return true;
   }
 
+  // check duplicate user
+  bool duplicateUser() {
+    if (usersAlias.contains(userAliasText)) {
+      toastWidget("User Alias Supposed To Be Unique!");
+      return true;
+    }
+    if (usersEmail.contains(userEmailText)) {
+      toastWidget("User Email Supposed To Be Unique!");
+      return true;
+    }
+
+    return false;
+  }
+
   // add added selected users
   Widget addedSelectedUsersButton() => ElevatedButton.icon(
       icon: const Icon(Icons.add),
       label: const Text("Add"),
       onPressed: () async {
+        final selectedRoomProvider = ref.watch(selectedRoom);
+
+        if (selectedUsersDatabase.isEmpty) {
+          selectedUsersDatabase = await _selectedUsersServices
+              .getSelectedUsers(selectedRoomProvider.room!);
+
+          usersAlias.addAll(selectedUsersDatabase.map((data) => data.alias));
+          usersEmail.addAll(selectedUsersDatabase.map((data) => data.email));
+        }
+
         if (!userAliasValid()) return;
         if (!emailValid()) return;
         if (!userPhotoValid()) return;
+        if (duplicateUser()) return;
 
         SmartDialog.showLoading();
 
@@ -197,6 +244,8 @@ class _ContentPageState extends State<ContentPage> {
 
         setState(() {
           addedSelectedUsers.add(selectedUser);
+          usersAlias.add(userAliasText);
+          usersEmail.add(userEmailText);
           userPhoto = null;
         });
 
@@ -262,6 +311,9 @@ class _ContentPageState extends State<ContentPage> {
                             addedSelectedUsers.removeAt(index);
                           });
 
+                          usersAlias.remove(currentData["alias"]);
+                          usersEmail.remove(currentData["email"]);
+
                           widget.callback(addedSelectedUsers);
                         }),
                     title: Row(
@@ -299,5 +351,6 @@ class _ContentPageState extends State<ContentPage> {
         ],
       ),
     );
+    ;
   }
 }

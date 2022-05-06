@@ -17,6 +17,22 @@ class SelectedUsersServices {
 
   final String rootRoomsCollection = "rooms";
 
+  // get selected users
+  Future<List<SelectedUsers>> getSelectedUsers(Room room) async {
+    // collection
+    final CollectionReference<Map<String, dynamic>> selectedUsersCollection =
+        _db.collection("$rootRoomsCollection/${room.id}/selected_users");
+
+    // get selected users
+    final getSelectedUsers = await selectedUsersCollection.get();
+
+    final selectedUsersInObject = getSelectedUsers.docs
+        .map((data) => SelectedUsers.fromFireStore(data))
+        .toList();
+
+    return selectedUsersInObject;
+  }
+
   // deleate all selected users
   Future deleteSelectedUsers(Room room) async {
     // collection
@@ -82,7 +98,7 @@ class SelectedUsersServices {
   Future removeSelectedUsers(Room room, SelectedUsers selectedUsers) async {
     final StorageService _storageService = StorageService();
     final UserPhotoMetricService _userPhotoMetricService =
-      UserPhotoMetricService();
+        UserPhotoMetricService();
 
     // collection
     final collectionPath = "$rootRoomsCollection/${room.id}/selected_users";
