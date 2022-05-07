@@ -140,13 +140,15 @@ class AttendByGalleryButton extends ConsumerWidget {
   final Function callback;
 
   // face valid
-  bool detectFaceValid(dynamic detectFaceStatus) {
+  bool detectFaceValid(dynamic detectFaceStatus, {String addMessage = ""}) {
     if (detectFaceStatus == "no_face_detected") {
-      toastWidget("There's No Face Detected In Selected Picture!");
+      toastWidget(
+          "There's No Face Detected In Selected Picture! " + addMessage);
       return false;
     }
     if (detectFaceStatus == "more_than_one_face") {
-      toastWidget("Detected More Than 1 Face in Selected Picture!");
+      toastWidget(
+          "Detected More Than 1 Face in Selected Picture! " + addMessage);
       return false;
     }
 
@@ -184,11 +186,13 @@ class AttendByGalleryButton extends ConsumerWidget {
       String filePath) async {
     final _mlService = MLService();
     final _userPhotoMetricService = UserPhotoMetricService();
-    // final _userAttendanceService = UserAttendanceService();
+    final _userAttendanceService = UserAttendanceService();
 
     final detectFace = await _mlService.runDetector(File(filePath));
 
-    if (!detectFaceValid(detectFace)) return;
+    if (!detectFaceValid(detectFace,
+        addMessage: "Please Attend With One Face Only!")) return;
+
 
     final runModelMetric = await _mlService.runModel(detectFace);
 
@@ -200,7 +204,7 @@ class AttendByGalleryButton extends ConsumerWidget {
     if (!classifiedValid(
         room, currentUser.uid, detected!["id"], currentUser.uid)) return;
 
-    // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
+    _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
 
   @override
@@ -231,17 +235,30 @@ class AttendByGalleryButton extends ConsumerWidget {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
 
-          await _userPhotoMetricService
+          final statusUpdatingPhoto = await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          if (!detectFaceValid(statusUpdatingPhoto,
+              addMessage:
+                  "Ask Host To Change Your Photo Of You With One Face Only!")) {
+            SmartDialog.dismiss();
+            return;
+          }
 
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Classifying User")));
 
           updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!,
               file.path);
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Done Classifying User")));
 
           SmartDialog.dismiss();
 
@@ -258,13 +275,15 @@ class AttendByCameraButton extends ConsumerWidget {
   final Function callback;
 
   // face valid
-  bool detectFaceValid(dynamic detectFaceStatus) {
+  bool detectFaceValid(dynamic detectFaceStatus, {String addMessage = ""}) {
     if (detectFaceStatus == "no_face_detected") {
-      toastWidget("There's No Face Detected In Selected Picture!");
+      toastWidget(
+          "There's No Face Detected In Selected Picture! " + addMessage);
       return false;
     }
     if (detectFaceStatus == "more_than_one_face") {
-      toastWidget("Detected More Than 1 Face in Selected Picture!");
+      toastWidget(
+          "Detected More Than 1 Face in Selected Picture! " + addMessage);
       return false;
     }
 
@@ -302,7 +321,7 @@ class AttendByCameraButton extends ConsumerWidget {
       String filePath) async {
     final _mlService = MLService();
     final _userPhotoMetricService = UserPhotoMetricService();
-    // final _userAttendanceService = UserAttendanceService();
+    final _userAttendanceService = UserAttendanceService();
 
     final detectFace = await _mlService.runDetector(File(filePath));
 
@@ -315,9 +334,10 @@ class AttendByCameraButton extends ConsumerWidget {
 
     callback(detected);
 
-    if (!classifiedValid(room, currentUser.uid, detected!["id"], currentUser.uid)) return;
+    if (!classifiedValid(
+        room, currentUser.uid, detected!["id"], currentUser.uid)) return;
 
-    // _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
+    _userAttendanceService.updateAbsentUser(currentUser, room, attendance);
   }
 
   @override
@@ -357,17 +377,30 @@ class AttendByCameraButton extends ConsumerWidget {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Updating Photo!")));
 
-          await _userPhotoMetricService
+          final statusUpdatingPhoto = await _userPhotoMetricService
               .updateWithSelectedUsersPhoto(_selectedRoomProvider.room!);
+
+          if (!detectFaceValid(statusUpdatingPhoto,
+              addMessage:
+                  "Ask Host To Change Your Photo Of You With One Face Only!")) {
+            SmartDialog.dismiss();
+            return;
+          }
 
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Photo Updated!")));
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Classifying User")));
 
           updateAbsentUser(
               _selectedCurrentUserProvider.user!,
               _selectedRoomProvider.room!,
               _selectedAttendanceProvider.attendance!,
               file.path);
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Done Classifying User")));
 
           SmartDialog.dismiss();
 
