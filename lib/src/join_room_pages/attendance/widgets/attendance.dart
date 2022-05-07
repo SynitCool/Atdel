@@ -47,13 +47,13 @@ class _AttendWithMLState extends State<AttendWithML> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        AttendByGalleryButton(
-            callback: (value) => setState(() {
-                  similarityText = "Similarity: ${value["similarity"]}";
-                })),
-        const SizedBox(
-          height: 10,
-        ),
+        // AttendByGalleryButton(
+        //     callback: (value) => setState(() {
+        //           similarityText = "Similarity: ${value["similarity"]}";
+        //         })),
+        // const SizedBox(
+        //   height: 10,
+        // ),
         AttendByCameraButton(
             callback: (value) => setState(() {
                   similarityText = "Similarity: ${value["similarity"]}";
@@ -61,7 +61,7 @@ class _AttendWithMLState extends State<AttendWithML> {
         const SizedBox(
           height: 15,
         ),
-        const DeleteUserPhotoMetric(),
+        // const DeleteUserPhotoMetric(),
         const SizedBox(
           height: 20,
         ),
@@ -191,7 +191,7 @@ class AttendByGalleryButton extends ConsumerWidget {
     final detectFace = await _mlService.runDetector(File(filePath));
 
     if (!detectFaceValid(detectFace,
-        addMessage: "Please Attend With One Face Only!")) return;
+        addMessage: "Please Attend With Your Photo Face Only!")) return;
 
 
     final runModelMetric = await _mlService.runModel(detectFace);
@@ -325,7 +325,8 @@ class AttendByCameraButton extends ConsumerWidget {
 
     final detectFace = await _mlService.runDetector(File(filePath));
 
-    if (!detectFaceValid(detectFace)) return;
+    if (!detectFaceValid(detectFace,
+        addMessage: "Please Attend With Your Face Only!")) return;
 
     final runModelMetric = await _mlService.runModel(detectFace);
 
