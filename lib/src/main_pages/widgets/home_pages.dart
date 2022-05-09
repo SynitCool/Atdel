@@ -4,11 +4,6 @@ import 'package:flutter/material.dart';
 // firebase
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// home pages feature
-// import 'package:atdel/src/main_pages/widgets/create_room_pages.dart';
-// import 'package:atdel/src/main_pages/widgets/join_room_page.dart';
-import 'package:atdel/src/main_pages/home_settings/settings_pages.dart';
-
 // host room control
 import 'package:atdel/src/host_room_pages/host_room_pages.dart';
 
@@ -36,6 +31,7 @@ import 'package:atdel/src/providers/selected_user_room_providers.dart';
 // pages
 import 'package:atdel/src/main_pages/create_room/create_room_page.dart';
 import 'package:atdel/src/main_pages/join_room/join_room_page.dart';
+import 'package:atdel/src/main_pages/home_settings/settings_pages.dart';
 
 // skeleton
 import 'package:skeleton_text/skeleton_text.dart';
@@ -301,12 +297,20 @@ class CustomAppBar extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                TextWidget(
+              children: [
+                const TextWidget(
                     text: "Atdel",
                     fontSize: 24,
                     color: Colors.white,
-                    fontWeight: FontWeight.w600)
+                    fontWeight: FontWeight.w600),
+                IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPages()));
+                    },
+                    icon: const Icon(Icons.settings, color: Colors.white)),
               ],
             ),
             Row(
