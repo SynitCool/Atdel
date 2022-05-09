@@ -1,8 +1,8 @@
 // flutter
 import 'package:flutter/material.dart';
 
-// // dart
-// import 'dart:html' as html;
+// launcher
+import 'package:url_launcher/url_launcher.dart';
 
 // icons
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,14 +34,19 @@ class ContentPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView(
-        children:  const [
-          FindUsTitle(),
-          // ...socialMedia.map((data) => LogoButton(
-          //     icon: data["icon"],
-          //     text: data["title"],
-          //     onPressed: () {
-          //       html.window.open(data["link"], data["title"]);
-          //     }))
+        children: [
+          const CreditsTitle(),
+          const CreditsContent(credits: credits),
+          const SizedBox(height: 20),
+          const FindUsTitle(),
+          ...socialMedia.map((data) => LogoButton(
+              icon: data["icon"],
+              text: data["title"],
+              onPressed: () async {
+                final Uri _url = Uri.parse(data["link"]);
+
+                if (!await launchUrl(_url)) throw 'Could not launch $_url';
+              }))
         ],
       ),
     );
@@ -65,4 +70,11 @@ const List<Map<String, dynamic>> socialMedia = [
     "link": "https://synitcool.github.io/Atdel/",
     "title": "Website"
   },
+];
+
+// credits
+const List<Map<String, dynamic>> credits = [
+  {"theme": "Template", "credit": "FlutterAwesome"},
+  {"theme": "Flutter", "credit": "Google"},
+  {"theme": "Thied Party Library", "credit": "Pub Dart"},
 ];

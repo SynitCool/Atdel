@@ -36,3 +36,48 @@ class FindUsTitle extends StatelessWidget {
     );
   }
 }
+
+// credits title
+class CreditsTitle extends StatelessWidget {
+  const CreditsTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      "Credits",
+      style: TextStyle(fontSize: 24, color: Colors.grey),
+    );
+  }
+}
+
+// credits content
+class CreditsContent extends StatelessWidget {
+  const CreditsContent({Key? key, required this.credits}) : super(key: key);
+
+  final List<Map<String, dynamic>> credits;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text("Thank you for third party library for making this app happened"),
+        const SizedBox(height: 20),
+        ...credits.map((data) => Credits(theme: data["theme"], credit: data["credit"]))
+      ],
+    );
+  }
+}
+
+// credits
+class Credits extends StatelessWidget {
+  const Credits({Key? key, required this.theme, required this.credit})
+      : super(key: key);
+
+  final String theme;
+  final String credit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text("$theme By $credit");
+  }
+}
