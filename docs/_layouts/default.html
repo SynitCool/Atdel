@@ -65,6 +65,12 @@
               <small>Download</small>
               .tar.gz file
             </a>
+            {% if site.github.releases[0].assets[0].name == "app-release.apk" %}
+              <a href="{{site.github.releases[0].assets[0].browser_download_url}}" class="button">
+                <small>Download</small>
+                .apk file
+              </a>
+            {% endif %}
           {% endif %}
 
           {% if site.github.is_project_page %}
