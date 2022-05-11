@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // pages
 import 'package:atdel/src/initialize_pages/initialize_pages.dart';
+import 'package:atdel/src/main_pages/home_settings/credits_pages.dart';
 
 // authentication
 import 'package:atdel/src/authentication/google_authentication.dart';
@@ -59,6 +60,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 infoCount: 0,
                 onTap: () {
                   Navigator.pop(context);
+                },
+              ),
+              CustomListTile(
+                isCollapsed: _isCollapsed,
+                icon: Icons.settings,
+                title: "Settings",
+                infoCount: 0,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CreditsPage()));
                 },
               ),
               const Divider(color: Colors.grey),
